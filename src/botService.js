@@ -80,6 +80,38 @@ function isGreetingOnly(normalizedText) {
   return normalizedText.length <= 80;
 }
 
+function looksLikeNewCaseIntent(normalizedText) {
+  const restartPhrases = [
+    "otro caso",
+    "nueva consulta",
+    "nuevo caso",
+    "ahora",
+    "tambien",
+    "adicional",
+    "otra persona",
+  ];
+  const caseSignals = [
+    "fallecio",
+    "murio",
+    "mataron",
+    "esposo",
+    "esposa",
+    "companero",
+    "pareja",
+    "hijo",
+    "hija",
+    "padre",
+    "madre",
+    "cedula",
+    "pension",
+  ];
+
+  return (
+    restartPhrases.some((token) => normalizedText.includes(token)) &&
+    caseSignals.some((token) => normalizedText.includes(token))
+  );
+}
+
 async function handleInbound(payload, options = {}) {
   const sendOutbound = options.sendMessage || sendMessage;
   const onBotMessage = options.onBotMessage || (() => {});
@@ -119,12 +151,31 @@ async function handleInbound(payload, options = {}) {
   }
 
   if (conv.status === "pending_legal_review") {
+    if (looksLikeNewCaseIntent(normalizedText)) {
+      const reopenMsg =
+        "Perfecto, iniciamos un nuevo caso. Para revisarlo necesito por favor la cedula del fallecido y la fecha exacta de fallecimiento (dia, mes y ano).";
+      await sendOutbound(phone, reopenMsg);
+      onBotMessage(reopenMsg);
+      appendConversationMessage(phone, { role: "bot", text: reopenMsg });
+
+      upsertConversation(phone, {
+        status: "active",
+        awaitingData: true,
+        reminderCount: 0,
+        color: "purple",
+        data: { idNumber: "", deathDate: "", claimant: "" },
+        metadata: { ...conv.metadata, senderName, reopenedAt: new Date().toISOString() },
+      });
+      conv = getConversation(phone);
+      return { ok: true, responseType: "reopened_new_case" };
+    } else {
     const alreadyReceived =
       "Gracias. Ya tengo sus datos en revision. Si encuentro derecho a pension, la contactare directamente.";
     await sendOutbound(phone, alreadyReceived);
     onBotMessage(alreadyReceived);
     appendConversationMessage(phone, { role: "bot", text: alreadyReceived });
     return { ok: true, responseType: "already_in_review" };
+    }
   }
 
   const extracted = extractStructuredData(text);

@@ -44,15 +44,21 @@ async function runMultiStepScenario() {
     send
   );
   const step3 = await handleInbound({ message: "ok", phone, senderName: "Test" }, send);
+  const step4 = await handleInbound(
+    { message: "Ahora mi hijo fallecio y cotizaba en colpensiones", phone, senderName: "Test" },
+    send
+  );
 
   const ok =
     step1.responseType === "green_request_data" &&
     step2.responseType === "data_collected" &&
     step3.responseType === "already_in_review" &&
+    step4.responseType === "reopened_new_case" &&
     replies.some((r) => r.toLowerCase().includes("estare consultando su caso")) &&
-    replies.some((r) => r.toLowerCase().includes("ya tengo sus datos en revision"));
+    replies.some((r) => r.toLowerCase().includes("ya tengo sus datos en revision")) &&
+    replies.some((r) => r.toLowerCase().includes("iniciamos un nuevo caso"));
 
-  return { id: "multi-step-review-guard", ok, result: { step1, step2, step3 }, replies };
+  return { id: "multi-step-review-guard", ok, result: { step1, step2, step3, step4 }, replies };
 }
 
 async function main() {

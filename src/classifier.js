@@ -94,6 +94,22 @@ function includesAny(text, words) {
 
 function classifyMessage(text) {
   const normalized = normalize(text);
+  const hasDeathSignal =
+    normalized.includes("fallecio") ||
+    normalized.includes("murio") ||
+    normalized.includes("mataron") ||
+    normalized.includes("asesinaron") ||
+    normalized.includes("muerte");
+  const hasRelationSignal =
+    normalized.includes("esposo") ||
+    normalized.includes("esposa") ||
+    normalized.includes("companero") ||
+    normalized.includes("pareja") ||
+    normalized.includes("hijo") ||
+    normalized.includes("hija") ||
+    normalized.includes("padre") ||
+    normalized.includes("madre") ||
+    normalized.includes("familiar");
 
   if (normalized.includes("victima")) {
     if (normalized.includes("sin fallecimiento")) {
@@ -120,9 +136,19 @@ function classifyMessage(text) {
     return { color: "yellow", reason: "yellow_keyword_match" };
   }
 
+  // Death context without enough legal details should ask 2-3 clarifying questions.
+  if (hasDeathSignal && !hasRelationSignal) {
+    return { color: "yellow", reason: "death_context_needs_clarification" };
+  }
+
   const isGreen = includesAny(normalized, GREEN_KEYWORDS);
   if (isGreen) {
     return { color: "green", reason: "green_keyword_match" };
+  }
+
+  // If death + relation is mentioned but still low detail, prioritize intake quickly.
+  if (hasDeathSignal && hasRelationSignal) {
+    return { color: "green", reason: "death_with_relationship_signal" };
   }
 
   return { color: "purple", reason: "unknown_or_incomplete" };
