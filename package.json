@@ -1,0 +1,20 @@
+{
+  "name": "edwin-whatsapp-bot-backend",
+  "version": "1.0.0",
+  "description": "Node.js backend for WhatsApp legal intake bot with Z-API + OpenAI",
+  "main": "src/server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js"
+  },
+  "dependencies": {
+    "axios": "^1.9.0",
+    "dayjs": "^1.11.13",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.2",
+    "googleapis": "^144.0.0",
+    "node-cron": "^3.0.3",
+    "openai": "^4.71.1"
+  }
+}
