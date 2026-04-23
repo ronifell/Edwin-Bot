@@ -150,6 +150,10 @@ function getConversationsAwaitingData(cutoffIso) {
   );
 }
 
+function resetStore() {
+  writeStore({ ...initialStore });
+}
+
 module.exports = {
   getConversation,
   upsertConversation,
@@ -159,4 +163,5 @@ module.exports = {
   getTodayKey,
   getStatsForDate,
   getConversationsAwaitingData,
+  resetStore,
 };

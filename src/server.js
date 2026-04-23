@@ -1,4 +1,5 @@
 const express = require("express");
+const cors = require("cors");
 const { validateConfig } = require("./config");
 const { handleInbound, sendDailySummary, startSchedulers } = require("./botService");
 const { config } = require("./config");
@@ -6,6 +7,7 @@ const { config } = require("./config");
 validateConfig();
 
 const app = express();
+app.use(cors());
 app.use(express.json({ limit: "10mb" }));
 
 app.get("/health", (_req, res) => {
@@ -13,12 +15,52 @@ app.get("/health", (_req, res) => {
 });
 
 app.post("/webhook/zapi", async (req, res) => {
+  if (config.botChannelMode !== "whatsapp") {
+    return res.status(403).json({
+      ok: false,
+      error: "webhook_disabled_in_local_mode",
+      botChannelMode: config.botChannelMode,
+    });
+  }
   try {
     const result = await handleInbound(req.body || {});
     return res.json({ ok: true, result });
   } catch (error) {
     console.error("Webhook failed:", error);
     return res.status(500).json({ ok: false, error: "webhook_failed" });
+  }
+});
+
+app.post("/api/test/chat", async (req, res) => {
+  if (!config.localTest.enabled) {
+    return res.status(403).json({ ok: false, error: "local_test_ui_disabled" });
+  }
+  if (config.botChannelMode !== "local") {
+    return res.status(403).json({
+      ok: false,
+      error: "local_test_requires_local_mode",
+      botChannelMode: config.botChannelMode,
+    });
+  }
+
+  const outbound = [];
+  const body = req.body || {};
+  try {
+    const result = await handleInbound(
+      {
+        message: body.message || "",
+        phone: body.phone || "573000000001",
+        senderName: body.senderName || "Cliente de prueba",
+      },
+      {
+        sendMessage: async () => {},
+        onBotMessage: (text) => outbound.push(text),
+      }
+    );
+    return res.json({ ok: true, result, replies: outbound });
+  } catch (error) {
+    console.error("Local test chat failed:", error);
+    return res.status(500).json({ ok: false, error: "local_test_chat_failed" });
   }
 });
 
@@ -33,6 +75,8 @@ app.post("/jobs/daily-summary", async (_req, res) => {
 });
 
 app.listen(config.port, () => {
-  console.log(`Server listening on port ${config.port}`);
-  startSchedulers();
+  console.log(`Server listening on port ${config.port} in ${config.botChannelMode} mode`);
+  if (config.botChannelMode === "whatsapp") {
+    startSchedulers();
+  }
 });

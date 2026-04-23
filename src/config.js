@@ -10,6 +10,7 @@ function toBool(value, fallback = false) {
 const config = {
   port: Number(process.env.PORT || 3000),
   nodeEnv: process.env.NODE_ENV || "development",
+  botChannelMode: process.env.BOT_CHANNEL_MODE || "local",
   zapi: {
     instanceId: process.env.ZAPI_INSTANCE_ID || "",
     token: process.env.ZAPI_TOKEN || "",
@@ -20,6 +21,7 @@ const config = {
     apiKey: process.env.OPENAI_API_KEY || "",
     model: process.env.OPENAI_MODEL || "gpt-4o-mini",
     transcribeModel: process.env.OPENAI_TRANSCRIBE_MODEL || "gpt-4o-mini-transcribe",
+    enableReplyGeneration: toBool(process.env.OPENAI_ENABLE_REPLY_GENERATION, false),
   },
   adminReportNumber: process.env.ADMIN_REPORT_NUMBER || "",
   defaultCountryPrefix: process.env.DEFAULT_COUNTRY_PREFIX || "57",
@@ -33,16 +35,21 @@ const config = {
     minDelayMs: Number(process.env.MIN_TYPING_DELAY_MS || 1300),
     maxDelayMs: Number(process.env.MAX_TYPING_DELAY_MS || 3800),
   },
+  localTest: {
+    enabled: toBool(process.env.LOCAL_TEST_UI_ENABLED, true),
+  },
 };
 
 function validateConfig() {
-  const required = [
-    ["ZAPI_INSTANCE_ID", config.zapi.instanceId],
-    ["ZAPI_TOKEN", config.zapi.token],
-    ["ZAPI_BASE_URL", config.zapi.baseUrl],
-    ["CLIENT_TOKEN", config.zapi.clientToken],
-    ["OPENAI_API_KEY", config.openai.apiKey],
-  ];
+  const required = [["OPENAI_API_KEY", config.openai.apiKey]];
+  if (config.botChannelMode === "whatsapp") {
+    required.push(
+      ["ZAPI_INSTANCE_ID", config.zapi.instanceId],
+      ["ZAPI_TOKEN", config.zapi.token],
+      ["ZAPI_BASE_URL", config.zapi.baseUrl],
+      ["CLIENT_TOKEN", config.zapi.clientToken]
+    );
+  }
 
   const missing = required.filter(([, value]) => !value).map(([key]) => key);
   if (missing.length) {

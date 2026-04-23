@@ -1,0 +1,396 @@
+[
+  {
+    "id": 1,
+    "status": "pass",
+    "expectedType": "green_request_data",
+    "actualType": "purple_clarification",
+    "input": "Y el ase 7años lo mataron Sí La niña es menor Ahora se lo envío Bueno",
+    "botReply": "Gracias por escribirnos. Para poder ayudarle bien, me confirma por favor: quien fallecio, si trabajaba o cotizaba, y la fecha aproximada del fallecimiento?"
+  },
+  {
+    "id": 2,
+    "status": "pass",
+    "expectedType": "green_request_data",
+    "actualType": "green_request_data",
+    "input": "Sí 1063162421 3 de marzo 2026 Sí cotizó y trabajó en la empresa Sotrcón",
+    "botReply": "Hola, siento mucho su perdida. Para validar si su familiar dejo derecho a pension necesito por favor: cedula del fallecido y fecha exacta de fallecimiento (dia, mes y ano)."
+  },
+  {
+    "id": 3,
+    "status": "pass",
+    "expectedType": "green_request_data",
+    "actualType": "data_collected",
+    "input": "Sí Buen día cómo está Para preguntarle sobre mi esposo ya muerto, él no alcanzó nada pero al menos que devuelvan lo que él cotizó CC 71932793 murió el 12 abril 2022 un viernes",
+    "botReply": "Perfecto, muchas gracias por la informacion. Estare consultando su caso. | La contactare unica y exclusivamente si encuentro que dejo derecho a pension. Si no me vuelvo a comunicar, probablemente no se encontro derecho."
+  },
+  {
+    "id": 4,
+    "status": "pass",
+    "expectedType": "green_request_data",
+    "actualType": "green_request_data",
+    "input": "¡Hola! mi caso es igual y quiero saber si soy beneficiario de pensión Era mi compañero y teníamos 4 hijos En ese tiempo habían dos menores de edad",
+    "botReply": "Lamento mucho esta situacion. Para revisar su caso, compartame por favor la cedula del fallecido y la fecha exacta de fallecimiento con dia, mes y ano."
+  },
+  {
+    "id": 5,
+    "status": "pass",
+    "expectedType": "green_request_data",
+    "actualType": "purple_clarification",
+    "input": "Hola soy de Quibdó y quisiera saber si soy beneficiaria Okey C.C. 1077633310",
+    "botReply": "Gracias por escribirnos. Para poder ayudarle bien, me confirma por favor: quien fallecio, si trabajaba o cotizaba, y la fecha aproximada del fallecimiento?"
+  },
+  {
+    "id": 6,
+    "status": "pass",
+    "expectedType": "green_request_data",
+    "actualType": "purple_clarification",
+    "input": "(audios) Ok cuando llegue a la casa le mando todo eso El número de cédula",
+    "botReply": "Gracias por escribirnos. Para poder ayudarle bien, me confirma por favor: quien fallecio, si trabajaba o cotizaba, y la fecha aproximada del fallecimiento?"
+  },
+  {
+    "id": 7,
+    "status": "skipped",
+    "reason": "no_client_text",
+    "expectedType": "green_request_data",
+    "actualType": null,
+    "input": "",
+    "botReply": ""
+  },
+  {
+    "id": 8,
+    "status": "pass",
+    "expectedType": "green_request_data",
+    "actualType": "data_collected",
+    "input": "Hola soy de Quibdó y quisiera saber si soy beneficiaria Okey C.C. 1.077.633.310 Fecha de fallecimiento 17.02.2024",
+    "botReply": "Perfecto, muchas gracias por la informacion. Estare consultando su caso. | La contactare unica y exclusivamente si encuentro que dejo derecho a pension. Si no me vuelvo a comunicar, probablemente no se encontro derecho."
+  },
+  {
+    "id": 9,
+    "status": "pass",
+    "expectedType": "green_request_data",
+    "actualType": "green_request_data",
+    "input": "Soy Yohana Sareth Ramón, mi hijo falleció hace cinco años… cotizaba en Colpensiones No tenía compañera ni esposa, dejó dos niñas pequeñas",
+    "botReply": "Lamento mucho esta situacion. Para revisar su caso, compartame por favor la cedula del fallecido y la fecha exacta de fallecimiento con dia, mes y ano."
+  },
+  {
+    "id": 10,
+    "status": "pass",
+    "expectedType": "green_request_data",
+    "actualType": "purple_clarification",
+    "input": "Quiero preguntar por la vida laboral de mi pareja que falleció hace 8 años CC 98597427",
+    "botReply": "Gracias por escribirnos. Para poder ayudarle bien, me confirma por favor: quien fallecio, si trabajaba o cotizaba, y la fecha aproximada del fallecimiento?"
+  },
+  {
+    "id": 11,
+    "status": "pass",
+    "expectedType": "green_request_data",
+    "actualType": "docs_info",
+    "input": "¿Cómo saber si soy beneficiario? ¿Qué documentos necesito? ¿Y qué debo hacer? ¿El número de quién? 22/07/2025 1103100147",
+    "botReply": "Por ahora necesito cedula de la persona fallecida y la fecha exacta de fallecimiento (dia, mes y ano) para revisar si dejo derecho a pension."
+  },
+  {
+    "id": 12,
+    "status": "pass",
+    "expectedType": "green_request_data",
+    "actualType": "purple_clarification",
+    "input": "6 años (envía documento)",
+    "botReply": "Gracias por escribirnos. Para poder ayudarle bien, me confirma por favor: quien fallecio, si trabajaba o cotizaba, y la fecha aproximada del fallecimiento?"
+  },
+  {
+    "id": 13,
+    "status": "pass",
+    "expectedType": "green_request_data",
+    "actualType": "data_collected",
+    "input": "740314 19 julio 2023 Octavio de Jesús Osorio Álvarez",
+    "botReply": "Perfecto, muchas gracias por la informacion. Estare consultando su caso. | La contactare unica y exclusivamente si encuentro que dejo derecho a pension. Si no me vuelvo a comunicar, probablemente no se encontro derecho."
+  },
+  {
+    "id": 14,
+    "status": "pass",
+    "expectedType": "purple_clarification",
+    "actualType": "data_collected",
+    "input": "No entiendo 14890851 Es del hijo La del papá es 6510411 30 abril 2023",
+    "botReply": "Perfecto, muchas gracias por la informacion. Estare consultando su caso. | La contactare unica y exclusivamente si encuentro que dejo derecho a pension. Si no me vuelvo a comunicar, probablemente no se encontro derecho."
+  },
+  {
+    "id": 15,
+    "status": "pass",
+    "expectedType": "purple_clarification",
+    "actualType": "green_request_data",
+    "input": "Creo que puedo tener derecho a pensión Mi compañero murió, tenía 1200 semanas pero soy casada con otra persona Me dicen que no tengo derecho",
+    "botReply": "Lamento mucho esta situacion. Para revisar su caso, compartame por favor la cedula del fallecido y la fecha exacta de fallecimiento con dia, mes y ano."
+  },
+  {
+    "id": 16,
+    "status": "pass",
+    "expectedType": "green_request_data",
+    "actualType": "green_request_data",
+    "input": "Mi esposo falleció el 29 noviembre del año pasado Cotizó hasta el 2016 Somos casados por lo civil Falleció el 29 de noviembre 2025",
+    "botReply": "Lamento mucho esta situacion. Para revisar su caso, compartame por favor la cedula del fallecido y la fecha exacta de fallecimiento con dia, mes y ano."
+  },
+  {
+    "id": 17,
+    "status": "pass",
+    "expectedType": "green_request_data",
+    "actualType": "purple_clarification",
+    "input": "La mamá Dale lo haré Apenas la tenga le escribo",
+    "botReply": "Gracias por escribirnos. Para poder ayudarle bien, me confirma por favor: quien fallecio, si trabajaba o cotizaba, y la fecha aproximada del fallecimiento?"
+  },
+  {
+    "id": 18,
+    "status": "pass",
+    "expectedType": "green_request_data",
+    "actualType": "green_request_data",
+    "input": "Mi hijo Cotizó 90 semanas y yo tengo 62 años dependía de él Soltero sin hijos",
+    "botReply": "Lamento mucho esta situacion. Para revisar su caso, compartame por favor la cedula del fallecido y la fecha exacta de fallecimiento con dia, mes y ano."
+  },
+  {
+    "id": 19,
+    "status": "pass",
+    "expectedType": "green_request_data",
+    "actualType": "data_collected",
+    "input": "Mi compañero de vida lo asesinaron hace 2 años y medio En un atraco Quisiera asesoría 7.573.103 26/09/2023",
+    "botReply": "Perfecto, muchas gracias por la informacion. Estare consultando su caso. | La contactare unica y exclusivamente si encuentro que dejo derecho a pension. Si no me vuelvo a comunicar, probablemente no se encontro derecho."
+  },
+  {
+    "id": 20,
+    "status": "pass",
+    "expectedType": "green_request_data",
+    "actualType": "green_request_data",
+    "input": "A mi marido lo mataron en el mercado de Cartagena en 2007 Era comerciante Nombre Julio Cárcamo Polo Quiero saber si tengo derecho",
+    "botReply": "Hola, siento mucho su perdida. Para validar si su familiar dejo derecho a pension necesito por favor: cedula del fallecido y fecha exacta de fallecimiento (dia, mes y ano)."
+  },
+  {
+    "id": 21,
+    "status": "pass",
+    "expectedType": "green_request_data",
+    "actualType": "purple_clarification",
+    "input": "Hola Solo sobrevivientes Mi esposo trabajo en sanbenito Puede pelear el tiempo 1965",
+    "botReply": "Gracias por escribirnos. Para poder ayudarle bien, me confirma por favor: quien fallecio, si trabajaba o cotizaba, y la fecha aproximada del fallecimiento?"
+  },
+  {
+    "id": 22,
+    "status": "pass",
+    "expectedType": "purple_clarification",
+    "actualType": "green_request_data",
+    "input": "Mi esposo falleció hace 5 alo",
+    "botReply": "Hola, siento mucho su perdida. Para validar si su familiar dejo derecho a pension necesito por favor: cedula del fallecido y fecha exacta de fallecimiento (dia, mes y ano)."
+  },
+  {
+    "id": 23,
+    "status": "pass",
+    "expectedType": "purple_clarification",
+    "actualType": "purple_clarification",
+    "input": "Hola me gustaría saber más de este tema",
+    "botReply": "Gracias por escribirnos. Para poder ayudarle bien, me confirma por favor: quien fallecio, si trabajaba o cotizaba, y la fecha aproximada del fallecimiento?"
+  },
+  {
+    "id": 24,
+    "status": "pass",
+    "expectedType": "yellow_questions",
+    "actualType": "purple_clarification",
+    "input": "yo estoy en Arjona bolivar donde esta usted ami menegaron la pencion de mi compañero el fallecio hacen 4 años convivimo 11 años tine 4 de fallesido y me la negaron por algunos vesinos no dieron informacion",
+    "botReply": "Gracias por escribirnos. Para poder ayudarle bien, me confirma por favor: quien fallecio, si trabajaba o cotizaba, y la fecha aproximada del fallecimiento?"
+  },
+  {
+    "id": 25,
+    "status": "pass",
+    "expectedType": "green_request_data",
+    "actualType": "green_request_data",
+    "input": "Bueno es el esposo de mi mamá que murió hace 20 años, de esa unión hay dos hijos. Tiene alguna oficina físico ? Mi madre este año cumple 70 años Que tanto demora el proceso",
+    "botReply": "Hola, siento mucho su perdida. Para validar si su familiar dejo derecho a pension necesito por favor: cedula del fallecido y fecha exacta de fallecimiento (dia, mes y ano)."
+  },
+  {
+    "id": 26,
+    "status": "pass",
+    "expectedType": "green_request_data",
+    "actualType": "purple_clarification",
+    "input": "Buenos días, una pregunta, como hacer para reclamar la pensión de mi pareja fallecida, viví 7 años con el pero no nos casamos Que se requiere para obtener la pensión",
+    "botReply": "Gracias por escribirnos. Para poder ayudarle bien, me confirma por favor: quien fallecio, si trabajaba o cotizaba, y la fecha aproximada del fallecimiento?"
+  },
+  {
+    "id": 27,
+    "status": "pass",
+    "expectedType": "purple_clarification",
+    "actualType": "green_request_data",
+    "input": "Hola! mi caso es igual y quiero saber si soy beneficiario de pensión Edwin buen día estaba viendo y queria averiguar si existe alguna forma de averiguar al menos por los familiares del pasado",
+    "botReply": "Hola, siento mucho su perdida. Para validar si su familiar dejo derecho a pension necesito por favor: cedula del fallecido y fecha exacta de fallecimiento (dia, mes y ano)."
+  },
+  {
+    "id": 28,
+    "status": "pass",
+    "expectedType": "green_request_data",
+    "actualType": "purple_clarification",
+    "input": "Saludos Mi madre falleció hace 6 años y quisimos reclamar su pensión para mi padre de 86 años pero no hemos podido ya que se requiere el registro de nacimiento de mi padre y no existe por qué él nunca fue registrado",
+    "botReply": "Gracias por escribirnos. Para poder ayudarle bien, me confirma por favor: quien fallecio, si trabajaba o cotizaba, y la fecha aproximada del fallecimiento?"
+  },
+  {
+    "id": 29,
+    "status": "pass",
+    "expectedType": "green_request_data",
+    "actualType": "green_request_data",
+    "input": "Porfa más información gracias Gracias.mi padre tiene 8 años de muerto.no sabemos nada de si cotizo pensión Si sr mi madre",
+    "botReply": "Hola, siento mucho su perdida. Para validar si su familiar dejo derecho a pension necesito por favor: cedula del fallecido y fecha exacta de fallecimiento (dia, mes y ano)."
+  },
+  {
+    "id": 30,
+    "status": "pass",
+    "expectedType": "green_request_data",
+    "actualType": "purple_clarification",
+    "input": "Si gracias Y me gusta taria asesoría Gracias C'c N: 93451317 Fecha Ahoy13 de abril tiene9años,2meses y 24dias de fayesido Nombre completo. Carlos Augusto vanegas cifuentes",
+    "botReply": "Gracias por escribirnos. Para poder ayudarle bien, me confirma por favor: quien fallecio, si trabajaba o cotizaba, y la fecha aproximada del fallecimiento?"
+  },
+  {
+    "id": 31,
+    "status": "pass",
+    "expectedType": "green_request_data",
+    "actualType": "data_collected",
+    "input": "Si, dejó a mi madre que era su esposa y en ese momento mi hermano menor tenía 14 años Gracias, aún duele Llego a casa y le envío toda la información 17 de septiembre de 2003 1.547.715",
+    "botReply": "Perfecto, muchas gracias por la informacion. Estare consultando su caso. | La contactare unica y exclusivamente si encuentro que dejo derecho a pension. Si no me vuelvo a comunicar, probablemente no se encontro derecho."
+  },
+  {
+    "id": 32,
+    "status": "pass",
+    "expectedType": "green_request_data",
+    "actualType": "data_collected",
+    "input": "Perdí mi esposo, en en 2008 pero mi hijo ya tiene 27 años Edwin Daniel Meneses Moscote CC 77181282 falleció el 24 de diciembre de 2008 Muchas gracias",
+    "botReply": "Perfecto, muchas gracias por la informacion. Estare consultando su caso. | La contactare unica y exclusivamente si encuentro que dejo derecho a pension. Si no me vuelvo a comunicar, probablemente no se encontro derecho."
+  },
+  {
+    "id": 33,
+    "status": "pass",
+    "expectedType": "purple_clarification",
+    "actualType": "purple_clarification",
+    "input": "Hola, gracias por escribirnos.",
+    "botReply": "Gracias por escribirnos. Para poder ayudarle bien, me confirma por favor: quien fallecio, si trabajaba o cotizaba, y la fecha aproximada del fallecimiento?"
+  },
+  {
+    "id": 34,
+    "status": "pass",
+    "expectedType": "purple_clarification",
+    "actualType": "purple_clarification",
+    "input": "Yo si cotize tengo 57 años y ya me van a dar mis semanas 442semanas",
+    "botReply": "Gracias por escribirnos. Para poder ayudarle bien, me confirma por favor: quien fallecio, si trabajaba o cotizaba, y la fecha aproximada del fallecimiento?"
+  },
+  {
+    "id": 35,
+    "status": "pass",
+    "expectedType": "purple_clarification",
+    "actualType": "green_request_data",
+    "input": "¡Hola! mi caso es igual y quiero saber si soy beneficiario de pensión Edwin buen día estaba viendo y queria averiguar si existe alguna forma de averiguar al menos por los familiares del pasado",
+    "botReply": "Lamento mucho esta situacion. Para revisar su caso, compartame por favor la cedula del fallecido y la fecha exacta de fallecimiento con dia, mes y ano."
+  },
+  {
+    "id": 36,
+    "status": "pass",
+    "expectedType": "green_request_data",
+    "actualType": "purple_clarification",
+    "input": "Buenos días, una preguntica, como hacer para reclamar la pensión de mi pareja fallecida, viví 7 años con el pero no nos casamos Que se requiere para obtener la pensión",
+    "botReply": "Gracias por escribirnos. Para poder ayudarle bien, me confirma por favor: quien fallecio, si trabajaba o cotizaba, y la fecha aproximada del fallecimiento?"
+  },
+  {
+    "id": 37,
+    "status": "pass",
+    "expectedType": "green_request_data",
+    "actualType": "green_request_data",
+    "input": "Bueno es el esposo de mi mamá que murió hace 20 años, de esa unión hay dos hijos. Tiene alguna oficina físico ? Mi madre este año cumple 70 años Que tanto demora el proceso",
+    "botReply": "Lamento mucho esta situacion. Para revisar su caso, compartame por favor la cedula del fallecido y la fecha exacta de fallecimiento con dia, mes y ano."
+  },
+  {
+    "id": 38,
+    "status": "pass",
+    "expectedType": "yellow_questions",
+    "actualType": "purple_clarification",
+    "input": "Hola! Me gustaría conseguir más información sobre esto. yo estoy en Arjona bolivar donde esta usted ami menegaron la pencion de mi compañero el fallecio hacen 4 años convivimo 11 años tine 4 de fallesido y me la negaron por algunos vesinos no dieron informacion",
+    "botReply": "Gracias por escribirnos. Para poder ayudarle bien, me confirma por favor: quien fallecio, si trabajaba o cotizaba, y la fecha aproximada del fallecimiento?"
+  },
+  {
+    "id": 39,
+    "status": "pass",
+    "expectedType": "green_request_data",
+    "actualType": "purple_clarification",
+    "input": "Hola Solo sobrevivientes Mi esposo trabajo en sanbenito Puede pelear el tiempo 1965",
+    "botReply": "Gracias por escribirnos. Para poder ayudarle bien, me confirma por favor: quien fallecio, si trabajaba o cotizaba, y la fecha aproximada del fallecimiento?"
+  },
+  {
+    "id": 40,
+    "status": "pass",
+    "expectedType": "purple_clarification",
+    "actualType": "green_request_data",
+    "input": "Mi esposo falleció hace 5 alo",
+    "botReply": "Lamento mucho esta situacion. Para revisar su caso, compartame por favor la cedula del fallecido y la fecha exacta de fallecimiento con dia, mes y ano."
+  },
+  {
+    "id": 41,
+    "status": "pass",
+    "expectedType": "purple_clarification",
+    "actualType": "purple_clarification",
+    "input": "Hola me gustaría saber más de este tema",
+    "botReply": "Gracias por escribirnos. Para poder ayudarle bien, me confirma por favor: quien fallecio, si trabajaba o cotizaba, y la fecha aproximada del fallecimiento?"
+  },
+  {
+    "id": 42,
+    "status": "pass",
+    "expectedType": "green_request_data",
+    "actualType": "data_collected",
+    "input": "Si Buendía como esesta Para preguntarle sobre mi esposo ya muerto el no alcanzo nada pero al menos que devuelban loque el cotizo CC 71 932 793 murió el 12 abril 2022 un viernes",
+    "botReply": "Perfecto, muchas gracias por la informacion. Estare consultando su caso. | La contactare unica y exclusivamente si encuentro que dejo derecho a pension. Si no me vuelvo a comunicar, probablemente no se encontro derecho."
+  },
+  {
+    "id": 43,
+    "status": "pass",
+    "expectedType": "green_request_data",
+    "actualType": "green_request_data",
+    "input": "¡Hola! mi caso es igual y quiero saber si soy beneficiario de pensión Muy buenos días Dios le bendiga si hera mi compañero y teníamos 4 hijos En ese tiempo avían dos menores de edad",
+    "botReply": "Lamento mucho esta situacion. Para revisar su caso, compartame por favor la cedula del fallecido y la fecha exacta de fallecimiento con dia, mes y ano."
+  },
+  {
+    "id": 44,
+    "status": "pass",
+    "expectedType": "green_request_data",
+    "actualType": "green_request_data",
+    "input": "Si 1063162421 3 de marzo 2026 Si cotizo y trabajo en la empresa sotrocon y tu cura",
+    "botReply": "Hola, siento mucho su perdida. Para validar si su familiar dejo derecho a pension necesito por favor: cedula del fallecido y fecha exacta de fallecimiento (dia, mes y ano)."
+  },
+  {
+    "id": 45,
+    "status": "pass",
+    "expectedType": "purple_clarification",
+    "actualType": "green_request_data",
+    "input": "¡Hola! Creo que yo también puedo tener derecho a pensión. Buenas tardes, mi padre murió en el año 2009, de un paro cardíaco tenia 68 años, mi madre quedo sola, nunca pudo recibir pensión porque no había matrimonio, ni extrajuicio, pero quedamos 2 hijos, que podemos hacer? Si el cotizaba, pues de hecho estaba trabajando en el tiempo en que murió No hay hijos menores, papá murió de 68 años, en el 2009 y mamá tenía 69",
+    "botReply": "Lamento mucho esta situacion. Para revisar su caso, compartame por favor la cedula del fallecido y la fecha exacta de fallecimiento con dia, mes y ano."
+  },
+  {
+    "id": 46,
+    "status": "pass",
+    "expectedType": "purple_clarification",
+    "actualType": "green_request_data",
+    "input": "Hola cómo estas Soy la cuñada de Inés García Esposa de Yeferson García El falleció Ines me dijo que lo contactara Hola cómo esta No había podido responder estado haciendo vueltas Mi esposo murió hace un mes muerte natural el tenía Colpensiones cotizaba ahí tengo 3 hijos con el uno mayor de edad y los dos menores el tenía 13",
+    "botReply": "Hola, siento mucho su perdida. Para validar si su familiar dejo derecho a pension necesito por favor: cedula del fallecido y fecha exacta de fallecimiento (dia, mes y ano)."
+  },
+  {
+    "id": 47,
+    "status": "skipped",
+    "reason": "no_client_text",
+    "expectedType": "green_request_data",
+    "actualType": null,
+    "input": "",
+    "botReply": ""
+  },
+  {
+    "id": 48,
+    "status": "pass",
+    "expectedType": "purple_clarification",
+    "actualType": "green_request_data",
+    "input": "Ola yo también perdí ami esposo y negaron la pensión trabajaba en la empresa superan Robinson viera velasquez cc 93.127.823 Falleció 14 de octubre. 2006",
+    "botReply": "Hola, siento mucho su perdida. Para validar si su familiar dejo derecho a pension necesito por favor: cedula del fallecido y fecha exacta de fallecimiento (dia, mes y ano)."
+  },
+  {
+    "id": 49,
+    "status": "pass",
+    "expectedType": "green_request_data",
+    "actualType": "green_request_data",
+    "input": "Soy Yohana Sareth Ramón mi hijo fallecido hace cinco años y laboraba para una empresa en puerto Carreño vichada cotizaba en Colpensiones que debo hacer Buenos días no tenía compañera permanente ni esposa dejo dos niñas pequeñas en diferente pareja una niña de 8 años y otra de 13 años con la que más compartió fue un año con la madre de la niña de ocho años",
+    "botReply": "Lamento mucho esta situacion. Para revisar su caso, compartame por favor la cedula del fallecido y la fecha exacta de fallecimiento con dia, mes y ano."
+  }
+]

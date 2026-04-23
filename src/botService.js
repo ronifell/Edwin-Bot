@@ -28,13 +28,21 @@ function buildGreenRequest() {
 
 function buildYellowQuestions() {
   return pickRandom([
-    "Para orientarle mejor, me ayuda con esto: quien fallecio, cuando fallecio y si cotizaba pension o trabajaba?",
-    "Gracias por escribir. Para revisar viabilidad cuenteme: quien fallecio, fecha de fallecimiento y por que le negaron la pension (si ya reclamo).",
+    "Para orientarle mejor necesito tres datos: quien fallecio, cuando fallecio y si cotizaba pension o trabajaba.",
+    "Gracias por escribir. Para revisar viabilidad, por favor confirmeme: quien fallecio, cuando fallecio y por que le negaron la pension (si ya reclamo).",
   ]);
 }
 
 function buildRedClose() {
   return "Siento no poder ayudarle, pero en este momento no manejamos ese tipo de casos. Gracias por escribirnos.";
+}
+
+function buildDocsInfo() {
+  return "Por ahora necesito cedula de la persona fallecida y la fecha exacta de fallecimiento (dia, mes y ano) para revisar si dejo derecho a pension.";
+}
+
+function buildHowItWorksInfo() {
+  return "Le explico: este proceso aplica cuando fallece un ser querido (esposa, companero, hijo o familiar directo) que trabajo o cotizo antes de morir. Con sus datos validamos si hay derecho.";
 }
 
 function extractInbound(payload) {
@@ -46,7 +54,35 @@ function extractInbound(payload) {
   return { message, phone, senderName, isAudio, audioUrl };
 }
 
-async function handleInbound(payload) {
+function isGreetingOnly(normalizedText) {
+  const hasGreetingPrompt =
+    normalizedText.includes("como esta") ||
+    normalizedText.includes("como estas") ||
+    normalizedText.includes("como se encuentra");
+  if (!hasGreetingPrompt) return false;
+
+  const legalSignals = [
+    "fallecio",
+    "murio",
+    "pension",
+    "cotizo",
+    "cotizaba",
+    "cedula",
+    "colpensiones",
+    "beneficiario",
+    "companero",
+    "esposo",
+    "esposa",
+    "hijo",
+    "hija",
+  ];
+  if (legalSignals.some((token) => normalizedText.includes(token))) return false;
+  return normalizedText.length <= 80;
+}
+
+async function handleInbound(payload, options = {}) {
+  const sendOutbound = options.sendMessage || sendMessage;
+  const onBotMessage = options.onBotMessage || (() => {});
   const { message, phone, senderName, isAudio, audioUrl } = extractInbound(payload);
   if (!phone) return { ok: true, ignored: "missing_phone" };
 
@@ -74,11 +110,21 @@ async function handleInbound(payload) {
   appendConversationMessage(phone, { role: "user", text, rawType: isAudio ? "audio" : "text" });
 
   const normalizedText = normalize(text);
-  if (normalizedText.includes("como esta") || normalizedText.includes("como se encuentra")) {
+  if (isGreetingOnly(normalizedText)) {
     const greeting = "Me encuentro bien, gracias a Dios. Y usted como esta?";
-    await sendMessage(phone, greeting);
+    await sendOutbound(phone, greeting);
+    onBotMessage(greeting);
     appendConversationMessage(phone, { role: "bot", text: greeting });
     return { ok: true, responseType: "greeting" };
+  }
+
+  if (conv.status === "pending_legal_review") {
+    const alreadyReceived =
+      "Gracias. Ya tengo sus datos en revision. Si encuentro derecho a pension, la contactare directamente.";
+    await sendOutbound(phone, alreadyReceived);
+    onBotMessage(alreadyReceived);
+    appendConversationMessage(phone, { role: "bot", text: alreadyReceived });
+    return { ok: true, responseType: "already_in_review" };
   }
 
   const extracted = extractStructuredData(text);
@@ -90,6 +136,34 @@ async function handleInbound(payload) {
 
   const classification = classifyMessage(text);
   const color = classification.color;
+  if (classification.intent === "docs") {
+    const docs = buildDocsInfo();
+    await sendOutbound(phone, docs);
+    onBotMessage(docs);
+    upsertConversation(phone, {
+      color: "purple",
+      status: "active",
+      awaitingData: true,
+      metadata: { ...conv.metadata, senderName },
+    });
+    appendConversationMessage(phone, { role: "bot", text: docs });
+    return { ok: true, responseType: "docs_info" };
+  }
+
+  if (classification.intent === "how_it_works") {
+    const info = buildHowItWorksInfo();
+    await sendOutbound(phone, info);
+    onBotMessage(info);
+    upsertConversation(phone, {
+      color: "purple",
+      status: "active",
+      awaitingData: true,
+      metadata: { ...conv.metadata, senderName },
+    });
+    appendConversationMessage(phone, { role: "bot", text: info });
+    return { ok: true, responseType: "how_it_works_info" };
+  }
+
   const previousColor = conv.color || "purple";
   if (color !== previousColor || isNewConversation) {
     incrementDailyStat(getTodayKey(), color);
@@ -98,7 +172,8 @@ async function handleInbound(payload) {
   if (classification.isVictimCase && !normalizedText.includes("si esta relacionada")) {
     const victimPrompt =
       "Gracias por contarnos. Para continuar, confirmeme por favor si el caso de victima esta directamente relacionado con el fallecimiento que daria derecho a pension (si o no).";
-    await sendMessage(phone, victimPrompt);
+    await sendOutbound(phone, victimPrompt);
+    onBotMessage(victimPrompt);
     upsertConversation(phone, {
       color: "yellow",
       awaitingData: false,
@@ -113,7 +188,8 @@ async function handleInbound(payload) {
   if (conv.metadata?.awaitingVictimRelation) {
     if (normalizedText.includes("no")) {
       const msg = buildRedClose();
-      await sendMessage(phone, msg);
+      await sendOutbound(phone, msg);
+      onBotMessage(msg);
       upsertConversation(phone, {
         color: "red",
         status: "closed",
@@ -137,8 +213,10 @@ async function handleInbound(payload) {
     const confirmation2 =
       "La contactare unica y exclusivamente si encuentro que dejo derecho a pension. Si no me vuelvo a comunicar, probablemente no se encontro derecho.";
 
-    await sendMessage(phone, confirmation1);
-    await sendMessage(phone, confirmation2);
+    await sendOutbound(phone, confirmation1);
+    onBotMessage(confirmation1);
+    await sendOutbound(phone, confirmation2);
+    onBotMessage(confirmation2);
 
     upsertConversation(phone, {
       status: "pending_legal_review",
@@ -165,7 +243,8 @@ async function handleInbound(payload) {
 
   if (color === "red") {
     const messageToSend = buildRedClose();
-    await sendMessage(phone, messageToSend);
+    await sendOutbound(phone, messageToSend);
+    onBotMessage(messageToSend);
     upsertConversation(phone, {
       color: "red",
       status: "closed",
@@ -179,18 +258,21 @@ async function handleInbound(payload) {
 
   if (color === "green") {
     let messageToSend = buildGreenRequest();
-    try {
-      const aiReply = await generateNaturalReply({
-        userText: text,
-        color: "green",
-        instruction: "Pide cedula del fallecido y fecha exacta de fallecimiento en tono humano.",
-      });
-      if (aiReply) messageToSend = aiReply;
-    } catch (error) {
-      console.error("AI green reply failed:", error.message);
+    if (config.openai.enableReplyGeneration) {
+      try {
+        const aiReply = await generateNaturalReply({
+          userText: text,
+          color: "green",
+          instruction: "Pide cedula del fallecido y fecha exacta de fallecimiento en tono humano.",
+        });
+        if (aiReply) messageToSend = aiReply;
+      } catch (error) {
+        console.error("AI green reply failed:", error.message);
+      }
     }
 
-    await sendMessage(phone, messageToSend);
+    await sendOutbound(phone, messageToSend);
+    onBotMessage(messageToSend);
     upsertConversation(phone, {
       color: "green",
       status: "active",
@@ -205,7 +287,8 @@ async function handleInbound(payload) {
 
   if (color === "yellow") {
     const messageToSend = buildYellowQuestions();
-    await sendMessage(phone, messageToSend);
+    await sendOutbound(phone, messageToSend);
+    onBotMessage(messageToSend);
     upsertConversation(phone, {
       color: "yellow",
       status: "active",
@@ -221,7 +304,8 @@ async function handleInbound(payload) {
   // Purple (uncertain): keep lead alive and ask a clarifying question.
   const purpleQuestion =
     "Gracias por escribirnos. Para poder ayudarle bien, me confirma por favor: quien fallecio, si trabajaba o cotizaba, y la fecha aproximada del fallecimiento?";
-  await sendMessage(phone, purpleQuestion);
+  await sendOutbound(phone, purpleQuestion);
+  onBotMessage(purpleQuestion);
   upsertConversation(phone, {
     color: "purple",
     status: "active",
