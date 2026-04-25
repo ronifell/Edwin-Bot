@@ -74,6 +74,15 @@ Reglas obligatorias:
 - Si ya hay una pregunta activa de recoleccion de datos, no cambies de tema.
 - No inventes hechos no dados por el cliente.
 - Entrega solo el texto final del mensaje para WhatsApp.
+
+Regla critica de relacion (obligatoria):
+- En el primer mensaje del cliente, intenta identificar:
+  1) quien fallecio, y
+  2) cual es el vinculo con quien escribe (esposa, esposo, companera, hijo, madre, etc.).
+- Si NO puedes identificar claramente esos dos puntos, tu siguiente respuesta debe preguntar primero, de forma amable y breve:
+  - quien fue la persona fallecida
+  - que relacion tenia el cliente con esa persona
+- Antes de tener clara esa relacion, no pidas todos los documentos finales; primero aclara el vinculo.
 `.trim();
 
   const userPrompt = `
