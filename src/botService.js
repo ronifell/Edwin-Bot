@@ -20,21 +20,21 @@ const { pickRandom } = require("./utils");
 
 function buildGreenRequest() {
   const templates = [
-    "Hola, siento mucho su perdida. Para validar si su familiar dejo derecho a pension necesito por favor: cedula del fallecido y fecha exacta de fallecimiento (dia, mes y ano).",
-    "Lamento mucho esta situacion. Para revisar su caso, compartame por favor la cedula del fallecido y la fecha exacta de fallecimiento con dia, mes y ano.",
+    "Lamentamos su perdida. Oro por el eterno descanso de su ser querido. Para validar si su familiar dejo derecho a pension necesito por favor: cedula del fallecido y fecha exacta de fallecimiento (dia, mes y ano).",
+    "Lamento mucho esta situacion. Oro por el eterno descanso de su ser querido. Para revisar su caso, compartame por favor la cedula del fallecido y la fecha exacta de fallecimiento con dia, mes y ano.",
   ];
   return pickRandom(templates);
 }
 
 function buildYellowQuestions() {
   return pickRandom([
-    "Para orientarle mejor necesito tres datos: quien fallecio, cuando fallecio y si cotizaba pension o trabajaba.",
-    "Gracias por escribir. Para revisar viabilidad, por favor confirmeme: quien fallecio, cuando fallecio y por que le negaron la pension (si ya reclamo).",
+    "Lamentamos su perdida. Oro por el eterno descanso de su ser querido. Para orientarle mejor necesito tres datos: quien fallecio, cuando fallecio y si cotizaba pension o trabajaba.",
+    "Lamentamos su perdida. Oro por el eterno descanso de su ser querido. Para revisar viabilidad, por favor confirmeme: quien fallecio, cuando fallecio y por que le negaron la pension (si ya reclamo).",
   ]);
 }
 
 function buildRedClose() {
-  return "Siento no poder ayudarle, pero en este momento no manejamos ese tipo de casos. Gracias por escribirnos.";
+  return "Lamentamos su perdida y oramos por el eterno descanso de su ser querido. Siento no poder ayudarle, pero en este momento no manejamos ese tipo de casos. Gracias por escribirnos.";
 }
 
 function buildDocsInfo() {
@@ -43,6 +43,11 @@ function buildDocsInfo() {
 
 function buildHowItWorksInfo() {
   return "Le explico: este proceso aplica cuando fallece un ser querido (esposa, companero, hijo o familiar directo) que trabajo o cotizo antes de morir. Con sus datos validamos si hay derecho.";
+}
+
+function hasDeathContext(normalizedText) {
+  const deathTokens = ["fallecio", "murio", "mataron", "asesinaron", "muerte"];
+  return deathTokens.some((token) => normalizedText.includes(token));
 }
 
 function extractInbound(payload) {
@@ -153,7 +158,7 @@ async function handleInbound(payload, options = {}) {
   if (conv.status === "pending_legal_review") {
     if (looksLikeNewCaseIntent(normalizedText)) {
       const reopenMsg =
-        "Perfecto, iniciamos un nuevo caso. Para revisarlo necesito por favor la cedula del fallecido y la fecha exacta de fallecimiento (dia, mes y ano).";
+        "Lamentamos su perdida. Oro por el eterno descanso de su ser querido. Perfecto, iniciamos un nuevo caso. Para revisarlo necesito por favor la cedula del fallecido y la fecha exacta de fallecimiento (dia, mes y ano).";
       await sendOutbound(phone, reopenMsg);
       onBotMessage(reopenMsg);
       appendConversationMessage(phone, { role: "bot", text: reopenMsg });
@@ -170,7 +175,7 @@ async function handleInbound(payload, options = {}) {
       return { ok: true, responseType: "reopened_new_case" };
     } else {
     const alreadyReceived =
-      "Gracias. Ya tengo sus datos en revision. Si encuentro derecho a pension, la contactare directamente.";
+      "Lamentamos su perdida y oramos por el eterno descanso de su ser querido. Gracias. Ya tengo sus datos en revision. Si encuentro derecho a pension, la contactare directamente.";
     await sendOutbound(phone, alreadyReceived);
     onBotMessage(alreadyReceived);
     appendConversationMessage(phone, { role: "bot", text: alreadyReceived });
@@ -188,7 +193,10 @@ async function handleInbound(payload, options = {}) {
   const classification = classifyMessage(text);
   const color = classification.color;
   if (classification.intent === "docs") {
-    const docs = buildDocsInfo();
+    const docsBase = buildDocsInfo();
+    const docs = hasDeathContext(normalizedText)
+      ? `Lamentamos su perdida. Oro por el eterno descanso de su ser querido. ${docsBase}`
+      : docsBase;
     await sendOutbound(phone, docs);
     onBotMessage(docs);
     upsertConversation(phone, {
@@ -202,7 +210,10 @@ async function handleInbound(payload, options = {}) {
   }
 
   if (classification.intent === "how_it_works") {
-    const info = buildHowItWorksInfo();
+    const infoBase = buildHowItWorksInfo();
+    const info = hasDeathContext(normalizedText)
+      ? `Lamentamos su perdida. Oro por el eterno descanso de su ser querido. ${infoBase}`
+      : infoBase;
     await sendOutbound(phone, info);
     onBotMessage(info);
     upsertConversation(phone, {
@@ -222,7 +233,7 @@ async function handleInbound(payload, options = {}) {
 
   if (classification.isVictimCase && !normalizedText.includes("si esta relacionada")) {
     const victimPrompt =
-      "Gracias por contarnos. Para continuar, confirmeme por favor si el caso de victima esta directamente relacionado con el fallecimiento que daria derecho a pension (si o no).";
+      "Lamentamos su perdida. Oro por el eterno descanso de su ser querido. Gracias por contarnos. Para continuar, confirmeme por favor si el caso de victima esta directamente relacionado con el fallecimiento que daria derecho a pension (si o no).";
     await sendOutbound(phone, victimPrompt);
     onBotMessage(victimPrompt);
     upsertConversation(phone, {
@@ -261,11 +272,13 @@ async function handleInbound(payload, options = {}) {
     incrementDailyStat(getTodayKey(), "deathDatesCollected");
 
     const confirmation1 = "Perfecto, muchas gracias por la informacion. Estare consultando su caso.";
+    const empatheticConfirmation1 =
+      "Lamentamos su perdida. Oro por el eterno descanso de su ser querido. Perfecto, muchas gracias por la informacion. Estare consultando su caso.";
     const confirmation2 =
       "La contactare unica y exclusivamente si encuentro que dejo derecho a pension. Si no me vuelvo a comunicar, probablemente no se encontro derecho.";
 
-    await sendOutbound(phone, confirmation1);
-    onBotMessage(confirmation1);
+    await sendOutbound(phone, empatheticConfirmation1);
+    onBotMessage(empatheticConfirmation1);
     await sendOutbound(phone, confirmation2);
     onBotMessage(confirmation2);
 
@@ -277,7 +290,7 @@ async function handleInbound(payload, options = {}) {
       metadata: { ...conv.metadata, senderName },
     });
 
-    appendConversationMessage(phone, { role: "bot", text: confirmation1 });
+    appendConversationMessage(phone, { role: "bot", text: empatheticConfirmation1 });
     appendConversationMessage(phone, { role: "bot", text: confirmation2 });
 
     await appendLeadRow({
@@ -354,7 +367,7 @@ async function handleInbound(payload, options = {}) {
 
   // Purple (uncertain): keep lead alive and ask a clarifying question.
   const purpleQuestion =
-    "Gracias por escribirnos. Para poder ayudarle bien, me confirma por favor: quien fallecio, si trabajaba o cotizaba, y la fecha aproximada del fallecimiento?";
+    "Lamentamos su perdida. Oro por el eterno descanso de su ser querido. Para poder ayudarle bien, me confirma por favor: quien fallecio, si trabajaba o cotizaba, y la fecha aproximada del fallecimiento?";
   await sendOutbound(phone, purpleQuestion);
   onBotMessage(purpleQuestion);
   upsertConversation(phone, {
