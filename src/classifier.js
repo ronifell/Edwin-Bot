@@ -122,6 +122,17 @@ function classifyMessage(text) {
     normalized.includes("empresa") ||
     normalized.includes("colpensiones") ||
     normalized.includes("comerciante");
+  const selfRetirementSignal =
+    !hasDeathSignal &&
+    (normalized.includes("yo ") || normalized.startsWith("yo")) &&
+    (normalized.includes("cotice") ||
+      normalized.includes("cotize") ||
+      normalized.includes("semanas") ||
+      normalized.includes("edad") ||
+      normalized.includes("mi pension"));
+  if (selfRetirementSignal) {
+    return { color: "purple", reason: "self_retirement_help", intent: "self_retirement_help" };
+  }
   const hasEligibilityIntent =
     normalized.includes("beneficiari") ||
     normalized.includes("tengo derecho") ||

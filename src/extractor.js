@@ -29,10 +29,43 @@ function extractIdNumber(text) {
   return "";
 }
 
+function extractDeceasedName(text) {
+  const explicitNameMatch = text.match(
+    /\b(?:nombre(?:\s+completo)?(?:\s+del\s+fallecido)?)\s*[:\-]?\s*([a-zA-ZÀ-ÿ][a-zA-ZÀ-ÿ\s]{4,})$/i
+  );
+  if (explicitNameMatch) return explicitNameMatch[1].trim();
+
+  const calledMatch = text.match(
+    /\b(?:mi\s+(?:esposo|esposa|companero|compañero|pareja|hijo|hija|padre|madre)\s+)?se\s+llama\s+([a-zA-ZÀ-ÿ]+(?:\s+[a-zA-ZÀ-ÿ]+){0,4})/i
+  );
+  if (calledMatch) return calledMatch[1].trim();
+
+  return "";
+}
+
+function extractWorkInfo(normalizedText) {
+  const workSignals = [
+    "trabajo",
+    "trabajaba",
+    "cotizo",
+    "cotizaba",
+    "empresa",
+    "colpensiones",
+    "porvenir",
+    "comerciante",
+    "historia laboral",
+  ];
+  return workSignals.some((token) => normalizedText.includes(token))
+    ? "reportado_por_cliente"
+    : "";
+}
+
 function extractStructuredData(text) {
   const normalizedText = normalize(text);
   const idNumber = extractIdNumber(text);
   const dateMatch = text.match(dateRegex);
+  const deceasedName = extractDeceasedName(text);
+  const workInfo = extractWorkInfo(normalizedText);
 
   let claimant = "";
   const claimantPatterns = [
@@ -55,8 +88,10 @@ function extractStructuredData(text) {
   return {
     idNumber,
     deathDate: dateMatch ? dateMatch[1] : "",
+    deceasedName,
+    workInfo,
     claimant,
-    hasAllRequired: Boolean(idNumber && dateMatch),
+    hasAllRequired: Boolean(idNumber && dateMatch && (deceasedName || workInfo)),
   };
 }
 

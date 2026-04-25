@@ -20,8 +20,8 @@ const { pickRandom } = require("./utils");
 
 function buildGreenRequest() {
   const templates = [
-    "Para validar si su familiar dejo derecho a pension necesito por favor: cedula del fallecido y fecha exacta de fallecimiento (dia, mes y ano).",
-    "Para revisar su caso, compartame por favor la cedula del fallecido y la fecha exacta de fallecimiento con dia, mes y ano.",
+    "Para validar si su familiar dejo derecho a pension necesito por favor estos datos: cedula del fallecido, nombre completo del fallecido, fecha exacta de fallecimiento (dia, mes y ano), y si trabajaba o cotizaba (si sabe la empresa o fondo, me la indica).",
+    "Para revisar su caso, compartame por favor: cedula del fallecido, nombre completo, fecha exacta de fallecimiento con dia, mes y ano, y si trabajaba o cotizaba.",
   ];
   return pickRandom(templates);
 }
@@ -38,7 +38,7 @@ function buildRedClose() {
 }
 
 function buildDocsInfo() {
-  return "Por ahora necesito cedula de la persona fallecida y la fecha exacta de fallecimiento (dia, mes y ano) para revisar si dejo derecho a pension.";
+  return "Por ahora necesito cedula de la persona fallecida, nombre completo del fallecido, fecha exacta de fallecimiento (dia, mes y ano), y si trabajaba o cotizaba para revisar si dejo derecho a pension.";
 }
 
 function buildHowItWorksInfo() {
@@ -164,9 +164,10 @@ function stripCondolencePhrases(text) {
     .trim();
 }
 
-function withCondolenceOnce(conv, baseText) {
+function withCondolenceOnce(conv, baseText, includeCondolence = true) {
   const alreadySent = Boolean(conv?.metadata?.condolenceSent);
   const cleanBaseText = stripCondolencePhrases(baseText);
+  if (!includeCondolence) return { text: cleanBaseText, metadataPatch: {} };
   if (alreadySent) return { text: cleanBaseText, metadataPatch: {} };
   const condolence = "Lamentamos su perdida. Oro por el eterno descanso de su ser querido.";
   return { text: `${condolence} ${cleanBaseText}`.trim(), metadataPatch: { condolenceSent: true } };
@@ -175,7 +176,9 @@ function withCondolenceOnce(conv, baseText) {
 function buildMissingFieldsPrompt(missingFields) {
   const labels = {
     idNumber: "el numero de cedula del fallecido",
+    deceasedName: "el nombre completo del fallecido",
     deathDate: "la fecha exacta de fallecimiento (dia, mes y ano)",
+    workInfo: "si la persona fallecida trabajaba o cotizaba (y, si sabe, en que empresa o fondo)",
   };
   const requested = missingFields.map((field) => labels[field]).filter(Boolean);
   if (!requested.length) return "";
@@ -185,6 +188,10 @@ function buildMissingFieldsPrompt(missingFields) {
   const last = requested[requested.length - 1];
   const first = requested.slice(0, -1).join(" y ");
   return `Gracias por la informacion. Para continuar, por favor envieme ${first} y ${last}.`;
+}
+
+function hasAllRequestedData(mergedData, requestedFields) {
+  return requestedFields.every((field) => Boolean(mergedData[field]));
 }
 
 async function handleInbound(payload, options = {}) {
@@ -217,6 +224,8 @@ async function handleInbound(payload, options = {}) {
   appendConversationMessage(phone, { role: "user", text, rawType: isAudio ? "audio" : "text" });
 
   const normalizedText = normalize(text);
+  const deathContextDetected =
+    hasDeathContext(normalizedText) || Boolean(conv.metadata?.deathContextDetected) || Boolean(conv.data?.deathDate);
   if (isGreetingOnly(normalizedText)) {
     const greeting = [
       "Hola, gracias por escribirnos.",
@@ -243,11 +252,13 @@ async function handleInbound(payload, options = {}) {
         awaitingData: true,
         reminderCount: 0,
         color: "purple",
-        data: { idNumber: "", deathDate: "", claimant: "" },
+        data: { idNumber: "", deathDate: "", deceasedName: "", workInfo: "", claimant: "" },
         metadata: {
           ...conv.metadata,
           ...reopenMsg.metadataPatch,
+          deathContextDetected,
           senderName,
+          requestedFields: ["idNumber", "deceasedName", "deathDate", "workInfo"],
           reopenedAt: new Date().toISOString(),
         },
       });
@@ -261,7 +272,7 @@ async function handleInbound(payload, options = {}) {
       onBotMessage(alreadyReceived.text);
       appendConversationMessage(phone, { role: "bot", text: alreadyReceived.text });
       upsertConversation(phone, {
-        metadata: { ...conv.metadata, ...alreadyReceived.metadataPatch, senderName },
+        metadata: { ...conv.metadata, ...alreadyReceived.metadataPatch, deathContextDetected, senderName },
       });
       return { ok: true, responseType: "already_in_review" };
     }
@@ -271,25 +282,33 @@ async function handleInbound(payload, options = {}) {
   const mergedData = {
     idNumber: extracted.idNumber || conv.data?.idNumber || "",
     deathDate: extracted.deathDate || conv.data?.deathDate || "",
+    deceasedName: extracted.deceasedName || conv.data?.deceasedName || "",
+    workInfo: extracted.workInfo || conv.data?.workInfo || "",
     claimant: extracted.claimant || conv.data?.claimant || "",
   };
   const requestedFields =
     conv.metadata?.requestedFields && conv.metadata.requestedFields.length
       ? conv.metadata.requestedFields
       : conv.awaitingData
-        ? ["idNumber", "deathDate"]
+        ? ["idNumber", "deceasedName", "deathDate", "workInfo"]
         : [];
-  const userProvidedTrackedFieldInThisMessage = Boolean(extracted.idNumber || extracted.deathDate);
+  const userProvidedTrackedFieldInThisMessage = Boolean(
+    extracted.idNumber || extracted.deathDate || extracted.deceasedName || extracted.workInfo
+  );
   if (conv.awaitingData && requestedFields.length && userProvidedTrackedFieldInThisMessage) {
     const missingFields = requestedFields.filter((field) => !mergedData[field]);
     if (missingFields.length) {
-      const missingPrompt = withCondolenceOnce(conv, buildMissingFieldsPrompt(missingFields));
+      const missingPrompt = withCondolenceOnce(
+        conv,
+        buildMissingFieldsPrompt(missingFields),
+        deathContextDetected
+      );
       await sendOutbound(phone, missingPrompt.text);
       onBotMessage(missingPrompt.text);
       upsertConversation(phone, {
         awaitingData: true,
         data: mergedData,
-        metadata: { ...conv.metadata, ...missingPrompt.metadataPatch, senderName },
+        metadata: { ...conv.metadata, ...missingPrompt.metadataPatch, deathContextDetected, senderName },
       });
       appendConversationMessage(phone, { role: "bot", text: missingPrompt.text });
       return { ok: true, responseType: "request_missing_data" };
@@ -313,8 +332,9 @@ async function handleInbound(payload, options = {}) {
       metadata: {
         ...conv.metadata,
         ...docsComposed.metadataPatch,
+        deathContextDetected,
         senderName,
-        requestedFields: ["idNumber", "deathDate"],
+        requestedFields: ["idNumber", "deceasedName", "deathDate", "workInfo"],
       },
     });
     appendConversationMessage(phone, { role: "bot", text: docs });
@@ -336,12 +356,28 @@ async function handleInbound(payload, options = {}) {
       metadata: {
         ...conv.metadata,
         ...infoComposed.metadataPatch,
+        deathContextDetected,
         senderName,
-        requestedFields: ["idNumber", "deathDate"],
+        requestedFields: ["idNumber", "deceasedName", "deathDate", "workInfo"],
       },
     });
     appendConversationMessage(phone, { role: "bot", text: info });
     return { ok: true, responseType: "how_it_works_info" };
+  }
+
+  if (classification.intent === "self_retirement_help") {
+    const reply = "Y necesita alguna ayuda con eso o puede hacerlo usted mismo?";
+    await sendOutbound(phone, reply);
+    onBotMessage(reply);
+    upsertConversation(phone, {
+      color: "purple",
+      status: "active",
+      awaitingData: false,
+      data: mergedData,
+      metadata: { ...conv.metadata, deathContextDetected, senderName },
+    });
+    appendConversationMessage(phone, { role: "bot", text: reply });
+    return { ok: true, responseType: "self_retirement_help" };
   }
 
   const previousColor = conv.color || "purple";
@@ -352,7 +388,7 @@ async function handleInbound(payload, options = {}) {
   if (classification.isVictimCase && !normalizedText.includes("si esta relacionada")) {
     const victimPromptBase =
       "Gracias por contarnos. Para continuar, confirmeme por favor si el caso de victima esta directamente relacionado con el fallecimiento que daria derecho a pension (si o no).";
-    const victimPrompt = withCondolenceOnce(conv, victimPromptBase);
+    const victimPrompt = withCondolenceOnce(conv, victimPromptBase, deathContextDetected);
     await sendOutbound(phone, victimPrompt.text);
     onBotMessage(victimPrompt.text);
     upsertConversation(phone, {
@@ -362,6 +398,7 @@ async function handleInbound(payload, options = {}) {
       metadata: {
         ...conv.metadata,
         ...victimPrompt.metadataPatch,
+        deathContextDetected,
         awaitingVictimRelation: true,
         senderName,
       },
@@ -373,16 +410,16 @@ async function handleInbound(payload, options = {}) {
 
   if (conv.metadata?.awaitingVictimRelation) {
     if (normalizedText.includes("no")) {
-      const msg = buildRedClose();
-      await sendOutbound(phone, msg);
-      onBotMessage(msg);
+      const msg = withCondolenceOnce(conv, buildRedClose(), deathContextDetected);
+      await sendOutbound(phone, msg.text);
+      onBotMessage(msg.text);
       upsertConversation(phone, {
         color: "red",
         status: "closed",
         awaitingData: false,
-        metadata: { ...conv.metadata, awaitingVictimRelation: false },
+        metadata: { ...conv.metadata, deathContextDetected, awaitingVictimRelation: false },
       });
-      appendConversationMessage(phone, { role: "bot", text: msg });
+      appendConversationMessage(phone, { role: "bot", text: msg.text });
       return { ok: true, responseType: "victim_rejected" };
     }
     upsertConversation(phone, {
@@ -391,12 +428,17 @@ async function handleInbound(payload, options = {}) {
   }
 
   // If data is complete, confirm and close as candidate for manual legal check.
-  if (mergedData.idNumber && mergedData.deathDate) {
+  const completeForCurrentRequest = hasAllRequestedData(
+    mergedData,
+    requestedFields.length ? requestedFields : ["idNumber", "deceasedName", "deathDate", "workInfo"]
+  );
+  if (completeForCurrentRequest) {
     incrementDailyStat(getTodayKey(), "idNumbersCollected");
     incrementDailyStat(getTodayKey(), "deathDatesCollected");
 
-    const confirmation1 = "Perfecto, muchas gracias por la informacion. Estare consultando su caso.";
-    const composedConfirmation = withCondolenceOnce(conv, confirmation1);
+    const confirmation1 =
+      "Perfecto, muchas gracias por la informacion. Estare consultando si la persona fallecida dejo derecho a pension para usted y/o los demas beneficiarios.";
+    const composedConfirmation = withCondolenceOnce(conv, confirmation1, deathContextDetected);
     const confirmation2 =
       "La contactare unica y exclusivamente si encuentro que dejo derecho a pension. Si no me vuelvo a comunicar, probablemente no se encontro derecho.";
 
@@ -413,6 +455,7 @@ async function handleInbound(payload, options = {}) {
       metadata: {
         ...conv.metadata,
         ...composedConfirmation.metadataPatch,
+        deathContextDetected,
         senderName,
         requestedFields: [],
       },
@@ -434,7 +477,7 @@ async function handleInbound(payload, options = {}) {
   }
 
   if (color === "red") {
-    const messageToSend = withCondolenceOnce(conv, buildRedClose());
+    const messageToSend = withCondolenceOnce(conv, buildRedClose(), deathContextDetected);
     await sendOutbound(phone, messageToSend.text);
     onBotMessage(messageToSend.text);
     upsertConversation(phone, {
@@ -442,7 +485,7 @@ async function handleInbound(payload, options = {}) {
       status: "closed",
       awaitingData: false,
       data: mergedData,
-      metadata: { ...conv.metadata, ...messageToSend.metadataPatch, senderName },
+      metadata: { ...conv.metadata, ...messageToSend.metadataPatch, deathContextDetected, senderName },
     });
     appendConversationMessage(phone, { role: "bot", text: messageToSend.text });
     return { ok: true, responseType: "closed_red" };
@@ -455,7 +498,7 @@ async function handleInbound(payload, options = {}) {
       messageToSend = [
         "Buen dia.",
         "No importa que no se hayan casado.",
-        "Por favor enviar numero de cedula de el y fecha de fallecimiento con dia mes y ano.",
+        "Por favor enviar numero de cedula de el, nombre completo, fecha de fallecimiento con dia mes y ano, y si trabajaba o cotizaba.",
       ].join(" ");
       allowAiRewrite = false;
     }
@@ -472,7 +515,7 @@ async function handleInbound(payload, options = {}) {
       }
     }
 
-    const greenReply = withCondolenceOnce(conv, messageToSend);
+    const greenReply = withCondolenceOnce(conv, messageToSend, deathContextDetected);
     await sendOutbound(phone, greenReply.text);
     onBotMessage(greenReply.text);
     upsertConversation(phone, {
@@ -484,8 +527,9 @@ async function handleInbound(payload, options = {}) {
       metadata: {
         ...conv.metadata,
         ...greenReply.metadataPatch,
+        deathContextDetected,
         senderName,
-        requestedFields: ["idNumber", "deathDate"],
+        requestedFields: ["idNumber", "deceasedName", "deathDate", "workInfo"],
         followUpAt: dayjs().add(7, "hour").toISOString(),
       },
     });
@@ -494,7 +538,7 @@ async function handleInbound(payload, options = {}) {
   }
 
   if (color === "yellow") {
-    const messageToSend = withCondolenceOnce(conv, buildYellowQuestions());
+    const messageToSend = withCondolenceOnce(conv, buildYellowQuestions(), deathContextDetected);
     await sendOutbound(phone, messageToSend.text);
     onBotMessage(messageToSend.text);
     upsertConversation(phone, {
@@ -506,7 +550,9 @@ async function handleInbound(payload, options = {}) {
       metadata: {
         ...conv.metadata,
         ...messageToSend.metadataPatch,
+        deathContextDetected,
         senderName,
+        requestedFields: ["idNumber", "deceasedName", "deathDate", "workInfo"],
         followUpAt: dayjs().add(7, "hour").toISOString(),
       },
     });
@@ -517,7 +563,8 @@ async function handleInbound(payload, options = {}) {
   // Purple (uncertain): keep lead alive and ask a clarifying question.
   const purpleQuestion = withCondolenceOnce(
     conv,
-    "Para poder ayudarle bien, me confirma por favor: quien fallecio, si trabajaba o cotizaba, y la fecha aproximada del fallecimiento?"
+    "Para poder ayudarle bien, me confirma por favor: quien fallecio, si trabajaba o cotizaba, y la fecha aproximada del fallecimiento?",
+    deathContextDetected
   );
   await sendOutbound(phone, purpleQuestion.text);
   onBotMessage(purpleQuestion.text);
@@ -530,7 +577,9 @@ async function handleInbound(payload, options = {}) {
     metadata: {
       ...conv.metadata,
       ...purpleQuestion.metadataPatch,
+      deathContextDetected,
       senderName,
+      requestedFields: ["idNumber", "deceasedName", "deathDate", "workInfo"],
       followUpAt: dayjs().add(7, "hour").toISOString(),
     },
   });
