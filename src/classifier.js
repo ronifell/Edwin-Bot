@@ -96,7 +96,13 @@ function classifyMessage(text) {
   const normalized = normalize(text);
   const hasDeathSignal =
     normalized.includes("fallecio") ||
+    normalized.includes("fallecida") ||
+    normalized.includes("fallecido") ||
     normalized.includes("murio") ||
+    normalized.includes("muerto") ||
+    normalized.includes("muerta") ||
+    normalized.includes("perdi") ||
+    normalized.includes("perdio") ||
     normalized.includes("mataron") ||
     normalized.includes("asesinaron") ||
     normalized.includes("muerte");

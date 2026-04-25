@@ -100,10 +100,13 @@ function buildInput(block) {
 
 function responseMatches(expectedType, actualType) {
   if (expectedType === actualType) return true;
+  // Keep compatibility strict to avoid false "pass" results.
   const compatible = {
-    green_request_data: ["yellow_questions", "purple_clarification", "data_collected", "docs_info"],
-    yellow_questions: ["green_request_data", "purple_clarification"],
-    purple_clarification: ["yellow_questions", "green_request_data", "docs_info", "greeting", "data_collected"],
+    // If client already sent id+date in same block, collecting data is valid.
+    green_request_data: ["data_collected"],
+    // Reference examples are noisy; yellow and purple can overlap only between them.
+    yellow_questions: ["purple_clarification"],
+    purple_clarification: ["yellow_questions"],
   };
   return (compatible[expectedType] || []).includes(actualType);
 }

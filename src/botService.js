@@ -20,21 +20,21 @@ const { pickRandom } = require("./utils");
 
 function buildGreenRequest() {
   const templates = [
-    "Lamentamos su perdida. Oro por el eterno descanso de su ser querido. Para validar si su familiar dejo derecho a pension necesito por favor: cedula del fallecido y fecha exacta de fallecimiento (dia, mes y ano).",
-    "Lamento mucho esta situacion. Oro por el eterno descanso de su ser querido. Para revisar su caso, compartame por favor la cedula del fallecido y la fecha exacta de fallecimiento con dia, mes y ano.",
+    "Para validar si su familiar dejo derecho a pension necesito por favor: cedula del fallecido y fecha exacta de fallecimiento (dia, mes y ano).",
+    "Para revisar su caso, compartame por favor la cedula del fallecido y la fecha exacta de fallecimiento con dia, mes y ano.",
   ];
   return pickRandom(templates);
 }
 
 function buildYellowQuestions() {
   return pickRandom([
-    "Lamentamos su perdida. Oro por el eterno descanso de su ser querido. Para orientarle mejor necesito tres datos: quien fallecio, cuando fallecio y si cotizaba pension o trabajaba.",
-    "Lamentamos su perdida. Oro por el eterno descanso de su ser querido. Para revisar viabilidad, por favor confirmeme: quien fallecio, cuando fallecio y por que le negaron la pension (si ya reclamo).",
+    "Para orientarle mejor necesito tres datos: quien fallecio, cuando fallecio y si cotizaba pension o trabajaba.",
+    "Para revisar viabilidad, por favor confirmeme: quien fallecio, cuando fallecio y por que le negaron la pension (si ya reclamo).",
   ]);
 }
 
 function buildRedClose() {
-  return "Lamentamos su perdida y oramos por el eterno descanso de su ser querido. Siento no poder ayudarle, pero en este momento no manejamos ese tipo de casos. Gracias por escribirnos.";
+  return "Siento no poder ayudarle, pero en este momento no manejamos ese tipo de casos. Gracias por escribirnos.";
 }
 
 function buildDocsInfo() {
@@ -64,6 +64,7 @@ function isGreetingOnly(normalizedText) {
     "hola",
     "buen dia",
     "buenos dias",
+    "buena tarde",
     "buenas tardes",
     "buenas noches",
     "que tal",
@@ -89,9 +90,22 @@ function isGreetingOnly(normalizedText) {
     "esposa",
     "hijo",
     "hija",
+    "beneficiario",
+    "beneficiaria",
+    "derecho",
+    "reclamar",
+    "reclamo",
+    "consulta",
+    "asesoria",
+    "ayuda",
+    "quiero",
+    "quisiera",
+    "gustaria",
+    "saber",
   ];
   if (legalSignals.some((token) => normalizedText.includes(token))) return false;
-  return normalizedText.length <= 80;
+  const words = normalizedText.split(" ").filter(Boolean).length;
+  return normalizedText.length <= 40 && words <= 6;
 }
 
 function looksLikeNewCaseIntent(normalizedText) {
@@ -124,6 +138,27 @@ function looksLikeNewCaseIntent(normalizedText) {
     restartPhrases.some((token) => normalizedText.includes(token)) &&
     caseSignals.some((token) => normalizedText.includes(token))
   );
+}
+
+function hasUnmarriedConcern(normalizedText) {
+  const unmarriedSignals = [
+    "no nos casamos",
+    "no se casaron",
+    "no estaban casados",
+    "no estabamos casados",
+    "no me case",
+    "no estaba casada",
+    "no estaba casado",
+    "union libre",
+  ];
+  return unmarriedSignals.some((token) => normalizedText.includes(token));
+}
+
+function withCondolenceOnce(conv, baseText) {
+  const alreadySent = Boolean(conv?.metadata?.condolenceSent);
+  if (alreadySent) return { text: baseText, metadataPatch: {} };
+  const condolence = "Lamentamos su perdida. Oro por el eterno descanso de su ser querido.";
+  return { text: `${condolence} ${baseText}`.trim(), metadataPatch: { condolenceSent: true } };
 }
 
 async function handleInbound(payload, options = {}) {
@@ -170,11 +205,12 @@ async function handleInbound(payload, options = {}) {
 
   if (conv.status === "pending_legal_review") {
     if (looksLikeNewCaseIntent(normalizedText)) {
-      const reopenMsg =
-        "Lamentamos su perdida. Oro por el eterno descanso de su ser querido. Perfecto, iniciamos un nuevo caso. Para revisarlo necesito por favor la cedula del fallecido y la fecha exacta de fallecimiento (dia, mes y ano).";
-      await sendOutbound(phone, reopenMsg);
-      onBotMessage(reopenMsg);
-      appendConversationMessage(phone, { role: "bot", text: reopenMsg });
+      const reopenBase =
+        "Perfecto, iniciamos un nuevo caso. Para revisarlo necesito por favor la cedula del fallecido y la fecha exacta de fallecimiento (dia, mes y ano).";
+      const reopenMsg = withCondolenceOnce(conv, reopenBase);
+      await sendOutbound(phone, reopenMsg.text);
+      onBotMessage(reopenMsg.text);
+      appendConversationMessage(phone, { role: "bot", text: reopenMsg.text });
 
       upsertConversation(phone, {
         status: "active",
@@ -182,17 +218,26 @@ async function handleInbound(payload, options = {}) {
         reminderCount: 0,
         color: "purple",
         data: { idNumber: "", deathDate: "", claimant: "" },
-        metadata: { ...conv.metadata, senderName, reopenedAt: new Date().toISOString() },
+        metadata: {
+          ...conv.metadata,
+          ...reopenMsg.metadataPatch,
+          senderName,
+          reopenedAt: new Date().toISOString(),
+        },
       });
       conv = getConversation(phone);
       return { ok: true, responseType: "reopened_new_case" };
     } else {
-    const alreadyReceived =
-      "Lamentamos su perdida y oramos por el eterno descanso de su ser querido. Gracias. Ya tengo sus datos en revision. Si encuentro derecho a pension, la contactare directamente.";
-    await sendOutbound(phone, alreadyReceived);
-    onBotMessage(alreadyReceived);
-    appendConversationMessage(phone, { role: "bot", text: alreadyReceived });
-    return { ok: true, responseType: "already_in_review" };
+      const alreadyBase =
+        "Gracias. Ya tengo sus datos en revision. Si encuentro derecho a pension, la contactare directamente.";
+      const alreadyReceived = withCondolenceOnce(conv, alreadyBase);
+      await sendOutbound(phone, alreadyReceived.text);
+      onBotMessage(alreadyReceived.text);
+      appendConversationMessage(phone, { role: "bot", text: alreadyReceived.text });
+      upsertConversation(phone, {
+        metadata: { ...conv.metadata, ...alreadyReceived.metadataPatch, senderName },
+      });
+      return { ok: true, responseType: "already_in_review" };
     }
   }
 
@@ -207,16 +252,17 @@ async function handleInbound(payload, options = {}) {
   const color = classification.color;
   if (classification.intent === "docs") {
     const docsBase = buildDocsInfo();
-    const docs = hasDeathContext(normalizedText)
-      ? `Lamentamos su perdida. Oro por el eterno descanso de su ser querido. ${docsBase}`
-      : docsBase;
+    const docsComposed = hasDeathContext(normalizedText)
+      ? withCondolenceOnce(conv, docsBase)
+      : { text: docsBase, metadataPatch: {} };
+    const docs = docsComposed.text;
     await sendOutbound(phone, docs);
     onBotMessage(docs);
     upsertConversation(phone, {
       color: "purple",
       status: "active",
       awaitingData: true,
-      metadata: { ...conv.metadata, senderName },
+      metadata: { ...conv.metadata, ...docsComposed.metadataPatch, senderName },
     });
     appendConversationMessage(phone, { role: "bot", text: docs });
     return { ok: true, responseType: "docs_info" };
@@ -224,16 +270,17 @@ async function handleInbound(payload, options = {}) {
 
   if (classification.intent === "how_it_works") {
     const infoBase = buildHowItWorksInfo();
-    const info = hasDeathContext(normalizedText)
-      ? `Lamentamos su perdida. Oro por el eterno descanso de su ser querido. ${infoBase}`
-      : infoBase;
+    const infoComposed = hasDeathContext(normalizedText)
+      ? withCondolenceOnce(conv, infoBase)
+      : { text: infoBase, metadataPatch: {} };
+    const info = infoComposed.text;
     await sendOutbound(phone, info);
     onBotMessage(info);
     upsertConversation(phone, {
       color: "purple",
       status: "active",
       awaitingData: true,
-      metadata: { ...conv.metadata, senderName },
+      metadata: { ...conv.metadata, ...infoComposed.metadataPatch, senderName },
     });
     appendConversationMessage(phone, { role: "bot", text: info });
     return { ok: true, responseType: "how_it_works_info" };
@@ -245,18 +292,24 @@ async function handleInbound(payload, options = {}) {
   }
 
   if (classification.isVictimCase && !normalizedText.includes("si esta relacionada")) {
-    const victimPrompt =
-      "Lamentamos su perdida. Oro por el eterno descanso de su ser querido. Gracias por contarnos. Para continuar, confirmeme por favor si el caso de victima esta directamente relacionado con el fallecimiento que daria derecho a pension (si o no).";
-    await sendOutbound(phone, victimPrompt);
-    onBotMessage(victimPrompt);
+    const victimPromptBase =
+      "Gracias por contarnos. Para continuar, confirmeme por favor si el caso de victima esta directamente relacionado con el fallecimiento que daria derecho a pension (si o no).";
+    const victimPrompt = withCondolenceOnce(conv, victimPromptBase);
+    await sendOutbound(phone, victimPrompt.text);
+    onBotMessage(victimPrompt.text);
     upsertConversation(phone, {
       color: "yellow",
       awaitingData: false,
       status: "active",
-      metadata: { ...conv.metadata, awaitingVictimRelation: true, senderName },
+      metadata: {
+        ...conv.metadata,
+        ...victimPrompt.metadataPatch,
+        awaitingVictimRelation: true,
+        senderName,
+      },
       data: mergedData,
     });
-    appendConversationMessage(phone, { role: "bot", text: victimPrompt });
+    appendConversationMessage(phone, { role: "bot", text: victimPrompt.text });
     return { ok: true, responseType: "victim_clarification" };
   }
 
@@ -285,13 +338,12 @@ async function handleInbound(payload, options = {}) {
     incrementDailyStat(getTodayKey(), "deathDatesCollected");
 
     const confirmation1 = "Perfecto, muchas gracias por la informacion. Estare consultando su caso.";
-    const empatheticConfirmation1 =
-      "Lamentamos su perdida. Oro por el eterno descanso de su ser querido. Perfecto, muchas gracias por la informacion. Estare consultando su caso.";
+    const composedConfirmation = withCondolenceOnce(conv, confirmation1);
     const confirmation2 =
       "La contactare unica y exclusivamente si encuentro que dejo derecho a pension. Si no me vuelvo a comunicar, probablemente no se encontro derecho.";
 
-    await sendOutbound(phone, empatheticConfirmation1);
-    onBotMessage(empatheticConfirmation1);
+    await sendOutbound(phone, composedConfirmation.text);
+    onBotMessage(composedConfirmation.text);
     await sendOutbound(phone, confirmation2);
     onBotMessage(confirmation2);
 
@@ -300,10 +352,10 @@ async function handleInbound(payload, options = {}) {
       awaitingData: false,
       color: color === "red" ? "yellow" : color,
       data: mergedData,
-      metadata: { ...conv.metadata, senderName },
+      metadata: { ...conv.metadata, ...composedConfirmation.metadataPatch, senderName },
     });
 
-    appendConversationMessage(phone, { role: "bot", text: empatheticConfirmation1 });
+    appendConversationMessage(phone, { role: "bot", text: composedConfirmation.text });
     appendConversationMessage(phone, { role: "bot", text: confirmation2 });
 
     await appendLeadRow({
@@ -319,23 +371,32 @@ async function handleInbound(payload, options = {}) {
   }
 
   if (color === "red") {
-    const messageToSend = buildRedClose();
-    await sendOutbound(phone, messageToSend);
-    onBotMessage(messageToSend);
+    const messageToSend = withCondolenceOnce(conv, buildRedClose());
+    await sendOutbound(phone, messageToSend.text);
+    onBotMessage(messageToSend.text);
     upsertConversation(phone, {
       color: "red",
       status: "closed",
       awaitingData: false,
       data: mergedData,
-      metadata: { ...conv.metadata, senderName },
+      metadata: { ...conv.metadata, ...messageToSend.metadataPatch, senderName },
     });
-    appendConversationMessage(phone, { role: "bot", text: messageToSend });
+    appendConversationMessage(phone, { role: "bot", text: messageToSend.text });
     return { ok: true, responseType: "closed_red" };
   }
 
   if (color === "green") {
     let messageToSend = buildGreenRequest();
-    if (config.openai.enableReplyGeneration) {
+    let allowAiRewrite = true;
+    if (hasUnmarriedConcern(normalizedText)) {
+      messageToSend = [
+        "Buen dia.",
+        "No importa que no se hayan casado.",
+        "Por favor enviar numero de cedula de el y fecha de fallecimiento con dia mes y ano.",
+      ].join(" ");
+      allowAiRewrite = false;
+    }
+    if (config.openai.enableReplyGeneration && allowAiRewrite) {
       try {
         const aiReply = await generateNaturalReply({
           userText: text,
@@ -348,50 +409,68 @@ async function handleInbound(payload, options = {}) {
       }
     }
 
-    await sendOutbound(phone, messageToSend);
-    onBotMessage(messageToSend);
+    const greenReply = withCondolenceOnce(conv, messageToSend);
+    await sendOutbound(phone, greenReply.text);
+    onBotMessage(greenReply.text);
     upsertConversation(phone, {
       color: "green",
       status: "active",
       awaitingData: true,
       reminderCount: 0,
       data: mergedData,
-      metadata: { ...conv.metadata, senderName, followUpAt: dayjs().add(7, "hour").toISOString() },
+      metadata: {
+        ...conv.metadata,
+        ...greenReply.metadataPatch,
+        senderName,
+        followUpAt: dayjs().add(7, "hour").toISOString(),
+      },
     });
-    appendConversationMessage(phone, { role: "bot", text: messageToSend });
+    appendConversationMessage(phone, { role: "bot", text: greenReply.text });
     return { ok: true, responseType: "green_request_data" };
   }
 
   if (color === "yellow") {
-    const messageToSend = buildYellowQuestions();
-    await sendOutbound(phone, messageToSend);
-    onBotMessage(messageToSend);
+    const messageToSend = withCondolenceOnce(conv, buildYellowQuestions());
+    await sendOutbound(phone, messageToSend.text);
+    onBotMessage(messageToSend.text);
     upsertConversation(phone, {
       color: "yellow",
       status: "active",
       awaitingData: true,
       reminderCount: 0,
       data: mergedData,
-      metadata: { ...conv.metadata, senderName, followUpAt: dayjs().add(7, "hour").toISOString() },
+      metadata: {
+        ...conv.metadata,
+        ...messageToSend.metadataPatch,
+        senderName,
+        followUpAt: dayjs().add(7, "hour").toISOString(),
+      },
     });
-    appendConversationMessage(phone, { role: "bot", text: messageToSend });
+    appendConversationMessage(phone, { role: "bot", text: messageToSend.text });
     return { ok: true, responseType: "yellow_questions" };
   }
 
   // Purple (uncertain): keep lead alive and ask a clarifying question.
-  const purpleQuestion =
-    "Lamentamos su perdida. Oro por el eterno descanso de su ser querido. Para poder ayudarle bien, me confirma por favor: quien fallecio, si trabajaba o cotizaba, y la fecha aproximada del fallecimiento?";
-  await sendOutbound(phone, purpleQuestion);
-  onBotMessage(purpleQuestion);
+  const purpleQuestion = withCondolenceOnce(
+    conv,
+    "Para poder ayudarle bien, me confirma por favor: quien fallecio, si trabajaba o cotizaba, y la fecha aproximada del fallecimiento?"
+  );
+  await sendOutbound(phone, purpleQuestion.text);
+  onBotMessage(purpleQuestion.text);
   upsertConversation(phone, {
     color: "purple",
     status: "active",
     awaitingData: true,
     reminderCount: 0,
     data: mergedData,
-    metadata: { ...conv.metadata, senderName, followUpAt: dayjs().add(7, "hour").toISOString() },
+    metadata: {
+      ...conv.metadata,
+      ...purpleQuestion.metadataPatch,
+      senderName,
+      followUpAt: dayjs().add(7, "hour").toISOString(),
+    },
   });
-  appendConversationMessage(phone, { role: "bot", text: purpleQuestion });
+  appendConversationMessage(phone, { role: "bot", text: purpleQuestion.text });
   return { ok: true, responseType: "purple_clarification" };
 }
 
