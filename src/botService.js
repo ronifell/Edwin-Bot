@@ -60,10 +60,19 @@ function extractInbound(payload) {
 }
 
 function isGreetingOnly(normalizedText) {
-  const hasGreetingPrompt =
-    normalizedText.includes("como esta") ||
-    normalizedText.includes("como estas") ||
-    normalizedText.includes("como se encuentra");
+  const greetingTokens = [
+    "hola",
+    "buen dia",
+    "buenos dias",
+    "buenas tardes",
+    "buenas noches",
+    "que tal",
+    "como esta",
+    "como estas",
+    "como se encuentra",
+    "saludos",
+  ];
+  const hasGreetingPrompt = greetingTokens.some((token) => normalizedText.includes(token));
   if (!hasGreetingPrompt) return false;
 
   const legalSignals = [
@@ -148,7 +157,11 @@ async function handleInbound(payload, options = {}) {
 
   const normalizedText = normalize(text);
   if (isGreetingOnly(normalizedText)) {
-    const greeting = "Me encuentro bien, gracias a Dios. Y usted como esta?";
+    const greeting = [
+      "Hola, gracias por escribirnos.",
+      "Soy Edwin Tello, abogado especialista en pensiones de sobrevivientes a nivel nacional.",
+      "Cómo podemos ayudarle?",
+    ].join("\n");
     await sendOutbound(phone, greeting);
     onBotMessage(greeting);
     appendConversationMessage(phone, { role: "bot", text: greeting });
