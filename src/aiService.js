@@ -1,9 +1,33 @@
 const OpenAI = require("openai");
+const fs = require("fs");
+const path = require("path");
 const { config } = require("./config");
 
-const client = new OpenAI({ apiKey: config.openai.apiKey });
+const client = config.openai.apiKey ? new OpenAI({ apiKey: config.openai.apiKey }) : null;
+
+const ABOUT_PATH = path.join(process.cwd(), "about.md");
+const CONVERSATION_PATH = path.join(process.cwd(), "conversation.md");
+
+function safeRead(filePath, fallback = "") {
+  try {
+    if (!fs.existsSync(filePath)) return fallback;
+    return fs.readFileSync(filePath, "utf8");
+  } catch {
+    return fallback;
+  }
+}
+
+function trimForPrompt(text, maxChars) {
+  const input = String(text || "");
+  if (input.length <= maxChars) return input;
+  return input.slice(0, maxChars);
+}
+
+const ABOUT_CONTEXT = trimForPrompt(safeRead(ABOUT_PATH), 8000);
+const CONVERSATION_CONTEXT = trimForPrompt(safeRead(CONVERSATION_PATH), 12000);
 
 async function transcribeAudioFromUrl(audioUrl) {
+  if (!client) return "";
   if (!audioUrl) return "";
   const response = await fetch(audioUrl);
   if (!response.ok) {
@@ -19,21 +43,58 @@ async function transcribeAudioFromUrl(audioUrl) {
   return result.text || "";
 }
 
-async function generateNaturalReply({ userText, color, instruction }) {
-  const prompt = `
-Eres asistente legal por WhatsApp en Colombia, con tono humano, empatico y profesional.
-Debes responder en espanol natural, corto y claro.
-Color del caso: ${color}.
-Instruccion principal: ${instruction}
-Texto del usuario: "${userText}"
+async function generateNaturalReply({
+  userText,
+  color,
+  instruction,
+  responseType = "",
+  conversationHistory = [],
+}) {
+  if (!client) return "";
 
-Responde solo con el mensaje listo para WhatsApp. Nada mas.
+  const historyText = (conversationHistory || [])
+    .slice(-8)
+    .map((m) => `${m.role === "bot" ? "BOT" : "CLIENTE"}: ${m.text}`)
+    .join("\n");
+
+  const systemPrompt = `
+Eres Edwin Tello por WhatsApp (abogado especialista en pensiones de sobrevivientes en Colombia).
+Debes responder como humano, breve, empatico y natural, siguiendo el estilo real de ejemplos.
+Tu prioridad es conservar el significado legal correcto y sonar como las conversaciones de referencia.
+
+Contexto operativo (about.md):
+${ABOUT_CONTEXT}
+
+Conversaciones de estilo (conversation.md):
+${CONVERSATION_CONTEXT}
+
+Reglas obligatorias:
+- Responde en espanol claro y natural.
+- Mantente en el rol de Edwin Tello.
+- Si ya hay una pregunta activa de recoleccion de datos, no cambies de tema.
+- No inventes hechos no dados por el cliente.
+- Entrega solo el texto final del mensaje para WhatsApp.
+`.trim();
+
+  const userPrompt = `
+Color del caso: ${color}
+Tipo de respuesta esperado: ${responseType || "n/a"}
+Instruccion principal: ${instruction}
+
+Historial reciente:
+${historyText || "(sin historial)"}
+
+Mensaje actual del cliente:
+"${userText}"
 `.trim();
 
   const res = await client.chat.completions.create({
     model: config.openai.model,
-    temperature: 0.8,
-    messages: [{ role: "user", content: prompt }],
+    temperature: 0.7,
+    messages: [
+      { role: "system", content: systemPrompt },
+      { role: "user", content: userPrompt },
+    ],
   });
   return res.choices?.[0]?.message?.content?.trim() || "";
 }

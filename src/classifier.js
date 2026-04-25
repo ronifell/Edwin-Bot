@@ -124,6 +124,7 @@ function classifyMessage(text) {
     normalized.includes("comerciante");
   const selfRetirementSignal =
     !hasDeathSignal &&
+    !hasRelationSignal &&
     (normalized.includes("yo ") || normalized.startsWith("yo")) &&
     (normalized.includes("cotice") ||
       normalized.includes("cotize") ||

@@ -5,18 +5,18 @@
       "conversations": {
         "570000000001": {
           "phone": "570000000001",
-          "createdAt": "2026-04-25T16:45:52.268Z",
+          "createdAt": "2026-04-25T21:48:47.790Z",
           "messages": [
             {
               "role": "user",
               "text": "Y el ase 7años lo mataron Sí La niña es menor Ahora se lo envío Bueno",
               "rawType": "text",
-              "at": "2026-04-25T16:45:52.279Z"
+              "at": "2026-04-25T21:48:47.801Z"
             },
             {
               "role": "bot",
-              "text": "Lamentamos su perdida. Oro por el eterno descanso de su ser querido. Para revisar su caso, compartame por favor la cedula del fallecido y la fecha exacta de fallecimiento con dia, mes y ano.",
-              "at": "2026-04-25T16:45:52.294Z"
+              "text": "Lamentamos su perdida. Oro por el eterno descanso de su ser querido. Para revisar su caso, compartame por favor: cedula del fallecido, nombre completo, fecha exacta de fallecimiento con dia, mes y ano, y si trabajaba o cotizaba.",
+              "at": "2026-04-25T21:48:47.817Z"
             }
           ],
           "status": "active",
@@ -26,14 +26,23 @@
           "data": {
             "idNumber": "",
             "deathDate": "",
+            "deceasedName": "",
+            "workInfo": "",
             "claimant": ""
           },
           "metadata": {
             "senderName": "SimUser",
             "condolenceSent": true,
-            "followUpAt": "2026-04-25T23:45:52.285Z"
+            "deathContextDetected": true,
+            "requestedFields": [
+              "idNumber",
+              "deceasedName",
+              "deathDate",
+              "workInfo"
+            ],
+            "followUpAt": "2026-04-26T04:48:47.807Z"
           },
-          "updatedAt": "2026-04-25T16:45:52.294Z"
+          "updatedAt": "2026-04-25T21:48:47.817Z"
         }
       },
       "dailyStats": {
@@ -55,39 +64,43 @@
       "conversations": {
         "570000000002": {
           "phone": "570000000002",
-          "createdAt": "2026-04-25T16:45:52.300Z",
+          "createdAt": "2026-04-25T21:48:47.823Z",
           "messages": [
             {
               "role": "user",
               "text": "Sí 1063162421 3 de marzo 2026 Sí cotizó y trabajó en la empresa Sotrcón",
               "rawType": "text",
-              "at": "2026-04-25T16:45:52.309Z"
+              "at": "2026-04-25T21:48:47.834Z"
             },
             {
               "role": "bot",
-              "text": "Lamentamos su perdida. Oro por el eterno descanso de su ser querido. Perfecto, muchas gracias por la informacion. Estare consultando su caso.",
-              "at": "2026-04-25T16:45:52.334Z"
-            },
-            {
-              "role": "bot",
-              "text": "La contactare unica y exclusivamente si encuentro que dejo derecho a pension. Si no me vuelvo a comunicar, probablemente no se encontro derecho.",
-              "at": "2026-04-25T16:45:52.339Z"
+              "text": "Para validar si su familiar dejo derecho a pension necesito por favor estos datos: cedula del fallecido, nombre completo del fallecido, fecha exacta de fallecimiento (dia, mes y ano), y si trabajaba o cotizaba (si sabe la empresa o fondo, me la indica).",
+              "at": "2026-04-25T21:48:47.849Z"
             }
           ],
-          "status": "pending_legal_review",
+          "status": "active",
           "color": "green",
           "reminderCount": 0,
-          "awaitingData": false,
+          "awaitingData": true,
           "data": {
             "idNumber": "1063162421",
             "deathDate": "3 de marzo 2026",
+            "deceasedName": "",
+            "workInfo": "reportado_por_cliente",
             "claimant": ""
           },
           "metadata": {
             "senderName": "SimUser",
-            "condolenceSent": true
+            "deathContextDetected": false,
+            "requestedFields": [
+              "idNumber",
+              "deceasedName",
+              "deathDate",
+              "workInfo"
+            ],
+            "followUpAt": "2026-04-26T04:48:47.839Z"
           },
-          "updatedAt": "2026-04-25T16:45:52.339Z"
+          "updatedAt": "2026-04-25T21:48:47.849Z"
         }
       },
       "dailyStats": {
@@ -97,8 +110,8 @@
           "yellow": 0,
           "red": 0,
           "purple": 0,
-          "idNumbersCollected": 1,
-          "deathDatesCollected": 1
+          "idNumbersCollected": 0,
+          "deathDatesCollected": 0
         }
       }
     }
@@ -109,39 +122,44 @@
       "conversations": {
         "570000000003": {
           "phone": "570000000003",
-          "createdAt": "2026-04-25T16:45:52.347Z",
+          "createdAt": "2026-04-25T21:48:47.855Z",
           "messages": [
             {
               "role": "user",
               "text": "Sí Buen día cómo está Para preguntarle sobre mi esposo ya muerto, él no alcanzó nada pero al menos que devuelvan lo que él cotizó CC 71932793 murió el 12 abril 2022 un viernes",
               "rawType": "text",
-              "at": "2026-04-25T16:45:52.359Z"
+              "at": "2026-04-25T21:48:47.866Z"
             },
             {
               "role": "bot",
-              "text": "Lamentamos su perdida. Oro por el eterno descanso de su ser querido. Perfecto, muchas gracias por la informacion. Estare consultando su caso.",
-              "at": "2026-04-25T16:45:52.402Z"
-            },
-            {
-              "role": "bot",
-              "text": "La contactare unica y exclusivamente si encuentro que dejo derecho a pension. Si no me vuelvo a comunicar, probablemente no se encontro derecho.",
-              "at": "2026-04-25T16:45:52.410Z"
+              "text": "Lamentamos su perdida. Oro por el eterno descanso de su ser querido. Para validar si su familiar dejo derecho a pension necesito por favor estos datos: cedula del fallecido, nombre completo del fallecido, fecha exacta de fallecimiento (dia, mes y ano), y si trabajaba o cotizaba (si sabe la empresa o fondo, me la indica).",
+              "at": "2026-04-25T21:48:47.882Z"
             }
           ],
-          "status": "pending_legal_review",
+          "status": "active",
           "color": "green",
           "reminderCount": 0,
-          "awaitingData": false,
+          "awaitingData": true,
           "data": {
             "idNumber": "71932793",
             "deathDate": "12 abril 2022",
+            "deceasedName": "",
+            "workInfo": "reportado_por_cliente",
             "claimant": ""
           },
           "metadata": {
             "senderName": "SimUser",
-            "condolenceSent": true
+            "condolenceSent": true,
+            "deathContextDetected": true,
+            "requestedFields": [
+              "idNumber",
+              "deceasedName",
+              "deathDate",
+              "workInfo"
+            ],
+            "followUpAt": "2026-04-26T04:48:47.871Z"
           },
-          "updatedAt": "2026-04-25T16:45:52.410Z"
+          "updatedAt": "2026-04-25T21:48:47.882Z"
         }
       },
       "dailyStats": {
@@ -151,8 +169,8 @@
           "yellow": 0,
           "red": 0,
           "purple": 0,
-          "idNumbersCollected": 1,
-          "deathDatesCollected": 1
+          "idNumbersCollected": 0,
+          "deathDatesCollected": 0
         }
       }
     }
@@ -163,18 +181,18 @@
       "conversations": {
         "570000000004": {
           "phone": "570000000004",
-          "createdAt": "2026-04-25T16:45:52.420Z",
+          "createdAt": "2026-04-25T21:48:47.889Z",
           "messages": [
             {
               "role": "user",
               "text": "¡Hola! mi caso es igual y quiero saber si soy beneficiario de pensión Era mi compañero y teníamos 4 hijos En ese tiempo habían dos menores de edad",
               "rawType": "text",
-              "at": "2026-04-25T16:45:52.434Z"
+              "at": "2026-04-25T21:48:47.900Z"
             },
             {
               "role": "bot",
-              "text": "Lamentamos su perdida. Oro por el eterno descanso de su ser querido. Para revisar su caso, compartame por favor la cedula del fallecido y la fecha exacta de fallecimiento con dia, mes y ano.",
-              "at": "2026-04-25T16:45:52.454Z"
+              "text": "Para revisar su caso, compartame por favor: cedula del fallecido, nombre completo, fecha exacta de fallecimiento con dia, mes y ano, y si trabajaba o cotizaba.",
+              "at": "2026-04-25T21:48:47.916Z"
             }
           ],
           "status": "active",
@@ -184,14 +202,22 @@
           "data": {
             "idNumber": "",
             "deathDate": "",
+            "deceasedName": "",
+            "workInfo": "",
             "claimant": "hijo/hija"
           },
           "metadata": {
             "senderName": "SimUser",
-            "condolenceSent": true,
-            "followUpAt": "2026-04-25T23:45:52.444Z"
+            "deathContextDetected": false,
+            "requestedFields": [
+              "idNumber",
+              "deceasedName",
+              "deathDate",
+              "workInfo"
+            ],
+            "followUpAt": "2026-04-26T04:48:47.905Z"
           },
-          "updatedAt": "2026-04-25T16:45:52.454Z"
+          "updatedAt": "2026-04-25T21:48:47.916Z"
         }
       },
       "dailyStats": {
@@ -213,18 +239,18 @@
       "conversations": {
         "570000000005": {
           "phone": "570000000005",
-          "createdAt": "2026-04-25T16:45:52.461Z",
+          "createdAt": "2026-04-25T21:48:47.922Z",
           "messages": [
             {
               "role": "user",
               "text": "Hola soy de Quibdó y quisiera saber si soy beneficiaria Okey C.C. 1077633310",
               "rawType": "text",
-              "at": "2026-04-25T16:45:52.471Z"
+              "at": "2026-04-25T21:48:47.933Z"
             },
             {
               "role": "bot",
-              "text": "Lamentamos su perdida. Oro por el eterno descanso de su ser querido. Para validar si su familiar dejo derecho a pension necesito por favor: cedula del fallecido y fecha exacta de fallecimiento (dia, mes y ano).",
-              "at": "2026-04-25T16:45:52.486Z"
+              "text": "Para validar si su familiar dejo derecho a pension necesito por favor estos datos: cedula del fallecido, nombre completo del fallecido, fecha exacta de fallecimiento (dia, mes y ano), y si trabajaba o cotizaba (si sabe la empresa o fondo, me la indica).",
+              "at": "2026-04-25T21:48:47.949Z"
             }
           ],
           "status": "active",
@@ -234,14 +260,22 @@
           "data": {
             "idNumber": "1077633310",
             "deathDate": "",
+            "deceasedName": "",
+            "workInfo": "",
             "claimant": ""
           },
           "metadata": {
             "senderName": "SimUser",
-            "condolenceSent": true,
-            "followUpAt": "2026-04-25T23:45:52.477Z"
+            "deathContextDetected": false,
+            "requestedFields": [
+              "idNumber",
+              "deceasedName",
+              "deathDate",
+              "workInfo"
+            ],
+            "followUpAt": "2026-04-26T04:48:47.938Z"
           },
-          "updatedAt": "2026-04-25T16:45:52.486Z"
+          "updatedAt": "2026-04-25T21:48:47.949Z"
         }
       },
       "dailyStats": {
@@ -263,18 +297,18 @@
       "conversations": {
         "570000000006": {
           "phone": "570000000006",
-          "createdAt": "2026-04-25T16:45:52.493Z",
+          "createdAt": "2026-04-25T21:48:47.956Z",
           "messages": [
             {
               "role": "user",
               "text": "(audios) Ok cuando llegue a la casa le mando todo eso El número de cédula",
               "rawType": "text",
-              "at": "2026-04-25T16:45:52.503Z"
+              "at": "2026-04-25T21:48:47.967Z"
             },
             {
               "role": "bot",
-              "text": "Lamentamos su perdida. Oro por el eterno descanso de su ser querido. Para revisar su caso, compartame por favor la cedula del fallecido y la fecha exacta de fallecimiento con dia, mes y ano.",
-              "at": "2026-04-25T16:45:52.519Z"
+              "text": "Para revisar su caso, compartame por favor: cedula del fallecido, nombre completo, fecha exacta de fallecimiento con dia, mes y ano, y si trabajaba o cotizaba.",
+              "at": "2026-04-25T21:48:47.983Z"
             }
           ],
           "status": "active",
@@ -284,14 +318,22 @@
           "data": {
             "idNumber": "",
             "deathDate": "",
+            "deceasedName": "",
+            "workInfo": "",
             "claimant": ""
           },
           "metadata": {
             "senderName": "SimUser",
-            "condolenceSent": true,
-            "followUpAt": "2026-04-25T23:45:52.509Z"
+            "deathContextDetected": false,
+            "requestedFields": [
+              "idNumber",
+              "deceasedName",
+              "deathDate",
+              "workInfo"
+            ],
+            "followUpAt": "2026-04-26T04:48:47.972Z"
           },
-          "updatedAt": "2026-04-25T16:45:52.519Z"
+          "updatedAt": "2026-04-25T21:48:47.983Z"
         }
       },
       "dailyStats": {
@@ -313,18 +355,18 @@
       "conversations": {
         "570000000006": {
           "phone": "570000000006",
-          "createdAt": "2026-04-25T16:45:52.493Z",
+          "createdAt": "2026-04-25T21:48:47.956Z",
           "messages": [
             {
               "role": "user",
               "text": "(audios) Ok cuando llegue a la casa le mando todo eso El número de cédula",
               "rawType": "text",
-              "at": "2026-04-25T16:45:52.503Z"
+              "at": "2026-04-25T21:48:47.967Z"
             },
             {
               "role": "bot",
-              "text": "Lamentamos su perdida. Oro por el eterno descanso de su ser querido. Para revisar su caso, compartame por favor la cedula del fallecido y la fecha exacta de fallecimiento con dia, mes y ano.",
-              "at": "2026-04-25T16:45:52.519Z"
+              "text": "Para revisar su caso, compartame por favor: cedula del fallecido, nombre completo, fecha exacta de fallecimiento con dia, mes y ano, y si trabajaba o cotizaba.",
+              "at": "2026-04-25T21:48:47.983Z"
             }
           ],
           "status": "active",
@@ -334,14 +376,22 @@
           "data": {
             "idNumber": "",
             "deathDate": "",
+            "deceasedName": "",
+            "workInfo": "",
             "claimant": ""
           },
           "metadata": {
             "senderName": "SimUser",
-            "condolenceSent": true,
-            "followUpAt": "2026-04-25T23:45:52.509Z"
+            "deathContextDetected": false,
+            "requestedFields": [
+              "idNumber",
+              "deceasedName",
+              "deathDate",
+              "workInfo"
+            ],
+            "followUpAt": "2026-04-26T04:48:47.972Z"
           },
-          "updatedAt": "2026-04-25T16:45:52.519Z"
+          "updatedAt": "2026-04-25T21:48:47.983Z"
         }
       },
       "dailyStats": {
@@ -363,39 +413,43 @@
       "conversations": {
         "570000000008": {
           "phone": "570000000008",
-          "createdAt": "2026-04-25T16:45:52.525Z",
+          "createdAt": "2026-04-25T21:48:47.990Z",
           "messages": [
             {
               "role": "user",
               "text": "Hola soy de Quibdó y quisiera saber si soy beneficiaria Okey C.C. 1.077.633.310 Fecha de fallecimiento 17.02.2024",
               "rawType": "text",
-              "at": "2026-04-25T16:45:52.535Z"
+              "at": "2026-04-25T21:48:48.001Z"
             },
             {
               "role": "bot",
-              "text": "Lamentamos su perdida. Oro por el eterno descanso de su ser querido. Perfecto, muchas gracias por la informacion. Estare consultando su caso.",
-              "at": "2026-04-25T16:45:52.560Z"
-            },
-            {
-              "role": "bot",
-              "text": "La contactare unica y exclusivamente si encuentro que dejo derecho a pension. Si no me vuelvo a comunicar, probablemente no se encontro derecho.",
-              "at": "2026-04-25T16:45:52.566Z"
+              "text": "Para validar si su familiar dejo derecho a pension necesito por favor estos datos: cedula del fallecido, nombre completo del fallecido, fecha exacta de fallecimiento (dia, mes y ano), y si trabajaba o cotizaba (si sabe la empresa o fondo, me la indica).",
+              "at": "2026-04-25T21:48:48.017Z"
             }
           ],
-          "status": "pending_legal_review",
+          "status": "active",
           "color": "green",
           "reminderCount": 0,
-          "awaitingData": false,
+          "awaitingData": true,
           "data": {
             "idNumber": "1077633310",
             "deathDate": "17.02.2024",
+            "deceasedName": "",
+            "workInfo": "",
             "claimant": ""
           },
           "metadata": {
             "senderName": "SimUser",
-            "condolenceSent": true
+            "deathContextDetected": false,
+            "requestedFields": [
+              "idNumber",
+              "deceasedName",
+              "deathDate",
+              "workInfo"
+            ],
+            "followUpAt": "2026-04-26T04:48:48.006Z"
           },
-          "updatedAt": "2026-04-25T16:45:52.566Z"
+          "updatedAt": "2026-04-25T21:48:48.017Z"
         }
       },
       "dailyStats": {
@@ -405,8 +459,8 @@
           "yellow": 0,
           "red": 0,
           "purple": 0,
-          "idNumbersCollected": 1,
-          "deathDatesCollected": 1
+          "idNumbersCollected": 0,
+          "deathDatesCollected": 0
         }
       }
     }
@@ -417,18 +471,18 @@
       "conversations": {
         "570000000009": {
           "phone": "570000000009",
-          "createdAt": "2026-04-25T16:45:52.573Z",
+          "createdAt": "2026-04-25T21:48:48.023Z",
           "messages": [
             {
               "role": "user",
               "text": "Soy Yohana Sareth Ramón, mi hijo falleció hace cinco años… cotizaba en Colpensiones No tenía compañera ni esposa, dejó dos niñas pequeñas",
               "rawType": "text",
-              "at": "2026-04-25T16:45:52.585Z"
+              "at": "2026-04-25T21:48:48.034Z"
             },
             {
               "role": "bot",
-              "text": "Lamentamos su perdida. Oro por el eterno descanso de su ser querido. Para revisar su caso, compartame por favor la cedula del fallecido y la fecha exacta de fallecimiento con dia, mes y ano.",
-              "at": "2026-04-25T16:45:52.603Z"
+              "text": "Lamentamos su perdida. Oro por el eterno descanso de su ser querido. Para validar si su familiar dejo derecho a pension necesito por favor estos datos: cedula del fallecido, nombre completo del fallecido, fecha exacta de fallecimiento (dia, mes y ano), y si trabajaba o cotizaba (si sabe la empresa o fondo, me la indica).",
+              "at": "2026-04-25T21:48:48.049Z"
             }
           ],
           "status": "active",
@@ -438,14 +492,23 @@
           "data": {
             "idNumber": "",
             "deathDate": "",
+            "deceasedName": "",
+            "workInfo": "reportado_por_cliente",
             "claimant": "esposa"
           },
           "metadata": {
             "senderName": "SimUser",
             "condolenceSent": true,
-            "followUpAt": "2026-04-25T23:45:52.592Z"
+            "deathContextDetected": true,
+            "requestedFields": [
+              "idNumber",
+              "deceasedName",
+              "deathDate",
+              "workInfo"
+            ],
+            "followUpAt": "2026-04-26T04:48:48.038Z"
           },
-          "updatedAt": "2026-04-25T16:45:52.603Z"
+          "updatedAt": "2026-04-25T21:48:48.049Z"
         }
       },
       "dailyStats": {
@@ -467,18 +530,18 @@
       "conversations": {
         "570000000010": {
           "phone": "570000000010",
-          "createdAt": "2026-04-25T16:45:52.611Z",
+          "createdAt": "2026-04-25T21:48:48.055Z",
           "messages": [
             {
               "role": "user",
               "text": "Quiero preguntar por la vida laboral de mi pareja que falleció hace 8 años CC 98597427",
               "rawType": "text",
-              "at": "2026-04-25T16:45:52.620Z"
+              "at": "2026-04-25T21:48:48.065Z"
             },
             {
               "role": "bot",
               "text": "Lamentamos su perdida. Oro por el eterno descanso de su ser querido. Para poder ayudarle bien, me confirma por favor: quien fallecio, si trabajaba o cotizaba, y la fecha aproximada del fallecimiento?",
-              "at": "2026-04-25T16:45:52.636Z"
+              "at": "2026-04-25T21:48:48.080Z"
             }
           ],
           "status": "active",
@@ -488,14 +551,23 @@
           "data": {
             "idNumber": "98597427",
             "deathDate": "",
+            "deceasedName": "",
+            "workInfo": "",
             "claimant": "pareja"
           },
           "metadata": {
             "senderName": "SimUser",
             "condolenceSent": true,
-            "followUpAt": "2026-04-25T23:45:52.627Z"
+            "deathContextDetected": true,
+            "requestedFields": [
+              "idNumber",
+              "deceasedName",
+              "deathDate",
+              "workInfo"
+            ],
+            "followUpAt": "2026-04-26T04:48:48.070Z"
           },
-          "updatedAt": "2026-04-25T16:45:52.636Z"
+          "updatedAt": "2026-04-25T21:48:48.080Z"
         }
       },
       "dailyStats": {
@@ -517,18 +589,18 @@
       "conversations": {
         "570000000011": {
           "phone": "570000000011",
-          "createdAt": "2026-04-25T16:45:52.643Z",
+          "createdAt": "2026-04-25T21:48:48.086Z",
           "messages": [
             {
               "role": "user",
               "text": "¿Cómo saber si soy beneficiario? ¿Qué documentos necesito? ¿Y qué debo hacer? ¿El número de quién? 22/07/2025 1103100147",
               "rawType": "text",
-              "at": "2026-04-25T16:45:52.653Z"
+              "at": "2026-04-25T21:48:48.096Z"
             },
             {
               "role": "bot",
-              "text": "Por ahora necesito cedula de la persona fallecida y la fecha exacta de fallecimiento (dia, mes y ano) para revisar si dejo derecho a pension.",
-              "at": "2026-04-25T16:45:52.663Z"
+              "text": "Por ahora necesito cedula de la persona fallecida, nombre completo del fallecido, fecha exacta de fallecimiento (dia, mes y ano), y si trabajaba o cotizaba para revisar si dejo derecho a pension.",
+              "at": "2026-04-25T21:48:48.106Z"
             }
           ],
           "status": "active",
@@ -541,9 +613,16 @@
             "claimant": ""
           },
           "metadata": {
-            "senderName": "SimUser"
+            "senderName": "SimUser",
+            "deathContextDetected": false,
+            "requestedFields": [
+              "idNumber",
+              "deceasedName",
+              "deathDate",
+              "workInfo"
+            ]
           },
-          "updatedAt": "2026-04-25T16:45:52.663Z"
+          "updatedAt": "2026-04-25T21:48:48.106Z"
         }
       },
       "dailyStats": {
@@ -565,18 +644,18 @@
       "conversations": {
         "570000000012": {
           "phone": "570000000012",
-          "createdAt": "2026-04-25T16:45:52.669Z",
+          "createdAt": "2026-04-25T21:48:48.113Z",
           "messages": [
             {
               "role": "user",
               "text": "6 años (envía documento)",
               "rawType": "text",
-              "at": "2026-04-25T16:45:52.679Z"
+              "at": "2026-04-25T21:48:48.122Z"
             },
             {
               "role": "bot",
-              "text": "Lamentamos su perdida. Oro por el eterno descanso de su ser querido. Para poder ayudarle bien, me confirma por favor: quien fallecio, si trabajaba o cotizaba, y la fecha aproximada del fallecimiento?",
-              "at": "2026-04-25T16:45:52.695Z"
+              "text": "Para poder ayudarle bien, me confirma por favor: quien fallecio, si trabajaba o cotizaba, y la fecha aproximada del fallecimiento?",
+              "at": "2026-04-25T21:48:48.138Z"
             }
           ],
           "status": "active",
@@ -586,14 +665,22 @@
           "data": {
             "idNumber": "",
             "deathDate": "",
+            "deceasedName": "",
+            "workInfo": "",
             "claimant": ""
           },
           "metadata": {
             "senderName": "SimUser",
-            "condolenceSent": true,
-            "followUpAt": "2026-04-25T23:45:52.685Z"
+            "deathContextDetected": false,
+            "requestedFields": [
+              "idNumber",
+              "deceasedName",
+              "deathDate",
+              "workInfo"
+            ],
+            "followUpAt": "2026-04-26T04:48:48.128Z"
           },
-          "updatedAt": "2026-04-25T16:45:52.695Z"
+          "updatedAt": "2026-04-25T21:48:48.138Z"
         }
       },
       "dailyStats": {
@@ -615,39 +702,43 @@
       "conversations": {
         "570000000013": {
           "phone": "570000000013",
-          "createdAt": "2026-04-25T16:45:52.701Z",
+          "createdAt": "2026-04-25T21:48:48.145Z",
           "messages": [
             {
               "role": "user",
               "text": "740314 19 julio 2023 Octavio de Jesús Osorio Álvarez",
               "rawType": "text",
-              "at": "2026-04-25T16:45:52.711Z"
+              "at": "2026-04-25T21:48:48.154Z"
             },
             {
               "role": "bot",
-              "text": "Lamentamos su perdida. Oro por el eterno descanso de su ser querido. Perfecto, muchas gracias por la informacion. Estare consultando su caso.",
-              "at": "2026-04-25T16:45:52.737Z"
-            },
-            {
-              "role": "bot",
-              "text": "La contactare unica y exclusivamente si encuentro que dejo derecho a pension. Si no me vuelvo a comunicar, probablemente no se encontro derecho.",
-              "at": "2026-04-25T16:45:52.742Z"
+              "text": "Para poder ayudarle bien, me confirma por favor: quien fallecio, si trabajaba o cotizaba, y la fecha aproximada del fallecimiento?",
+              "at": "2026-04-25T21:48:48.170Z"
             }
           ],
-          "status": "pending_legal_review",
+          "status": "active",
           "color": "purple",
           "reminderCount": 0,
-          "awaitingData": false,
+          "awaitingData": true,
           "data": {
             "idNumber": "740314",
             "deathDate": "19 julio 2023",
+            "deceasedName": "",
+            "workInfo": "",
             "claimant": ""
           },
           "metadata": {
             "senderName": "SimUser",
-            "condolenceSent": true
+            "deathContextDetected": false,
+            "requestedFields": [
+              "idNumber",
+              "deceasedName",
+              "deathDate",
+              "workInfo"
+            ],
+            "followUpAt": "2026-04-26T04:48:48.161Z"
           },
-          "updatedAt": "2026-04-25T16:45:52.742Z"
+          "updatedAt": "2026-04-25T21:48:48.170Z"
         }
       },
       "dailyStats": {
@@ -657,8 +748,8 @@
           "yellow": 0,
           "red": 0,
           "purple": 1,
-          "idNumbersCollected": 1,
-          "deathDatesCollected": 1
+          "idNumbersCollected": 0,
+          "deathDatesCollected": 0
         }
       }
     }
@@ -669,39 +760,43 @@
       "conversations": {
         "570000000014": {
           "phone": "570000000014",
-          "createdAt": "2026-04-25T16:45:52.749Z",
+          "createdAt": "2026-04-25T21:48:48.176Z",
           "messages": [
             {
               "role": "user",
               "text": "No entiendo 14890851 Es del hijo La del papá es 6510411 30 abril 2023",
               "rawType": "text",
-              "at": "2026-04-25T16:45:52.759Z"
+              "at": "2026-04-25T21:48:48.186Z"
             },
             {
               "role": "bot",
-              "text": "Lamentamos su perdida. Oro por el eterno descanso de su ser querido. Perfecto, muchas gracias por la informacion. Estare consultando su caso.",
-              "at": "2026-04-25T16:45:52.783Z"
-            },
-            {
-              "role": "bot",
-              "text": "La contactare unica y exclusivamente si encuentro que dejo derecho a pension. Si no me vuelvo a comunicar, probablemente no se encontro derecho.",
-              "at": "2026-04-25T16:45:52.788Z"
+              "text": "Para poder ayudarle bien, me confirma por favor: quien fallecio, si trabajaba o cotizaba, y la fecha aproximada del fallecimiento?",
+              "at": "2026-04-25T21:48:48.201Z"
             }
           ],
-          "status": "pending_legal_review",
+          "status": "active",
           "color": "purple",
           "reminderCount": 0,
-          "awaitingData": false,
+          "awaitingData": true,
           "data": {
             "idNumber": "14890851",
             "deathDate": "30 abril 2023",
+            "deceasedName": "",
+            "workInfo": "",
             "claimant": "hijo/hija"
           },
           "metadata": {
             "senderName": "SimUser",
-            "condolenceSent": true
+            "deathContextDetected": false,
+            "requestedFields": [
+              "idNumber",
+              "deceasedName",
+              "deathDate",
+              "workInfo"
+            ],
+            "followUpAt": "2026-04-26T04:48:48.191Z"
           },
-          "updatedAt": "2026-04-25T16:45:52.788Z"
+          "updatedAt": "2026-04-25T21:48:48.201Z"
         }
       },
       "dailyStats": {
@@ -711,8 +806,8 @@
           "yellow": 0,
           "red": 0,
           "purple": 1,
-          "idNumbersCollected": 1,
-          "deathDatesCollected": 1
+          "idNumbersCollected": 0,
+          "deathDatesCollected": 0
         }
       }
     }
@@ -723,18 +818,18 @@
       "conversations": {
         "570000000015": {
           "phone": "570000000015",
-          "createdAt": "2026-04-25T16:45:52.795Z",
+          "createdAt": "2026-04-25T21:48:48.207Z",
           "messages": [
             {
               "role": "user",
               "text": "Creo que puedo tener derecho a pensión Mi compañero murió, tenía 1200 semanas pero soy casada con otra persona Me dicen que no tengo derecho",
               "rawType": "text",
-              "at": "2026-04-25T16:45:52.805Z"
+              "at": "2026-04-25T21:48:48.218Z"
             },
             {
               "role": "bot",
-              "text": "Lamentamos su perdida. Oro por el eterno descanso de su ser querido. Para validar si su familiar dejo derecho a pension necesito por favor: cedula del fallecido y fecha exacta de fallecimiento (dia, mes y ano).",
-              "at": "2026-04-25T16:45:52.819Z"
+              "text": "Lamentamos su perdida. Oro por el eterno descanso de su ser querido. Para validar si su familiar dejo derecho a pension necesito por favor estos datos: cedula del fallecido, nombre completo del fallecido, fecha exacta de fallecimiento (dia, mes y ano), y si trabajaba o cotizaba (si sabe la empresa o fondo, me la indica).",
+              "at": "2026-04-25T21:48:48.233Z"
             }
           ],
           "status": "active",
@@ -744,14 +839,23 @@
           "data": {
             "idNumber": "",
             "deathDate": "",
+            "deceasedName": "",
+            "workInfo": "",
             "claimant": ""
           },
           "metadata": {
             "senderName": "SimUser",
             "condolenceSent": true,
-            "followUpAt": "2026-04-25T23:45:52.810Z"
+            "deathContextDetected": true,
+            "requestedFields": [
+              "idNumber",
+              "deceasedName",
+              "deathDate",
+              "workInfo"
+            ],
+            "followUpAt": "2026-04-26T04:48:48.223Z"
           },
-          "updatedAt": "2026-04-25T16:45:52.819Z"
+          "updatedAt": "2026-04-25T21:48:48.233Z"
         }
       },
       "dailyStats": {
@@ -773,18 +877,18 @@
       "conversations": {
         "570000000016": {
           "phone": "570000000016",
-          "createdAt": "2026-04-25T16:45:52.826Z",
+          "createdAt": "2026-04-25T21:48:48.239Z",
           "messages": [
             {
               "role": "user",
               "text": "Mi esposo falleció el 29 noviembre del año pasado Cotizó hasta el 2016 Somos casados por lo civil Falleció el 29 de noviembre 2025",
               "rawType": "text",
-              "at": "2026-04-25T16:45:52.835Z"
+              "at": "2026-04-25T21:48:48.248Z"
             },
             {
               "role": "bot",
-              "text": "Lamentamos su perdida. Oro por el eterno descanso de su ser querido. Para validar si su familiar dejo derecho a pension necesito por favor: cedula del fallecido y fecha exacta de fallecimiento (dia, mes y ano).",
-              "at": "2026-04-25T16:45:52.849Z"
+              "text": "Lamentamos su perdida. Oro por el eterno descanso de su ser querido. Para validar si su familiar dejo derecho a pension necesito por favor estos datos: cedula del fallecido, nombre completo del fallecido, fecha exacta de fallecimiento (dia, mes y ano), y si trabajaba o cotizaba (si sabe la empresa o fondo, me la indica).",
+              "at": "2026-04-25T21:48:48.264Z"
             }
           ],
           "status": "active",
@@ -794,14 +898,23 @@
           "data": {
             "idNumber": "",
             "deathDate": "29 de noviembre 2025",
+            "deceasedName": "",
+            "workInfo": "reportado_por_cliente",
             "claimant": ""
           },
           "metadata": {
             "senderName": "SimUser",
             "condolenceSent": true,
-            "followUpAt": "2026-04-25T23:45:52.839Z"
+            "deathContextDetected": true,
+            "requestedFields": [
+              "idNumber",
+              "deceasedName",
+              "deathDate",
+              "workInfo"
+            ],
+            "followUpAt": "2026-04-26T04:48:48.253Z"
           },
-          "updatedAt": "2026-04-25T16:45:52.849Z"
+          "updatedAt": "2026-04-25T21:48:48.264Z"
         }
       },
       "dailyStats": {
@@ -823,18 +936,18 @@
       "conversations": {
         "570000000017": {
           "phone": "570000000017",
-          "createdAt": "2026-04-25T16:45:52.856Z",
+          "createdAt": "2026-04-25T21:48:48.269Z",
           "messages": [
             {
               "role": "user",
               "text": "La mamá Dale lo haré Apenas la tenga le escribo",
               "rawType": "text",
-              "at": "2026-04-25T16:45:52.866Z"
+              "at": "2026-04-25T21:48:48.279Z"
             },
             {
               "role": "bot",
-              "text": "Lamentamos su perdida. Oro por el eterno descanso de su ser querido. Para revisar su caso, compartame por favor la cedula del fallecido y la fecha exacta de fallecimiento con dia, mes y ano.",
-              "at": "2026-04-25T16:45:52.882Z"
+              "text": "Para validar si su familiar dejo derecho a pension necesito por favor estos datos: cedula del fallecido, nombre completo del fallecido, fecha exacta de fallecimiento (dia, mes y ano), y si trabajaba o cotizaba (si sabe la empresa o fondo, me la indica).",
+              "at": "2026-04-25T21:48:48.294Z"
             }
           ],
           "status": "active",
@@ -844,14 +957,22 @@
           "data": {
             "idNumber": "",
             "deathDate": "",
+            "deceasedName": "",
+            "workInfo": "",
             "claimant": ""
           },
           "metadata": {
             "senderName": "SimUser",
-            "condolenceSent": true,
-            "followUpAt": "2026-04-25T23:45:52.871Z"
+            "deathContextDetected": false,
+            "requestedFields": [
+              "idNumber",
+              "deceasedName",
+              "deathDate",
+              "workInfo"
+            ],
+            "followUpAt": "2026-04-26T04:48:48.284Z"
           },
-          "updatedAt": "2026-04-25T16:45:52.882Z"
+          "updatedAt": "2026-04-25T21:48:48.294Z"
         }
       },
       "dailyStats": {
@@ -873,18 +994,18 @@
       "conversations": {
         "570000000018": {
           "phone": "570000000018",
-          "createdAt": "2026-04-25T16:45:52.888Z",
+          "createdAt": "2026-04-25T21:48:48.300Z",
           "messages": [
             {
               "role": "user",
               "text": "Mi hijo Cotizó 90 semanas y yo tengo 62 años dependía de él Soltero sin hijos",
               "rawType": "text",
-              "at": "2026-04-25T16:45:52.898Z"
+              "at": "2026-04-25T21:48:48.310Z"
             },
             {
               "role": "bot",
-              "text": "Lamentamos su perdida. Oro por el eterno descanso de su ser querido. Para revisar su caso, compartame por favor la cedula del fallecido y la fecha exacta de fallecimiento con dia, mes y ano.",
-              "at": "2026-04-25T16:45:52.914Z"
+              "text": "Para validar si su familiar dejo derecho a pension necesito por favor estos datos: cedula del fallecido, nombre completo del fallecido, fecha exacta de fallecimiento (dia, mes y ano), y si trabajaba o cotizaba (si sabe la empresa o fondo, me la indica).",
+              "at": "2026-04-25T21:48:48.325Z"
             }
           ],
           "status": "active",
@@ -894,14 +1015,22 @@
           "data": {
             "idNumber": "",
             "deathDate": "",
+            "deceasedName": "",
+            "workInfo": "reportado_por_cliente",
             "claimant": "hijo/hija"
           },
           "metadata": {
             "senderName": "SimUser",
-            "condolenceSent": true,
-            "followUpAt": "2026-04-25T23:45:52.904Z"
+            "deathContextDetected": false,
+            "requestedFields": [
+              "idNumber",
+              "deceasedName",
+              "deathDate",
+              "workInfo"
+            ],
+            "followUpAt": "2026-04-26T04:48:48.315Z"
           },
-          "updatedAt": "2026-04-25T16:45:52.914Z"
+          "updatedAt": "2026-04-25T21:48:48.325Z"
         }
       },
       "dailyStats": {
@@ -923,39 +1052,44 @@
       "conversations": {
         "570000000019": {
           "phone": "570000000019",
-          "createdAt": "2026-04-25T16:45:52.920Z",
+          "createdAt": "2026-04-25T21:48:48.331Z",
           "messages": [
             {
               "role": "user",
               "text": "Mi compañero de vida lo asesinaron hace 2 años y medio En un atraco Quisiera asesoría 7.573.103 26/09/2023",
               "rawType": "text",
-              "at": "2026-04-25T16:45:52.930Z"
+              "at": "2026-04-25T21:48:48.340Z"
             },
             {
               "role": "bot",
-              "text": "Lamentamos su perdida. Oro por el eterno descanso de su ser querido. Perfecto, muchas gracias por la informacion. Estare consultando su caso.",
-              "at": "2026-04-25T16:45:52.954Z"
-            },
-            {
-              "role": "bot",
-              "text": "La contactare unica y exclusivamente si encuentro que dejo derecho a pension. Si no me vuelvo a comunicar, probablemente no se encontro derecho.",
-              "at": "2026-04-25T16:45:52.959Z"
+              "text": "Lamentamos su perdida. Oro por el eterno descanso de su ser querido. Para poder ayudarle bien, me confirma por favor: quien fallecio, si trabajaba o cotizaba, y la fecha aproximada del fallecimiento?",
+              "at": "2026-04-25T21:48:48.354Z"
             }
           ],
-          "status": "pending_legal_review",
+          "status": "active",
           "color": "purple",
           "reminderCount": 0,
-          "awaitingData": false,
+          "awaitingData": true,
           "data": {
             "idNumber": "7573103",
             "deathDate": "26/09/2023",
+            "deceasedName": "",
+            "workInfo": "",
             "claimant": ""
           },
           "metadata": {
             "senderName": "SimUser",
-            "condolenceSent": true
+            "condolenceSent": true,
+            "deathContextDetected": true,
+            "requestedFields": [
+              "idNumber",
+              "deceasedName",
+              "deathDate",
+              "workInfo"
+            ],
+            "followUpAt": "2026-04-26T04:48:48.345Z"
           },
-          "updatedAt": "2026-04-25T16:45:52.959Z"
+          "updatedAt": "2026-04-25T21:48:48.354Z"
         }
       },
       "dailyStats": {
@@ -965,8 +1099,8 @@
           "yellow": 0,
           "red": 0,
           "purple": 1,
-          "idNumbersCollected": 1,
-          "deathDatesCollected": 1
+          "idNumbersCollected": 0,
+          "deathDatesCollected": 0
         }
       }
     }
@@ -977,18 +1111,18 @@
       "conversations": {
         "570000000020": {
           "phone": "570000000020",
-          "createdAt": "2026-04-25T16:45:52.966Z",
+          "createdAt": "2026-04-25T21:48:48.361Z",
           "messages": [
             {
               "role": "user",
               "text": "A mi marido lo mataron en el mercado de Cartagena en 2007 Era comerciante Nombre Julio Cárcamo Polo Quiero saber si tengo derecho",
               "rawType": "text",
-              "at": "2026-04-25T16:45:52.975Z"
+              "at": "2026-04-25T21:48:48.371Z"
             },
             {
               "role": "bot",
-              "text": "Lamentamos su perdida. Oro por el eterno descanso de su ser querido. Para revisar su caso, compartame por favor la cedula del fallecido y la fecha exacta de fallecimiento con dia, mes y ano.",
-              "at": "2026-04-25T16:45:52.989Z"
+              "text": "Lamentamos su perdida. Oro por el eterno descanso de su ser querido. Para validar si su familiar dejo derecho a pension necesito por favor estos datos: cedula del fallecido, nombre completo del fallecido, fecha exacta de fallecimiento (dia, mes y ano), y si trabajaba o cotizaba (si sabe la empresa o fondo, me la indica).",
+              "at": "2026-04-25T21:48:48.386Z"
             }
           ],
           "status": "active",
@@ -998,14 +1132,23 @@
           "data": {
             "idNumber": "",
             "deathDate": "",
+            "deceasedName": "Julio Cárcamo Polo Quiero saber si tengo derecho",
+            "workInfo": "reportado_por_cliente",
             "claimant": ""
           },
           "metadata": {
             "senderName": "SimUser",
             "condolenceSent": true,
-            "followUpAt": "2026-04-25T23:45:52.980Z"
+            "deathContextDetected": true,
+            "requestedFields": [
+              "idNumber",
+              "deceasedName",
+              "deathDate",
+              "workInfo"
+            ],
+            "followUpAt": "2026-04-26T04:48:48.377Z"
           },
-          "updatedAt": "2026-04-25T16:45:52.989Z"
+          "updatedAt": "2026-04-25T21:48:48.386Z"
         }
       },
       "dailyStats": {
@@ -1027,18 +1170,18 @@
       "conversations": {
         "570000000021": {
           "phone": "570000000021",
-          "createdAt": "2026-04-25T16:45:52.995Z",
+          "createdAt": "2026-04-25T21:48:48.388Z",
           "messages": [
             {
               "role": "user",
               "text": "Hola Solo sobrevivientes Mi esposo trabajo en sanbenito Puede pelear el tiempo 1965",
               "rawType": "text",
-              "at": "2026-04-25T16:45:53.004Z"
+              "at": "2026-04-25T21:48:48.399Z"
             },
             {
               "role": "bot",
-              "text": "Lamentamos su perdida. Oro por el eterno descanso de su ser querido. Para revisar su caso, compartame por favor la cedula del fallecido y la fecha exacta de fallecimiento con dia, mes y ano.",
-              "at": "2026-04-25T16:45:53.018Z"
+              "text": "Para validar si su familiar dejo derecho a pension necesito por favor estos datos: cedula del fallecido, nombre completo del fallecido, fecha exacta de fallecimiento (dia, mes y ano), y si trabajaba o cotizaba (si sabe la empresa o fondo, me la indica).",
+              "at": "2026-04-25T21:48:48.415Z"
             }
           ],
           "status": "active",
@@ -1048,14 +1191,22 @@
           "data": {
             "idNumber": "",
             "deathDate": "",
+            "deceasedName": "",
+            "workInfo": "reportado_por_cliente",
             "claimant": ""
           },
           "metadata": {
             "senderName": "SimUser",
-            "condolenceSent": true,
-            "followUpAt": "2026-04-25T23:45:53.010Z"
+            "deathContextDetected": false,
+            "requestedFields": [
+              "idNumber",
+              "deceasedName",
+              "deathDate",
+              "workInfo"
+            ],
+            "followUpAt": "2026-04-26T04:48:48.404Z"
           },
-          "updatedAt": "2026-04-25T16:45:53.018Z"
+          "updatedAt": "2026-04-25T21:48:48.415Z"
         }
       },
       "dailyStats": {
@@ -1077,18 +1228,18 @@
       "conversations": {
         "570000000022": {
           "phone": "570000000022",
-          "createdAt": "2026-04-25T16:45:53.024Z",
+          "createdAt": "2026-04-25T21:48:48.421Z",
           "messages": [
             {
               "role": "user",
               "text": "Mi esposo falleció hace 5 alo",
               "rawType": "text",
-              "at": "2026-04-25T16:45:53.033Z"
+              "at": "2026-04-25T21:48:48.431Z"
             },
             {
               "role": "bot",
               "text": "Lamentamos su perdida. Oro por el eterno descanso de su ser querido. Para poder ayudarle bien, me confirma por favor: quien fallecio, si trabajaba o cotizaba, y la fecha aproximada del fallecimiento?",
-              "at": "2026-04-25T16:45:53.047Z"
+              "at": "2026-04-25T21:48:48.446Z"
             }
           ],
           "status": "active",
@@ -1098,14 +1249,23 @@
           "data": {
             "idNumber": "",
             "deathDate": "",
+            "deceasedName": "",
+            "workInfo": "",
             "claimant": ""
           },
           "metadata": {
             "senderName": "SimUser",
             "condolenceSent": true,
-            "followUpAt": "2026-04-25T23:45:53.038Z"
+            "deathContextDetected": true,
+            "requestedFields": [
+              "idNumber",
+              "deceasedName",
+              "deathDate",
+              "workInfo"
+            ],
+            "followUpAt": "2026-04-26T04:48:48.436Z"
           },
-          "updatedAt": "2026-04-25T16:45:53.047Z"
+          "updatedAt": "2026-04-25T21:48:48.446Z"
         }
       },
       "dailyStats": {
@@ -1127,18 +1287,18 @@
       "conversations": {
         "570000000023": {
           "phone": "570000000023",
-          "createdAt": "2026-04-25T16:45:53.052Z",
+          "createdAt": "2026-04-25T21:48:48.451Z",
           "messages": [
             {
               "role": "user",
               "text": "Hola me gustaría saber más de este tema",
               "rawType": "text",
-              "at": "2026-04-25T16:45:53.062Z"
+              "at": "2026-04-25T21:48:48.461Z"
             },
             {
               "role": "bot",
-              "text": "Lamentamos su perdida. Oro por el eterno descanso de su ser querido. Para poder ayudarle bien, me confirma por favor: quien fallecio, si trabajaba o cotizaba, y la fecha aproximada del fallecimiento?",
-              "at": "2026-04-25T16:45:53.076Z"
+              "text": "Para poder ayudarle bien, me confirma por favor: quien fallecio, si trabajaba o cotizaba, y la fecha aproximada del fallecimiento?",
+              "at": "2026-04-25T21:48:48.475Z"
             }
           ],
           "status": "active",
@@ -1148,14 +1308,22 @@
           "data": {
             "idNumber": "",
             "deathDate": "",
+            "deceasedName": "",
+            "workInfo": "",
             "claimant": ""
           },
           "metadata": {
             "senderName": "SimUser",
-            "condolenceSent": true,
-            "followUpAt": "2026-04-25T23:45:53.067Z"
+            "deathContextDetected": false,
+            "requestedFields": [
+              "idNumber",
+              "deceasedName",
+              "deathDate",
+              "workInfo"
+            ],
+            "followUpAt": "2026-04-26T04:48:48.466Z"
           },
-          "updatedAt": "2026-04-25T16:45:53.076Z"
+          "updatedAt": "2026-04-25T21:48:48.475Z"
         }
       },
       "dailyStats": {
@@ -1177,18 +1345,18 @@
       "conversations": {
         "570000000024": {
           "phone": "570000000024",
-          "createdAt": "2026-04-25T16:45:53.082Z",
+          "createdAt": "2026-04-25T21:48:48.481Z",
           "messages": [
             {
               "role": "user",
               "text": "yo estoy en Arjona bolivar donde esta usted ami menegaron la pencion de mi compañero el fallecio hacen 4 años convivimo 11 años tine 4 de fallesido y me la negaron por algunos vesinos no dieron informacion",
               "rawType": "text",
-              "at": "2026-04-25T16:45:53.092Z"
+              "at": "2026-04-25T21:48:48.490Z"
             },
             {
               "role": "bot",
               "text": "Lamentamos su perdida. Oro por el eterno descanso de su ser querido. Para revisar viabilidad, por favor confirmeme: quien fallecio, cuando fallecio y por que le negaron la pension (si ya reclamo).",
-              "at": "2026-04-25T16:45:53.106Z"
+              "at": "2026-04-25T21:48:48.507Z"
             }
           ],
           "status": "active",
@@ -1198,14 +1366,23 @@
           "data": {
             "idNumber": "",
             "deathDate": "",
+            "deceasedName": "",
+            "workInfo": "",
             "claimant": ""
           },
           "metadata": {
             "senderName": "SimUser",
             "condolenceSent": true,
-            "followUpAt": "2026-04-25T23:45:53.097Z"
+            "deathContextDetected": true,
+            "requestedFields": [
+              "idNumber",
+              "deceasedName",
+              "deathDate",
+              "workInfo"
+            ],
+            "followUpAt": "2026-04-26T04:48:48.496Z"
           },
-          "updatedAt": "2026-04-25T16:45:53.106Z"
+          "updatedAt": "2026-04-25T21:48:48.507Z"
         }
       },
       "dailyStats": {
@@ -1227,18 +1404,18 @@
       "conversations": {
         "570000000025": {
           "phone": "570000000025",
-          "createdAt": "2026-04-25T16:45:53.112Z",
+          "createdAt": "2026-04-25T21:48:48.513Z",
           "messages": [
             {
               "role": "user",
               "text": "Bueno es el esposo de mi mamá que murió hace 20 años, de esa unión hay dos hijos. Tiene alguna oficina físico ? Mi madre este año cumple 70 años Que tanto demora el proceso",
               "rawType": "text",
-              "at": "2026-04-25T16:45:53.121Z"
+              "at": "2026-04-25T21:48:48.522Z"
             },
             {
               "role": "bot",
               "text": "Lamentamos su perdida. Oro por el eterno descanso de su ser querido. Para poder ayudarle bien, me confirma por favor: quien fallecio, si trabajaba o cotizaba, y la fecha aproximada del fallecimiento?",
-              "at": "2026-04-25T16:45:53.135Z"
+              "at": "2026-04-25T21:48:48.537Z"
             }
           ],
           "status": "active",
@@ -1248,14 +1425,23 @@
           "data": {
             "idNumber": "",
             "deathDate": "",
+            "deceasedName": "",
+            "workInfo": "",
             "claimant": "hijo/hija"
           },
           "metadata": {
             "senderName": "SimUser",
             "condolenceSent": true,
-            "followUpAt": "2026-04-25T23:45:53.126Z"
+            "deathContextDetected": true,
+            "requestedFields": [
+              "idNumber",
+              "deceasedName",
+              "deathDate",
+              "workInfo"
+            ],
+            "followUpAt": "2026-04-26T04:48:48.528Z"
           },
-          "updatedAt": "2026-04-25T16:45:53.135Z"
+          "updatedAt": "2026-04-25T21:48:48.537Z"
         }
       },
       "dailyStats": {
@@ -1277,18 +1463,18 @@
       "conversations": {
         "570000000026": {
           "phone": "570000000026",
-          "createdAt": "2026-04-25T16:45:53.141Z",
+          "createdAt": "2026-04-25T21:48:48.543Z",
           "messages": [
             {
               "role": "user",
               "text": "Buenos días, una pregunta, como hacer para reclamar la pensión de mi pareja fallecida, viví 7 años con el pero no nos casamos Que se requiere para obtener la pensión",
               "rawType": "text",
-              "at": "2026-04-25T16:45:53.150Z"
+              "at": "2026-04-25T21:48:48.553Z"
             },
             {
               "role": "bot",
-              "text": "Lamentamos su perdida. Oro por el eterno descanso de su ser querido. Para poder ayudarle bien, me confirma por favor: quien fallecio, si trabajaba o cotizaba, y la fecha aproximada del fallecimiento?",
-              "at": "2026-04-25T16:45:53.165Z"
+              "text": "Para poder ayudarle bien, me confirma por favor: quien fallecio, si trabajaba o cotizaba, y la fecha aproximada del fallecimiento?",
+              "at": "2026-04-25T21:48:48.568Z"
             }
           ],
           "status": "active",
@@ -1298,14 +1484,22 @@
           "data": {
             "idNumber": "",
             "deathDate": "",
+            "deceasedName": "",
+            "workInfo": "",
             "claimant": "pareja"
           },
           "metadata": {
             "senderName": "SimUser",
-            "condolenceSent": true,
-            "followUpAt": "2026-04-25T23:45:53.155Z"
+            "deathContextDetected": false,
+            "requestedFields": [
+              "idNumber",
+              "deceasedName",
+              "deathDate",
+              "workInfo"
+            ],
+            "followUpAt": "2026-04-26T04:48:48.558Z"
           },
-          "updatedAt": "2026-04-25T16:45:53.165Z"
+          "updatedAt": "2026-04-25T21:48:48.568Z"
         }
       },
       "dailyStats": {
@@ -1327,18 +1521,18 @@
       "conversations": {
         "570000000027": {
           "phone": "570000000027",
-          "createdAt": "2026-04-25T16:45:53.170Z",
+          "createdAt": "2026-04-25T21:48:48.575Z",
           "messages": [
             {
               "role": "user",
               "text": "Hola! mi caso es igual y quiero saber si soy beneficiario de pensión Edwin buen día estaba viendo y queria averiguar si existe alguna forma de averiguar al menos por los familiares del pasado",
               "rawType": "text",
-              "at": "2026-04-25T16:45:53.180Z"
+              "at": "2026-04-25T21:48:48.585Z"
             },
             {
               "role": "bot",
-              "text": "Lamentamos su perdida. Oro por el eterno descanso de su ser querido. Para validar si su familiar dejo derecho a pension necesito por favor: cedula del fallecido y fecha exacta de fallecimiento (dia, mes y ano).",
-              "at": "2026-04-25T16:45:53.196Z"
+              "text": "Para revisar su caso, compartame por favor: cedula del fallecido, nombre completo, fecha exacta de fallecimiento con dia, mes y ano, y si trabajaba o cotizaba.",
+              "at": "2026-04-25T21:48:48.599Z"
             }
           ],
           "status": "active",
@@ -1348,14 +1542,22 @@
           "data": {
             "idNumber": "",
             "deathDate": "",
+            "deceasedName": "",
+            "workInfo": "",
             "claimant": ""
           },
           "metadata": {
             "senderName": "SimUser",
-            "condolenceSent": true,
-            "followUpAt": "2026-04-25T23:45:53.185Z"
+            "deathContextDetected": false,
+            "requestedFields": [
+              "idNumber",
+              "deceasedName",
+              "deathDate",
+              "workInfo"
+            ],
+            "followUpAt": "2026-04-26T04:48:48.589Z"
           },
-          "updatedAt": "2026-04-25T16:45:53.196Z"
+          "updatedAt": "2026-04-25T21:48:48.599Z"
         }
       },
       "dailyStats": {
@@ -1377,18 +1579,18 @@
       "conversations": {
         "570000000028": {
           "phone": "570000000028",
-          "createdAt": "2026-04-25T16:45:53.203Z",
+          "createdAt": "2026-04-25T21:48:48.605Z",
           "messages": [
             {
               "role": "user",
               "text": "Saludos Mi madre falleció hace 6 años y quisimos reclamar su pensión para mi padre de 86 años pero no hemos podido ya que se requiere el registro de nacimiento de mi padre y no existe por qué él nunca fue registrado",
               "rawType": "text",
-              "at": "2026-04-25T16:45:53.215Z"
+              "at": "2026-04-25T21:48:48.615Z"
             },
             {
               "role": "bot",
               "text": "Lamentamos su perdida. Oro por el eterno descanso de su ser querido. Para poder ayudarle bien, me confirma por favor: quien fallecio, si trabajaba o cotizaba, y la fecha aproximada del fallecimiento?",
-              "at": "2026-04-25T16:45:53.234Z"
+              "at": "2026-04-25T21:48:48.631Z"
             }
           ],
           "status": "active",
@@ -1398,14 +1600,23 @@
           "data": {
             "idNumber": "",
             "deathDate": "",
+            "deceasedName": "",
+            "workInfo": "",
             "claimant": "madre"
           },
           "metadata": {
             "senderName": "SimUser",
             "condolenceSent": true,
-            "followUpAt": "2026-04-25T23:45:53.222Z"
+            "deathContextDetected": true,
+            "requestedFields": [
+              "idNumber",
+              "deceasedName",
+              "deathDate",
+              "workInfo"
+            ],
+            "followUpAt": "2026-04-26T04:48:48.620Z"
           },
-          "updatedAt": "2026-04-25T16:45:53.234Z"
+          "updatedAt": "2026-04-25T21:48:48.631Z"
         }
       },
       "dailyStats": {
@@ -1427,18 +1638,18 @@
       "conversations": {
         "570000000029": {
           "phone": "570000000029",
-          "createdAt": "2026-04-25T16:45:53.240Z",
+          "createdAt": "2026-04-25T21:48:48.636Z",
           "messages": [
             {
               "role": "user",
               "text": "Porfa más información gracias Gracias.mi padre tiene 8 años de muerto.no sabemos nada de si cotizo pensión Si sr mi madre",
               "rawType": "text",
-              "at": "2026-04-25T16:45:53.250Z"
+              "at": "2026-04-25T21:48:48.646Z"
             },
             {
               "role": "bot",
-              "text": "Lamentamos su perdida. Oro por el eterno descanso de su ser querido. Para revisar su caso, compartame por favor la cedula del fallecido y la fecha exacta de fallecimiento con dia, mes y ano.",
-              "at": "2026-04-25T16:45:53.265Z"
+              "text": "Para revisar su caso, compartame por favor: cedula del fallecido, nombre completo, fecha exacta de fallecimiento con dia, mes y ano, y si trabajaba o cotizaba.",
+              "at": "2026-04-25T21:48:48.661Z"
             }
           ],
           "status": "active",
@@ -1448,14 +1659,22 @@
           "data": {
             "idNumber": "",
             "deathDate": "",
+            "deceasedName": "",
+            "workInfo": "reportado_por_cliente",
             "claimant": "madre"
           },
           "metadata": {
             "senderName": "SimUser",
-            "condolenceSent": true,
-            "followUpAt": "2026-04-25T23:45:53.255Z"
+            "deathContextDetected": false,
+            "requestedFields": [
+              "idNumber",
+              "deceasedName",
+              "deathDate",
+              "workInfo"
+            ],
+            "followUpAt": "2026-04-26T04:48:48.651Z"
           },
-          "updatedAt": "2026-04-25T16:45:53.265Z"
+          "updatedAt": "2026-04-25T21:48:48.661Z"
         }
       },
       "dailyStats": {
@@ -1477,18 +1696,18 @@
       "conversations": {
         "570000000030": {
           "phone": "570000000030",
-          "createdAt": "2026-04-25T16:45:53.271Z",
+          "createdAt": "2026-04-25T21:48:48.667Z",
           "messages": [
             {
               "role": "user",
               "text": "Si gracias Y me gusta taria asesoría Gracias C'c N: 93451317 Fecha Ahoy13 de abril tiene9años,2meses y 24dias de fayesido Nombre completo. Carlos Augusto vanegas cifuentes",
               "rawType": "text",
-              "at": "2026-04-25T16:45:53.282Z"
+              "at": "2026-04-25T21:48:48.677Z"
             },
             {
               "role": "bot",
-              "text": "Lamentamos su perdida. Oro por el eterno descanso de su ser querido. Para revisar su caso, compartame por favor la cedula del fallecido y la fecha exacta de fallecimiento con dia, mes y ano.",
-              "at": "2026-04-25T16:45:53.298Z"
+              "text": "Para revisar su caso, compartame por favor: cedula del fallecido, nombre completo, fecha exacta de fallecimiento con dia, mes y ano, y si trabajaba o cotizaba.",
+              "at": "2026-04-25T21:48:48.691Z"
             }
           ],
           "status": "active",
@@ -1498,14 +1717,22 @@
           "data": {
             "idNumber": "93451317",
             "deathDate": "",
+            "deceasedName": "",
+            "workInfo": "",
             "claimant": ""
           },
           "metadata": {
             "senderName": "SimUser",
-            "condolenceSent": true,
-            "followUpAt": "2026-04-25T23:45:53.287Z"
+            "deathContextDetected": false,
+            "requestedFields": [
+              "idNumber",
+              "deceasedName",
+              "deathDate",
+              "workInfo"
+            ],
+            "followUpAt": "2026-04-26T04:48:48.681Z"
           },
-          "updatedAt": "2026-04-25T16:45:53.298Z"
+          "updatedAt": "2026-04-25T21:48:48.691Z"
         }
       },
       "dailyStats": {
@@ -1527,39 +1754,43 @@
       "conversations": {
         "570000000031": {
           "phone": "570000000031",
-          "createdAt": "2026-04-25T16:45:53.305Z",
+          "createdAt": "2026-04-25T21:48:48.697Z",
           "messages": [
             {
               "role": "user",
               "text": "Si, dejó a mi madre que era su esposa y en ese momento mi hermano menor tenía 14 años Gracias, aún duele Llego a casa y le envío toda la información 17 de septiembre de 2003 1.547.715",
               "rawType": "text",
-              "at": "2026-04-25T16:45:53.315Z"
+              "at": "2026-04-25T21:48:48.706Z"
             },
             {
               "role": "bot",
-              "text": "Lamentamos su perdida. Oro por el eterno descanso de su ser querido. Perfecto, muchas gracias por la informacion. Estare consultando su caso.",
-              "at": "2026-04-25T16:45:53.340Z"
-            },
-            {
-              "role": "bot",
-              "text": "La contactare unica y exclusivamente si encuentro que dejo derecho a pension. Si no me vuelvo a comunicar, probablemente no se encontro derecho.",
-              "at": "2026-04-25T16:45:53.345Z"
+              "text": "Para validar si su familiar dejo derecho a pension necesito por favor estos datos: cedula del fallecido, nombre completo del fallecido, fecha exacta de fallecimiento (dia, mes y ano), y si trabajaba o cotizaba (si sabe la empresa o fondo, me la indica).",
+              "at": "2026-04-25T21:48:48.721Z"
             }
           ],
-          "status": "pending_legal_review",
+          "status": "active",
           "color": "green",
           "reminderCount": 0,
-          "awaitingData": false,
+          "awaitingData": true,
           "data": {
             "idNumber": "1547715",
             "deathDate": "17 de septiembre de 2003",
+            "deceasedName": "",
+            "workInfo": "",
             "claimant": "esposa"
           },
           "metadata": {
             "senderName": "SimUser",
-            "condolenceSent": true
+            "deathContextDetected": false,
+            "requestedFields": [
+              "idNumber",
+              "deceasedName",
+              "deathDate",
+              "workInfo"
+            ],
+            "followUpAt": "2026-04-26T04:48:48.713Z"
           },
-          "updatedAt": "2026-04-25T16:45:53.345Z"
+          "updatedAt": "2026-04-25T21:48:48.721Z"
         }
       },
       "dailyStats": {
@@ -1569,8 +1800,8 @@
           "yellow": 0,
           "red": 0,
           "purple": 0,
-          "idNumbersCollected": 1,
-          "deathDatesCollected": 1
+          "idNumbersCollected": 0,
+          "deathDatesCollected": 0
         }
       }
     }
@@ -1581,39 +1812,44 @@
       "conversations": {
         "570000000032": {
           "phone": "570000000032",
-          "createdAt": "2026-04-25T16:45:53.352Z",
+          "createdAt": "2026-04-25T21:48:48.727Z",
           "messages": [
             {
               "role": "user",
               "text": "Perdí mi esposo, en en 2008 pero mi hijo ya tiene 27 años Edwin Daniel Meneses Moscote CC 77181282 falleció el 24 de diciembre de 2008 Muchas gracias",
               "rawType": "text",
-              "at": "2026-04-25T16:45:53.363Z"
+              "at": "2026-04-25T21:48:48.736Z"
             },
             {
               "role": "bot",
-              "text": "Lamentamos su perdida. Oro por el eterno descanso de su ser querido. Perfecto, muchas gracias por la informacion. Estare consultando su caso.",
-              "at": "2026-04-25T16:45:53.389Z"
-            },
-            {
-              "role": "bot",
-              "text": "La contactare unica y exclusivamente si encuentro que dejo derecho a pension. Si no me vuelvo a comunicar, probablemente no se encontro derecho.",
-              "at": "2026-04-25T16:45:53.395Z"
+              "text": "Lamentamos su perdida. Oro por el eterno descanso de su ser querido. Para poder ayudarle bien, me confirma por favor: quien fallecio, si trabajaba o cotizaba, y la fecha aproximada del fallecimiento?",
+              "at": "2026-04-25T21:48:48.786Z"
             }
           ],
-          "status": "pending_legal_review",
+          "status": "active",
           "color": "purple",
           "reminderCount": 0,
-          "awaitingData": false,
+          "awaitingData": true,
           "data": {
             "idNumber": "77181282",
             "deathDate": "24 de diciembre de 2008",
+            "deceasedName": "",
+            "workInfo": "",
             "claimant": "hijo/hija"
           },
           "metadata": {
             "senderName": "SimUser",
-            "condolenceSent": true
+            "condolenceSent": true,
+            "deathContextDetected": true,
+            "requestedFields": [
+              "idNumber",
+              "deceasedName",
+              "deathDate",
+              "workInfo"
+            ],
+            "followUpAt": "2026-04-26T04:48:48.776Z"
           },
-          "updatedAt": "2026-04-25T16:45:53.395Z"
+          "updatedAt": "2026-04-25T21:48:48.786Z"
         }
       },
       "dailyStats": {
@@ -1623,8 +1859,8 @@
           "yellow": 0,
           "red": 0,
           "purple": 1,
-          "idNumbersCollected": 1,
-          "deathDatesCollected": 1
+          "idNumbersCollected": 0,
+          "deathDatesCollected": 0
         }
       }
     }
@@ -1635,18 +1871,18 @@
       "conversations": {
         "570000000033": {
           "phone": "570000000033",
-          "createdAt": "2026-04-25T16:45:53.401Z",
+          "createdAt": "2026-04-25T21:48:48.792Z",
           "messages": [
             {
               "role": "user",
               "text": "Hola, gracias por escribirnos.",
               "rawType": "text",
-              "at": "2026-04-25T16:45:53.411Z"
+              "at": "2026-04-25T21:48:48.798Z"
             },
             {
               "role": "bot",
               "text": "Hola, gracias por escribirnos.\nSoy Edwin Tello, abogado especialista en pensiones de sobrevivientes a nivel nacional.\nCómo podemos ayudarle?",
-              "at": "2026-04-25T16:45:53.416Z"
+              "at": "2026-04-25T21:48:48.802Z"
             }
           ],
           "status": "active",
@@ -1661,7 +1897,7 @@
           "metadata": {
             "senderName": "SimUser"
           },
-          "updatedAt": "2026-04-25T16:45:53.416Z"
+          "updatedAt": "2026-04-25T21:48:48.802Z"
         }
       },
       "dailyStats": {
@@ -1683,35 +1919,36 @@
       "conversations": {
         "570000000034": {
           "phone": "570000000034",
-          "createdAt": "2026-04-25T16:45:53.422Z",
+          "createdAt": "2026-04-25T21:48:48.810Z",
           "messages": [
             {
               "role": "user",
               "text": "Yo si cotize tengo 57 años y ya me van a dar mis semanas 442semanas",
               "rawType": "text",
-              "at": "2026-04-25T16:45:53.432Z"
+              "at": "2026-04-25T21:48:48.819Z"
             },
             {
               "role": "bot",
-              "text": "Lamentamos su perdida. Oro por el eterno descanso de su ser querido. Para poder ayudarle bien, me confirma por favor: quien fallecio, si trabajaba o cotizaba, y la fecha aproximada del fallecimiento?",
-              "at": "2026-04-25T16:45:53.447Z"
+              "text": "Y necesita alguna ayuda con eso o puede hacerlo usted mismo?",
+              "at": "2026-04-25T21:48:48.831Z"
             }
           ],
           "status": "active",
           "color": "purple",
           "reminderCount": 0,
-          "awaitingData": true,
+          "awaitingData": false,
           "data": {
             "idNumber": "",
             "deathDate": "",
+            "deceasedName": "",
+            "workInfo": "",
             "claimant": ""
           },
           "metadata": {
             "senderName": "SimUser",
-            "condolenceSent": true,
-            "followUpAt": "2026-04-25T23:45:53.438Z"
+            "deathContextDetected": false
           },
-          "updatedAt": "2026-04-25T16:45:53.447Z"
+          "updatedAt": "2026-04-25T21:48:48.831Z"
         }
       },
       "dailyStats": {
@@ -1720,7 +1957,7 @@
           "green": 0,
           "yellow": 0,
           "red": 0,
-          "purple": 1,
+          "purple": 0,
           "idNumbersCollected": 0,
           "deathDatesCollected": 0
         }
@@ -1733,18 +1970,18 @@
       "conversations": {
         "570000000035": {
           "phone": "570000000035",
-          "createdAt": "2026-04-25T16:45:53.453Z",
+          "createdAt": "2026-04-25T21:48:48.837Z",
           "messages": [
             {
               "role": "user",
               "text": "¡Hola! mi caso es igual y quiero saber si soy beneficiario de pensión Edwin buen día estaba viendo y queria averiguar si existe alguna forma de averiguar al menos por los familiares del pasado",
               "rawType": "text",
-              "at": "2026-04-25T16:45:53.463Z"
+              "at": "2026-04-25T21:48:48.847Z"
             },
             {
               "role": "bot",
-              "text": "Lamentamos su perdida. Oro por el eterno descanso de su ser querido. Para revisar su caso, compartame por favor la cedula del fallecido y la fecha exacta de fallecimiento con dia, mes y ano.",
-              "at": "2026-04-25T16:45:53.477Z"
+              "text": "Para revisar su caso, compartame por favor: cedula del fallecido, nombre completo, fecha exacta de fallecimiento con dia, mes y ano, y si trabajaba o cotizaba.",
+              "at": "2026-04-25T21:48:48.862Z"
             }
           ],
           "status": "active",
@@ -1754,14 +1991,22 @@
           "data": {
             "idNumber": "",
             "deathDate": "",
+            "deceasedName": "",
+            "workInfo": "",
             "claimant": ""
           },
           "metadata": {
             "senderName": "SimUser",
-            "condolenceSent": true,
-            "followUpAt": "2026-04-25T23:45:53.468Z"
+            "deathContextDetected": false,
+            "requestedFields": [
+              "idNumber",
+              "deceasedName",
+              "deathDate",
+              "workInfo"
+            ],
+            "followUpAt": "2026-04-26T04:48:48.852Z"
           },
-          "updatedAt": "2026-04-25T16:45:53.477Z"
+          "updatedAt": "2026-04-25T21:48:48.862Z"
         }
       },
       "dailyStats": {
@@ -1783,18 +2028,18 @@
       "conversations": {
         "570000000036": {
           "phone": "570000000036",
-          "createdAt": "2026-04-25T16:45:53.483Z",
+          "createdAt": "2026-04-25T21:48:48.868Z",
           "messages": [
             {
               "role": "user",
               "text": "Buenos días, una preguntica, como hacer para reclamar la pensión de mi pareja fallecida, viví 7 años con el pero no nos casamos Que se requiere para obtener la pensión",
               "rawType": "text",
-              "at": "2026-04-25T16:45:53.493Z"
+              "at": "2026-04-25T21:48:48.879Z"
             },
             {
               "role": "bot",
-              "text": "Lamentamos su perdida. Oro por el eterno descanso de su ser querido. Para poder ayudarle bien, me confirma por favor: quien fallecio, si trabajaba o cotizaba, y la fecha aproximada del fallecimiento?",
-              "at": "2026-04-25T16:45:53.506Z"
+              "text": "Para poder ayudarle bien, me confirma por favor: quien fallecio, si trabajaba o cotizaba, y la fecha aproximada del fallecimiento?",
+              "at": "2026-04-25T21:48:48.894Z"
             }
           ],
           "status": "active",
@@ -1804,14 +2049,22 @@
           "data": {
             "idNumber": "",
             "deathDate": "",
+            "deceasedName": "",
+            "workInfo": "",
             "claimant": "pareja"
           },
           "metadata": {
             "senderName": "SimUser",
-            "condolenceSent": true,
-            "followUpAt": "2026-04-25T23:45:53.497Z"
+            "deathContextDetected": false,
+            "requestedFields": [
+              "idNumber",
+              "deceasedName",
+              "deathDate",
+              "workInfo"
+            ],
+            "followUpAt": "2026-04-26T04:48:48.884Z"
           },
-          "updatedAt": "2026-04-25T16:45:53.506Z"
+          "updatedAt": "2026-04-25T21:48:48.894Z"
         }
       },
       "dailyStats": {
@@ -1833,18 +2086,18 @@
       "conversations": {
         "570000000037": {
           "phone": "570000000037",
-          "createdAt": "2026-04-25T16:45:53.513Z",
+          "createdAt": "2026-04-25T21:48:48.900Z",
           "messages": [
             {
               "role": "user",
               "text": "Bueno es el esposo de mi mamá que murió hace 20 años, de esa unión hay dos hijos. Tiene alguna oficina físico ? Mi madre este año cumple 70 años Que tanto demora el proceso",
               "rawType": "text",
-              "at": "2026-04-25T16:45:53.522Z"
+              "at": "2026-04-25T21:48:48.910Z"
             },
             {
               "role": "bot",
               "text": "Lamentamos su perdida. Oro por el eterno descanso de su ser querido. Para poder ayudarle bien, me confirma por favor: quien fallecio, si trabajaba o cotizaba, y la fecha aproximada del fallecimiento?",
-              "at": "2026-04-25T16:45:53.537Z"
+              "at": "2026-04-25T21:48:48.925Z"
             }
           ],
           "status": "active",
@@ -1854,14 +2107,23 @@
           "data": {
             "idNumber": "",
             "deathDate": "",
+            "deceasedName": "",
+            "workInfo": "",
             "claimant": "hijo/hija"
           },
           "metadata": {
             "senderName": "SimUser",
             "condolenceSent": true,
-            "followUpAt": "2026-04-25T23:45:53.527Z"
+            "deathContextDetected": true,
+            "requestedFields": [
+              "idNumber",
+              "deceasedName",
+              "deathDate",
+              "workInfo"
+            ],
+            "followUpAt": "2026-04-26T04:48:48.915Z"
           },
-          "updatedAt": "2026-04-25T16:45:53.537Z"
+          "updatedAt": "2026-04-25T21:48:48.925Z"
         }
       },
       "dailyStats": {
@@ -1883,18 +2145,18 @@
       "conversations": {
         "570000000038": {
           "phone": "570000000038",
-          "createdAt": "2026-04-25T16:45:53.543Z",
+          "createdAt": "2026-04-25T21:48:48.931Z",
           "messages": [
             {
               "role": "user",
               "text": "Hola! Me gustaría conseguir más información sobre esto. yo estoy en Arjona bolivar donde esta usted ami menegaron la pencion de mi compañero el fallecio hacen 4 años convivimo 11 años tine 4 de fallesido y me la negaron por algunos vesinos no dieron informacion",
               "rawType": "text",
-              "at": "2026-04-25T16:45:53.552Z"
+              "at": "2026-04-25T21:48:48.940Z"
             },
             {
               "role": "bot",
               "text": "Lamentamos su perdida. Oro por el eterno descanso de su ser querido. Para orientarle mejor necesito tres datos: quien fallecio, cuando fallecio y si cotizaba pension o trabajaba.",
-              "at": "2026-04-25T16:45:53.567Z"
+              "at": "2026-04-25T21:48:48.955Z"
             }
           ],
           "status": "active",
@@ -1904,14 +2166,23 @@
           "data": {
             "idNumber": "",
             "deathDate": "",
+            "deceasedName": "",
+            "workInfo": "",
             "claimant": ""
           },
           "metadata": {
             "senderName": "SimUser",
             "condolenceSent": true,
-            "followUpAt": "2026-04-25T23:45:53.557Z"
+            "deathContextDetected": true,
+            "requestedFields": [
+              "idNumber",
+              "deceasedName",
+              "deathDate",
+              "workInfo"
+            ],
+            "followUpAt": "2026-04-26T04:48:48.945Z"
           },
-          "updatedAt": "2026-04-25T16:45:53.567Z"
+          "updatedAt": "2026-04-25T21:48:48.955Z"
         }
       },
       "dailyStats": {
@@ -1933,18 +2204,18 @@
       "conversations": {
         "570000000039": {
           "phone": "570000000039",
-          "createdAt": "2026-04-25T16:45:53.573Z",
+          "createdAt": "2026-04-25T21:48:48.961Z",
           "messages": [
             {
               "role": "user",
               "text": "Hola Solo sobrevivientes Mi esposo trabajo en sanbenito Puede pelear el tiempo 1965",
               "rawType": "text",
-              "at": "2026-04-25T16:45:53.583Z"
+              "at": "2026-04-25T21:48:48.970Z"
             },
             {
               "role": "bot",
-              "text": "Lamentamos su perdida. Oro por el eterno descanso de su ser querido. Para validar si su familiar dejo derecho a pension necesito por favor: cedula del fallecido y fecha exacta de fallecimiento (dia, mes y ano).",
-              "at": "2026-04-25T16:45:53.597Z"
+              "text": "Para validar si su familiar dejo derecho a pension necesito por favor estos datos: cedula del fallecido, nombre completo del fallecido, fecha exacta de fallecimiento (dia, mes y ano), y si trabajaba o cotizaba (si sabe la empresa o fondo, me la indica).",
+              "at": "2026-04-25T21:48:48.986Z"
             }
           ],
           "status": "active",
@@ -1954,14 +2225,22 @@
           "data": {
             "idNumber": "",
             "deathDate": "",
+            "deceasedName": "",
+            "workInfo": "reportado_por_cliente",
             "claimant": ""
           },
           "metadata": {
             "senderName": "SimUser",
-            "condolenceSent": true,
-            "followUpAt": "2026-04-25T23:45:53.587Z"
+            "deathContextDetected": false,
+            "requestedFields": [
+              "idNumber",
+              "deceasedName",
+              "deathDate",
+              "workInfo"
+            ],
+            "followUpAt": "2026-04-26T04:48:48.976Z"
           },
-          "updatedAt": "2026-04-25T16:45:53.597Z"
+          "updatedAt": "2026-04-25T21:48:48.986Z"
         }
       },
       "dailyStats": {
@@ -1983,18 +2262,18 @@
       "conversations": {
         "570000000040": {
           "phone": "570000000040",
-          "createdAt": "2026-04-25T16:45:53.602Z",
+          "createdAt": "2026-04-25T21:48:48.992Z",
           "messages": [
             {
               "role": "user",
               "text": "Mi esposo falleció hace 5 alo",
               "rawType": "text",
-              "at": "2026-04-25T16:45:53.613Z"
+              "at": "2026-04-25T21:48:49.001Z"
             },
             {
               "role": "bot",
               "text": "Lamentamos su perdida. Oro por el eterno descanso de su ser querido. Para poder ayudarle bien, me confirma por favor: quien fallecio, si trabajaba o cotizaba, y la fecha aproximada del fallecimiento?",
-              "at": "2026-04-25T16:45:53.628Z"
+              "at": "2026-04-25T21:48:49.015Z"
             }
           ],
           "status": "active",
@@ -2004,14 +2283,23 @@
           "data": {
             "idNumber": "",
             "deathDate": "",
+            "deceasedName": "",
+            "workInfo": "",
             "claimant": ""
           },
           "metadata": {
             "senderName": "SimUser",
             "condolenceSent": true,
-            "followUpAt": "2026-04-25T23:45:53.618Z"
+            "deathContextDetected": true,
+            "requestedFields": [
+              "idNumber",
+              "deceasedName",
+              "deathDate",
+              "workInfo"
+            ],
+            "followUpAt": "2026-04-26T04:48:49.005Z"
           },
-          "updatedAt": "2026-04-25T16:45:53.628Z"
+          "updatedAt": "2026-04-25T21:48:49.015Z"
         }
       },
       "dailyStats": {
@@ -2033,18 +2321,18 @@
       "conversations": {
         "570000000041": {
           "phone": "570000000041",
-          "createdAt": "2026-04-25T16:45:53.634Z",
+          "createdAt": "2026-04-25T21:48:49.021Z",
           "messages": [
             {
               "role": "user",
               "text": "Hola me gustaría saber más de este tema",
               "rawType": "text",
-              "at": "2026-04-25T16:45:53.644Z"
+              "at": "2026-04-25T21:48:49.030Z"
             },
             {
               "role": "bot",
-              "text": "Lamentamos su perdida. Oro por el eterno descanso de su ser querido. Para poder ayudarle bien, me confirma por favor: quien fallecio, si trabajaba o cotizaba, y la fecha aproximada del fallecimiento?",
-              "at": "2026-04-25T16:45:53.658Z"
+              "text": "Para poder ayudarle bien, me confirma por favor: quien fallecio, si trabajaba o cotizaba, y la fecha aproximada del fallecimiento?",
+              "at": "2026-04-25T21:48:49.045Z"
             }
           ],
           "status": "active",
@@ -2054,14 +2342,22 @@
           "data": {
             "idNumber": "",
             "deathDate": "",
+            "deceasedName": "",
+            "workInfo": "",
             "claimant": ""
           },
           "metadata": {
             "senderName": "SimUser",
-            "condolenceSent": true,
-            "followUpAt": "2026-04-25T23:45:53.649Z"
+            "deathContextDetected": false,
+            "requestedFields": [
+              "idNumber",
+              "deceasedName",
+              "deathDate",
+              "workInfo"
+            ],
+            "followUpAt": "2026-04-26T04:48:49.035Z"
           },
-          "updatedAt": "2026-04-25T16:45:53.658Z"
+          "updatedAt": "2026-04-25T21:48:49.045Z"
         }
       },
       "dailyStats": {
@@ -2083,39 +2379,44 @@
       "conversations": {
         "570000000042": {
           "phone": "570000000042",
-          "createdAt": "2026-04-25T16:45:53.664Z",
+          "createdAt": "2026-04-25T21:48:49.050Z",
           "messages": [
             {
               "role": "user",
               "text": "Si Buendía como esesta Para preguntarle sobre mi esposo ya muerto el no alcanzo nada pero al menos que devuelban loque el cotizo CC 71 932 793 murió el 12 abril 2022 un viernes",
               "rawType": "text",
-              "at": "2026-04-25T16:45:53.673Z"
+              "at": "2026-04-25T21:48:49.059Z"
             },
             {
               "role": "bot",
-              "text": "Lamentamos su perdida. Oro por el eterno descanso de su ser querido. Perfecto, muchas gracias por la informacion. Estare consultando su caso.",
-              "at": "2026-04-25T16:45:53.698Z"
-            },
-            {
-              "role": "bot",
-              "text": "La contactare unica y exclusivamente si encuentro que dejo derecho a pension. Si no me vuelvo a comunicar, probablemente no se encontro derecho.",
-              "at": "2026-04-25T16:45:53.703Z"
+              "text": "Lamentamos su perdida. Oro por el eterno descanso de su ser querido. Para validar si su familiar dejo derecho a pension necesito por favor estos datos: cedula del fallecido, nombre completo del fallecido, fecha exacta de fallecimiento (dia, mes y ano), y si trabajaba o cotizaba (si sabe la empresa o fondo, me la indica).",
+              "at": "2026-04-25T21:48:49.073Z"
             }
           ],
-          "status": "pending_legal_review",
+          "status": "active",
           "color": "green",
           "reminderCount": 0,
-          "awaitingData": false,
+          "awaitingData": true,
           "data": {
             "idNumber": "71932793",
             "deathDate": "12 abril 2022",
+            "deceasedName": "",
+            "workInfo": "reportado_por_cliente",
             "claimant": ""
           },
           "metadata": {
             "senderName": "SimUser",
-            "condolenceSent": true
+            "condolenceSent": true,
+            "deathContextDetected": true,
+            "requestedFields": [
+              "idNumber",
+              "deceasedName",
+              "deathDate",
+              "workInfo"
+            ],
+            "followUpAt": "2026-04-26T04:48:49.064Z"
           },
-          "updatedAt": "2026-04-25T16:45:53.703Z"
+          "updatedAt": "2026-04-25T21:48:49.073Z"
         }
       },
       "dailyStats": {
@@ -2125,8 +2426,8 @@
           "yellow": 0,
           "red": 0,
           "purple": 0,
-          "idNumbersCollected": 1,
-          "deathDatesCollected": 1
+          "idNumbersCollected": 0,
+          "deathDatesCollected": 0
         }
       }
     }
@@ -2137,18 +2438,18 @@
       "conversations": {
         "570000000043": {
           "phone": "570000000043",
-          "createdAt": "2026-04-25T16:45:53.710Z",
+          "createdAt": "2026-04-25T21:48:49.079Z",
           "messages": [
             {
               "role": "user",
               "text": "¡Hola! mi caso es igual y quiero saber si soy beneficiario de pensión Muy buenos días Dios le bendiga si hera mi compañero y teníamos 4 hijos En ese tiempo avían dos menores de edad",
               "rawType": "text",
-              "at": "2026-04-25T16:45:53.720Z"
+              "at": "2026-04-25T21:48:49.087Z"
             },
             {
               "role": "bot",
-              "text": "Lamentamos su perdida. Oro por el eterno descanso de su ser querido. Para revisar su caso, compartame por favor la cedula del fallecido y la fecha exacta de fallecimiento con dia, mes y ano.",
-              "at": "2026-04-25T16:45:53.735Z"
+              "text": "Para revisar su caso, compartame por favor: cedula del fallecido, nombre completo, fecha exacta de fallecimiento con dia, mes y ano, y si trabajaba o cotizaba.",
+              "at": "2026-04-25T21:48:49.101Z"
             }
           ],
           "status": "active",
@@ -2158,14 +2459,22 @@
           "data": {
             "idNumber": "",
             "deathDate": "",
+            "deceasedName": "",
+            "workInfo": "",
             "claimant": "hijo/hija"
           },
           "metadata": {
             "senderName": "SimUser",
-            "condolenceSent": true,
-            "followUpAt": "2026-04-25T23:45:53.725Z"
+            "deathContextDetected": false,
+            "requestedFields": [
+              "idNumber",
+              "deceasedName",
+              "deathDate",
+              "workInfo"
+            ],
+            "followUpAt": "2026-04-26T04:48:49.093Z"
           },
-          "updatedAt": "2026-04-25T16:45:53.735Z"
+          "updatedAt": "2026-04-25T21:48:49.101Z"
         }
       },
       "dailyStats": {
@@ -2187,39 +2496,43 @@
       "conversations": {
         "570000000044": {
           "phone": "570000000044",
-          "createdAt": "2026-04-25T16:45:53.742Z",
+          "createdAt": "2026-04-25T21:48:49.107Z",
           "messages": [
             {
               "role": "user",
               "text": "Si 1063162421 3 de marzo 2026 Si cotizo y trabajo en la empresa sotrocon y tu cura",
               "rawType": "text",
-              "at": "2026-04-25T16:45:53.752Z"
+              "at": "2026-04-25T21:48:49.116Z"
             },
             {
               "role": "bot",
-              "text": "Lamentamos su perdida. Oro por el eterno descanso de su ser querido. Perfecto, muchas gracias por la informacion. Estare consultando su caso.",
-              "at": "2026-04-25T16:45:53.778Z"
-            },
-            {
-              "role": "bot",
-              "text": "La contactare unica y exclusivamente si encuentro que dejo derecho a pension. Si no me vuelvo a comunicar, probablemente no se encontro derecho.",
-              "at": "2026-04-25T16:45:53.783Z"
+              "text": "Para revisar su caso, compartame por favor: cedula del fallecido, nombre completo, fecha exacta de fallecimiento con dia, mes y ano, y si trabajaba o cotizaba.",
+              "at": "2026-04-25T21:48:49.124Z"
             }
           ],
-          "status": "pending_legal_review",
+          "status": "active",
           "color": "green",
           "reminderCount": 0,
-          "awaitingData": false,
+          "awaitingData": true,
           "data": {
             "idNumber": "1063162421",
             "deathDate": "3 de marzo 2026",
+            "deceasedName": "",
+            "workInfo": "reportado_por_cliente",
             "claimant": ""
           },
           "metadata": {
             "senderName": "SimUser",
-            "condolenceSent": true
+            "deathContextDetected": false,
+            "requestedFields": [
+              "idNumber",
+              "deceasedName",
+              "deathDate",
+              "workInfo"
+            ],
+            "followUpAt": "2026-04-26T04:48:49.120Z"
           },
-          "updatedAt": "2026-04-25T16:45:53.783Z"
+          "updatedAt": "2026-04-25T21:48:49.124Z"
         }
       },
       "dailyStats": {
@@ -2229,8 +2542,8 @@
           "yellow": 0,
           "red": 0,
           "purple": 0,
-          "idNumbersCollected": 1,
-          "deathDatesCollected": 1
+          "idNumbersCollected": 0,
+          "deathDatesCollected": 0
         }
       }
     }
@@ -2241,18 +2554,18 @@
       "conversations": {
         "570000000045": {
           "phone": "570000000045",
-          "createdAt": "2026-04-25T16:45:53.789Z",
+          "createdAt": "2026-04-25T21:48:49.131Z",
           "messages": [
             {
               "role": "user",
               "text": "¡Hola! Creo que yo también puedo tener derecho a pensión. Buenas tardes, mi padre murió en el año 2009, de un paro cardíaco tenia 68 años, mi madre quedo sola, nunca pudo recibir pensión porque no había matrimonio, ni extrajuicio, pero quedamos 2 hijos, que podemos hacer? Si el cotizaba, pues de hecho estaba trabajando en el tiempo en que murió No hay hijos menores, papá murió de 68 años, en el 2009 y mamá tenía 69",
               "rawType": "text",
-              "at": "2026-04-25T16:45:53.800Z"
+              "at": "2026-04-25T21:48:49.140Z"
             },
             {
               "role": "bot",
-              "text": "Lamentamos su perdida. Oro por el eterno descanso de su ser querido. Para validar si su familiar dejo derecho a pension necesito por favor: cedula del fallecido y fecha exacta de fallecimiento (dia, mes y ano).",
-              "at": "2026-04-25T16:45:53.817Z"
+              "text": "Lamentamos su perdida. Oro por el eterno descanso de su ser querido. Para validar si su familiar dejo derecho a pension necesito por favor estos datos: cedula del fallecido, nombre completo del fallecido, fecha exacta de fallecimiento (dia, mes y ano), y si trabajaba o cotizaba (si sabe la empresa o fondo, me la indica).",
+              "at": "2026-04-25T21:48:49.154Z"
             }
           ],
           "status": "active",
@@ -2262,14 +2575,23 @@
           "data": {
             "idNumber": "",
             "deathDate": "",
+            "deceasedName": "",
+            "workInfo": "reportado_por_cliente",
             "claimant": "hijo/hija"
           },
           "metadata": {
             "senderName": "SimUser",
             "condolenceSent": true,
-            "followUpAt": "2026-04-25T23:45:53.805Z"
+            "deathContextDetected": true,
+            "requestedFields": [
+              "idNumber",
+              "deceasedName",
+              "deathDate",
+              "workInfo"
+            ],
+            "followUpAt": "2026-04-26T04:48:49.145Z"
           },
-          "updatedAt": "2026-04-25T16:45:53.817Z"
+          "updatedAt": "2026-04-25T21:48:49.154Z"
         }
       },
       "dailyStats": {
@@ -2291,18 +2613,18 @@
       "conversations": {
         "570000000046": {
           "phone": "570000000046",
-          "createdAt": "2026-04-25T16:45:53.824Z",
+          "createdAt": "2026-04-25T21:48:49.160Z",
           "messages": [
             {
               "role": "user",
               "text": "Hola cómo estas Soy la cuñada de Inés García Esposa de Yeferson García El falleció Ines me dijo que lo contactara Hola cómo esta No había podido responder estado haciendo vueltas Mi esposo murió hace un mes muerte natural el tenía Colpensiones cotizaba ahí tengo 3 hijos con el uno mayor de edad y los dos menores el tenía 13",
               "rawType": "text",
-              "at": "2026-04-25T16:45:53.835Z"
+              "at": "2026-04-25T21:48:49.169Z"
             },
             {
               "role": "bot",
-              "text": "Lamentamos su perdida. Oro por el eterno descanso de su ser querido. Para validar si su familiar dejo derecho a pension necesito por favor: cedula del fallecido y fecha exacta de fallecimiento (dia, mes y ano).",
-              "at": "2026-04-25T16:45:53.852Z"
+              "text": "Lamentamos su perdida. Oro por el eterno descanso de su ser querido. Para validar si su familiar dejo derecho a pension necesito por favor estos datos: cedula del fallecido, nombre completo del fallecido, fecha exacta de fallecimiento (dia, mes y ano), y si trabajaba o cotizaba (si sabe la empresa o fondo, me la indica).",
+              "at": "2026-04-25T21:48:49.184Z"
             }
           ],
           "status": "active",
@@ -2312,14 +2634,23 @@
           "data": {
             "idNumber": "",
             "deathDate": "",
+            "deceasedName": "",
+            "workInfo": "reportado_por_cliente",
             "claimant": "esposa"
           },
           "metadata": {
             "senderName": "SimUser",
             "condolenceSent": true,
-            "followUpAt": "2026-04-25T23:45:53.841Z"
+            "deathContextDetected": true,
+            "requestedFields": [
+              "idNumber",
+              "deceasedName",
+              "deathDate",
+              "workInfo"
+            ],
+            "followUpAt": "2026-04-26T04:48:49.174Z"
           },
-          "updatedAt": "2026-04-25T16:45:53.852Z"
+          "updatedAt": "2026-04-25T21:48:49.184Z"
         }
       },
       "dailyStats": {
@@ -2341,18 +2672,18 @@
       "conversations": {
         "570000000046": {
           "phone": "570000000046",
-          "createdAt": "2026-04-25T16:45:53.824Z",
+          "createdAt": "2026-04-25T21:48:49.160Z",
           "messages": [
             {
               "role": "user",
               "text": "Hola cómo estas Soy la cuñada de Inés García Esposa de Yeferson García El falleció Ines me dijo que lo contactara Hola cómo esta No había podido responder estado haciendo vueltas Mi esposo murió hace un mes muerte natural el tenía Colpensiones cotizaba ahí tengo 3 hijos con el uno mayor de edad y los dos menores el tenía 13",
               "rawType": "text",
-              "at": "2026-04-25T16:45:53.835Z"
+              "at": "2026-04-25T21:48:49.169Z"
             },
             {
               "role": "bot",
-              "text": "Lamentamos su perdida. Oro por el eterno descanso de su ser querido. Para validar si su familiar dejo derecho a pension necesito por favor: cedula del fallecido y fecha exacta de fallecimiento (dia, mes y ano).",
-              "at": "2026-04-25T16:45:53.852Z"
+              "text": "Lamentamos su perdida. Oro por el eterno descanso de su ser querido. Para validar si su familiar dejo derecho a pension necesito por favor estos datos: cedula del fallecido, nombre completo del fallecido, fecha exacta de fallecimiento (dia, mes y ano), y si trabajaba o cotizaba (si sabe la empresa o fondo, me la indica).",
+              "at": "2026-04-25T21:48:49.184Z"
             }
           ],
           "status": "active",
@@ -2362,14 +2693,23 @@
           "data": {
             "idNumber": "",
             "deathDate": "",
+            "deceasedName": "",
+            "workInfo": "reportado_por_cliente",
             "claimant": "esposa"
           },
           "metadata": {
             "senderName": "SimUser",
             "condolenceSent": true,
-            "followUpAt": "2026-04-25T23:45:53.841Z"
+            "deathContextDetected": true,
+            "requestedFields": [
+              "idNumber",
+              "deceasedName",
+              "deathDate",
+              "workInfo"
+            ],
+            "followUpAt": "2026-04-26T04:48:49.174Z"
           },
-          "updatedAt": "2026-04-25T16:45:53.852Z"
+          "updatedAt": "2026-04-25T21:48:49.184Z"
         }
       },
       "dailyStats": {
@@ -2391,18 +2731,18 @@
       "conversations": {
         "570000000048": {
           "phone": "570000000048",
-          "createdAt": "2026-04-25T16:45:53.859Z",
+          "createdAt": "2026-04-25T21:48:49.189Z",
           "messages": [
             {
               "role": "user",
               "text": "Ola yo también perdí ami esposo y negaron la pensión trabajaba en la empresa superan Robinson viera velasquez cc 93.127.823 Falleció 14 de octubre. 2006",
               "rawType": "text",
-              "at": "2026-04-25T16:45:53.870Z"
+              "at": "2026-04-25T21:48:49.198Z"
             },
             {
               "role": "bot",
-              "text": "Lamentamos su perdida. Oro por el eterno descanso de su ser querido. Para validar si su familiar dejo derecho a pension necesito por favor: cedula del fallecido y fecha exacta de fallecimiento (dia, mes y ano).",
-              "at": "2026-04-25T16:45:53.887Z"
+              "text": "Lamentamos su perdida. Oro por el eterno descanso de su ser querido. Para validar si su familiar dejo derecho a pension necesito por favor estos datos: cedula del fallecido, nombre completo del fallecido, fecha exacta de fallecimiento (dia, mes y ano), y si trabajaba o cotizaba (si sabe la empresa o fondo, me la indica).",
+              "at": "2026-04-25T21:48:49.212Z"
             }
           ],
           "status": "active",
@@ -2412,14 +2752,23 @@
           "data": {
             "idNumber": "93127823",
             "deathDate": "",
+            "deceasedName": "",
+            "workInfo": "reportado_por_cliente",
             "claimant": ""
           },
           "metadata": {
             "senderName": "SimUser",
             "condolenceSent": true,
-            "followUpAt": "2026-04-25T23:45:53.876Z"
+            "deathContextDetected": true,
+            "requestedFields": [
+              "idNumber",
+              "deceasedName",
+              "deathDate",
+              "workInfo"
+            ],
+            "followUpAt": "2026-04-26T04:48:49.203Z"
           },
-          "updatedAt": "2026-04-25T16:45:53.887Z"
+          "updatedAt": "2026-04-25T21:48:49.212Z"
         }
       },
       "dailyStats": {
@@ -2441,18 +2790,18 @@
       "conversations": {
         "570000000049": {
           "phone": "570000000049",
-          "createdAt": "2026-04-25T16:45:53.895Z",
+          "createdAt": "2026-04-25T21:48:49.217Z",
           "messages": [
             {
               "role": "user",
               "text": "Soy Yohana Sareth Ramón mi hijo fallecido hace cinco años y laboraba para una empresa en puerto Carreño vichada cotizaba en Colpensiones que debo hacer Buenos días no tenía compañera permanente ni esposa dejo dos niñas pequeñas en diferente pareja una niña de 8 años y otra de 13 años con la que más compartió fue un año con la madre de la niña de ocho años",
               "rawType": "text",
-              "at": "2026-04-25T16:45:53.905Z"
+              "at": "2026-04-25T21:48:49.226Z"
             },
             {
               "role": "bot",
-              "text": "Lamentamos su perdida. Oro por el eterno descanso de su ser querido. Para validar si su familiar dejo derecho a pension necesito por favor: cedula del fallecido y fecha exacta de fallecimiento (dia, mes y ano).",
-              "at": "2026-04-25T16:45:53.922Z"
+              "text": "Para validar si su familiar dejo derecho a pension necesito por favor estos datos: cedula del fallecido, nombre completo del fallecido, fecha exacta de fallecimiento (dia, mes y ano), y si trabajaba o cotizaba (si sabe la empresa o fondo, me la indica).",
+              "at": "2026-04-25T21:48:49.240Z"
             }
           ],
           "status": "active",
@@ -2462,14 +2811,22 @@
           "data": {
             "idNumber": "",
             "deathDate": "",
+            "deceasedName": "",
+            "workInfo": "reportado_por_cliente",
             "claimant": "esposa"
           },
           "metadata": {
             "senderName": "SimUser",
-            "condolenceSent": true,
-            "followUpAt": "2026-04-25T23:45:53.911Z"
+            "deathContextDetected": false,
+            "requestedFields": [
+              "idNumber",
+              "deceasedName",
+              "deathDate",
+              "workInfo"
+            ],
+            "followUpAt": "2026-04-26T04:48:49.231Z"
           },
-          "updatedAt": "2026-04-25T16:45:53.922Z"
+          "updatedAt": "2026-04-25T21:48:49.240Z"
         }
       },
       "dailyStats": {
