@@ -21,7 +21,7 @@ function extractIdNumber(text) {
     return candidate;
   }
 
-  const groupedCandidates = text.match(/\b\d{1,3}(?:[.\s]\d{3})+\b/g) || [];
+  const groupedCandidates = text.match(/\b\d{1,3}(?:[.,\s]\d{3})+\b/g) || [];
   for (const candidate of groupedCandidates) {
     const normalized = normalizeId(candidate);
     if (normalized.length >= 6 && normalized.length <= 15) return normalized;
