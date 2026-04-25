@@ -154,11 +154,37 @@ function hasUnmarriedConcern(normalizedText) {
   return unmarriedSignals.some((token) => normalizedText.includes(token));
 }
 
+function stripCondolencePhrases(text) {
+  return String(text || "")
+    .replace(/lamentamos su perdida\.?/gi, "")
+    .replace(/lamento mucho esta situacion\.?/gi, "")
+    .replace(/oro por el eterno descanso de su ser querido\.?/gi, "")
+    .replace(/y oramos por el eterno descanso de su ser querido\.?/gi, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 function withCondolenceOnce(conv, baseText) {
   const alreadySent = Boolean(conv?.metadata?.condolenceSent);
-  if (alreadySent) return { text: baseText, metadataPatch: {} };
+  const cleanBaseText = stripCondolencePhrases(baseText);
+  if (alreadySent) return { text: cleanBaseText, metadataPatch: {} };
   const condolence = "Lamentamos su perdida. Oro por el eterno descanso de su ser querido.";
-  return { text: `${condolence} ${baseText}`.trim(), metadataPatch: { condolenceSent: true } };
+  return { text: `${condolence} ${cleanBaseText}`.trim(), metadataPatch: { condolenceSent: true } };
+}
+
+function buildMissingFieldsPrompt(missingFields) {
+  const labels = {
+    idNumber: "el numero de cedula del fallecido",
+    deathDate: "la fecha exacta de fallecimiento (dia, mes y ano)",
+  };
+  const requested = missingFields.map((field) => labels[field]).filter(Boolean);
+  if (!requested.length) return "";
+  if (requested.length === 1) {
+    return `Gracias por la informacion. Para continuar, por favor envieme ${requested[0]}.`;
+  }
+  const last = requested[requested.length - 1];
+  const first = requested.slice(0, -1).join(" y ");
+  return `Gracias por la informacion. Para continuar, por favor envieme ${first} y ${last}.`;
 }
 
 async function handleInbound(payload, options = {}) {
@@ -247,6 +273,28 @@ async function handleInbound(payload, options = {}) {
     deathDate: extracted.deathDate || conv.data?.deathDate || "",
     claimant: extracted.claimant || conv.data?.claimant || "",
   };
+  const requestedFields =
+    conv.metadata?.requestedFields && conv.metadata.requestedFields.length
+      ? conv.metadata.requestedFields
+      : conv.awaitingData
+        ? ["idNumber", "deathDate"]
+        : [];
+  const userProvidedTrackedFieldInThisMessage = Boolean(extracted.idNumber || extracted.deathDate);
+  if (conv.awaitingData && requestedFields.length && userProvidedTrackedFieldInThisMessage) {
+    const missingFields = requestedFields.filter((field) => !mergedData[field]);
+    if (missingFields.length) {
+      const missingPrompt = withCondolenceOnce(conv, buildMissingFieldsPrompt(missingFields));
+      await sendOutbound(phone, missingPrompt.text);
+      onBotMessage(missingPrompt.text);
+      upsertConversation(phone, {
+        awaitingData: true,
+        data: mergedData,
+        metadata: { ...conv.metadata, ...missingPrompt.metadataPatch, senderName },
+      });
+      appendConversationMessage(phone, { role: "bot", text: missingPrompt.text });
+      return { ok: true, responseType: "request_missing_data" };
+    }
+  }
 
   const classification = classifyMessage(text);
   const color = classification.color;
@@ -262,7 +310,12 @@ async function handleInbound(payload, options = {}) {
       color: "purple",
       status: "active",
       awaitingData: true,
-      metadata: { ...conv.metadata, ...docsComposed.metadataPatch, senderName },
+      metadata: {
+        ...conv.metadata,
+        ...docsComposed.metadataPatch,
+        senderName,
+        requestedFields: ["idNumber", "deathDate"],
+      },
     });
     appendConversationMessage(phone, { role: "bot", text: docs });
     return { ok: true, responseType: "docs_info" };
@@ -280,7 +333,12 @@ async function handleInbound(payload, options = {}) {
       color: "purple",
       status: "active",
       awaitingData: true,
-      metadata: { ...conv.metadata, ...infoComposed.metadataPatch, senderName },
+      metadata: {
+        ...conv.metadata,
+        ...infoComposed.metadataPatch,
+        senderName,
+        requestedFields: ["idNumber", "deathDate"],
+      },
     });
     appendConversationMessage(phone, { role: "bot", text: info });
     return { ok: true, responseType: "how_it_works_info" };
@@ -352,7 +410,12 @@ async function handleInbound(payload, options = {}) {
       awaitingData: false,
       color: color === "red" ? "yellow" : color,
       data: mergedData,
-      metadata: { ...conv.metadata, ...composedConfirmation.metadataPatch, senderName },
+      metadata: {
+        ...conv.metadata,
+        ...composedConfirmation.metadataPatch,
+        senderName,
+        requestedFields: [],
+      },
     });
 
     appendConversationMessage(phone, { role: "bot", text: composedConfirmation.text });
@@ -422,6 +485,7 @@ async function handleInbound(payload, options = {}) {
         ...conv.metadata,
         ...greenReply.metadataPatch,
         senderName,
+        requestedFields: ["idNumber", "deathDate"],
         followUpAt: dayjs().add(7, "hour").toISOString(),
       },
     });
