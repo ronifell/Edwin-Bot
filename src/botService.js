@@ -42,11 +42,35 @@ function buildFallbackEventKey({ phone, type, message, isAudio }) {
 }
 
 function extractInbound(payload) {
-  const message = payload?.text?.message || payload?.message || payload?.body || "";
+  const message =
+    payload?.text?.message ||
+    payload?.message ||
+    payload?.body ||
+    payload?.conversation ||
+    payload?.caption ||
+    payload?.extendedTextMessage?.text ||
+    payload?.audio?.transcription ||
+    payload?.transcription ||
+    "";
   const phone = payload?.phone || payload?.from || payload?.chatLid || payload?.sender || "";
   const senderName = payload?.senderName || payload?.pushName || "";
-  const isAudio = Boolean(payload?.audio?.audioUrl || payload?.audio?.url || payload?.isAudio);
-  const audioUrl = payload?.audio?.audioUrl || payload?.audio?.url || payload?.fileUrl || "";
+  const audioUrl =
+    payload?.audio?.audioUrl ||
+    payload?.audio?.url ||
+    payload?.fileUrl ||
+    payload?.file?.url ||
+    payload?.voice?.url ||
+    payload?.ptt?.url ||
+    payload?.mediaUrl ||
+    "";
+  const mimeType =
+    payload?.audio?.mimetype || payload?.audio?.mimeType || payload?.mimetype || payload?.mimeType || "";
+  const isAudio = Boolean(
+    payload?.isAudio ||
+      audioUrl ||
+      /^audio\//i.test(String(mimeType || "")) ||
+      /audio|voice|ptt/i.test(String(payload?.type || ""))
+  );
   const fromMe = Boolean(payload?.fromMe);
   const isStatusReply = Boolean(payload?.isStatusReply);
   const type = payload?.type || "";
@@ -205,6 +229,22 @@ async function handleInbound(payload, options = {}) {
   }
 
   if (!text.trim()) {
+    if (isAudio) {
+      const audioClarification = await maybeGenerateStyledReply({
+        conv: getConversation(phone),
+        userText: "audio_sin_transcripcion",
+        responseType: "audio_clarification",
+        instruction:
+          "Si recibes audio pero no se puede transcribir, pide amablemente que repita el audio con mejor claridad o que lo envie por texto. Mensaje breve y humano.",
+        fallback:
+          "Gracias. No pude escuchar bien el audio. ¿Podrías repetirlo con mejor claridad o enviarme ese mensaje por texto?",
+      });
+      await sendOutbound(phone, audioClarification);
+      onBotMessage(audioClarification);
+      appendConversationMessage(phone, { role: "bot", text: audioClarification });
+      console.warn(`[BOT] audio message without transcription phone=${phone}`);
+      return { ok: true, responseType: "audio_clarification" };
+    }
     console.warn(`[BOT] ignored: empty_message phone=${phone}`);
     return { ok: true, ignored: "empty_message" };
   }
