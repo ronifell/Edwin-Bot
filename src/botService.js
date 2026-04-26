@@ -147,6 +147,31 @@ function isLocationQuestion(input) {
   return locationSignals.some((token) => normalized.includes(token));
 }
 
+function isContactLaterIntent(input) {
+  const normalized = normalizeForKey(input);
+  if (!normalized) return false;
+  const laterSignals = [
+    "espere un momento",
+    "espera un momento",
+    "espera",
+    "luego te escribo",
+    "luego le escribo",
+    "despues te escribo",
+    "despues le escribo",
+    "mas tarde",
+    "te contacto luego",
+    "le contacto luego",
+    "cuando pueda",
+    "ahorita no puedo",
+    "ahora no puedo",
+    "en un rato",
+    "te aviso luego",
+    "le aviso luego",
+    "mas adelante",
+  ];
+  return laterSignals.some((token) => normalized.includes(token));
+}
+
 function getMissingCoreDataFields(data) {
   const missing = [];
   if (!data?.idNumber) missing.push("idNumber");
@@ -320,6 +345,26 @@ async function handleInbound(payload, options = {}) {
     });
     console.log(`[BOT] location response sent phone=${phone}`);
     return { ok: true, responseType: "location_info" };
+  }
+
+  if (isContactLaterIntent(text)) {
+    const laterReply = await maybeGenerateStyledReply({
+      conv,
+      userText: text,
+      responseType: "contact_later_ack",
+      instruction:
+        "El cliente indica que volvera a escribir despues. Responde con tono amable y profesional, en 1-2 frases cortas, confirmando que puede escribir cuando quiera y que con gusto se le ayudara.",
+      fallback: "Entendido. Puede escribirme en cualquier momento. Con gusto le ayudo.",
+    });
+    await sendOutbound(phone, laterReply);
+    onBotMessage(laterReply);
+    appendConversationMessage(phone, { role: "bot", text: laterReply });
+    upsertConversation(phone, {
+      status: "active",
+      metadata: { ...conv.metadata, senderName, aiDriven: true },
+    });
+    console.log(`[BOT] contact-later response sent phone=${phone}`);
+    return { ok: true, responseType: "contact_later_ack" };
   }
 
   const classification = classifyMessage(text);

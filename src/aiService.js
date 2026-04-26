@@ -87,6 +87,7 @@ Reglas obligatorias:
 - Si "Tipo de respuesta esperado" es "greeting_presentation", responde exactamente: "Hola, como podemos ayudarte?" y no anadas texto extra.
 - Si "Tipo de respuesta esperado" es "core_data_received_ack", responde exactamente: "Consultaré su caso y lo contactaré únicamente en caso de encontrar si tiene derecho a pensión." y no hagas preguntas adicionales.
 - Si "Tipo de respuesta esperado" es "missing_core_data_request", pide SOLO la cédula del fallecido y/o la fecha exacta de fallecimiento (día, mes y año), según falte, sin preguntas extra.
+- Si "Tipo de respuesta esperado" es "contact_later_ack", responde en 1-2 frases cortas, tono amable y profesional, confirmando que puede escribir cuando quiera y que con gusto se le ayudará.
 - Nunca digas que revisarás el caso o que contactarás con resultados, a menos que "Tipo de respuesta esperado" sea "core_data_received_ack".
 
 Regla critica de relacion (obligatoria):
