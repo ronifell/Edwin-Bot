@@ -14,6 +14,15 @@ app.get("/health", (_req, res) => {
   res.json({ ok: true, service: "edwin-whatsapp-bot-backend" });
 });
 
+app.get("/webhook/zapi", (_req, res) => {
+  res.status(200).json({
+    ok: true,
+    message: "Webhook endpoint is online. Use POST to deliver events.",
+    method: "POST",
+    path: "/webhook/zapi",
+  });
+});
+
 app.post("/webhook/zapi", async (req, res) => {
   const body = req.body || {};
   const from = body?.phone || body?.from || body?.chatLid || body?.sender || "unknown";
