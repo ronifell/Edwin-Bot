@@ -267,13 +267,69 @@ async function handleInbound(payload, options = {}) {
     incrementDailyStat(getTodayKey(), color);
   }
 
+  const hasCoreData = Boolean(mergedData.idNumber && mergedData.deathDate);
+  const hadCoreDataBefore = Boolean(conv.data?.idNumber && conv.data?.deathDate);
+
+  if (hasCoreData) {
+    const dataReceivedAck = await maybeGenerateStyledReply({
+      conv,
+      userText: text,
+      responseType: "core_data_received_ack",
+      instruction:
+        'Cuando ya tengas cédula y fecha exacta de fallecimiento, confirma brevemente que revisarás el caso y que solo contactarás al cliente si tiene derecho a pensión. No hagas más preguntas.',
+      fallback:
+        "Consultaré su caso y lo contactaré únicamente en caso de encontrar si tiene derecho a pensión.",
+    });
+    console.log(`[BOT] core data received phone=${phone} hadCoreDataBefore=${hadCoreDataBefore}`);
+    await sendOutbound(phone, dataReceivedAck);
+    onBotMessage(dataReceivedAck);
+    appendConversationMessage(phone, { role: "bot", text: dataReceivedAck });
+
+    // Metrics required by about.md
+    if (extracted.idNumber) incrementDailyStat(getTodayKey(), "idNumbersCollected");
+    if (extracted.deathDate) incrementDailyStat(getTodayKey(), "deathDatesCollected");
+
+    upsertConversation(phone, {
+      status: "active",
+      color,
+      awaitingData: false,
+      reminderCount: 0,
+      data: mergedData,
+      metadata: {
+        ...conv.metadata,
+        senderName,
+        aiDriven: true,
+        manualClosePending: true,
+        followUpAt: "",
+      },
+    });
+
+    // Persist lead once when core data is first completed.
+    if (!hadCoreDataBefore) {
+      console.log(`[BOT] appending lead row phone=${phone}`);
+      await appendLeadRow({
+        name: senderName,
+        phone,
+        idNumber: mergedData.idNumber,
+        deathDate: mergedData.deathDate,
+        color,
+        observations: mergedData.claimant
+          ? `Quien reclama: ${mergedData.claimant}`
+          : "Quien reclama: pendiente",
+      });
+      console.log(`[BOT] lead row appended phone=${phone}`);
+    }
+
+    console.log(`[BOT] completed phone=${phone} responseType=core_data_received_ack`);
+    return { ok: true, responseType: "core_data_received_ack" };
+  }
+
   const aiReply = await maybeGenerateStyledReply({ conv, userText: text });
   console.log(`[BOT] ai reply generated phone=${phone} chars=${aiReply.length}`);
   await sendOutbound(phone, aiReply);
   onBotMessage(aiReply);
   appendConversationMessage(phone, { role: "bot", text: aiReply });
 
-  const hasCoreData = Boolean(mergedData.idNumber && mergedData.deathDate);
   const isGreenAutoClosed = color === "green";
   const awaitingData = !hasCoreData && color !== "red" && !isGreenAutoClosed;
   const status = isGreenAutoClosed
