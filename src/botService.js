@@ -162,6 +162,28 @@ function getMissingCoreDataFields(data) {
   return missing;
 }
 
+function isAffirmative(input) {
+  const normalized = normalizeForKey(input);
+  return (
+    normalized === "si" ||
+    normalized === "sí" ||
+    normalized === "yes" ||
+    normalized.includes("si ") ||
+    normalized.includes("es por fallecimiento") ||
+    normalized.includes("fallecimiento de un familiar")
+  );
+}
+
+function isNegative(input) {
+  const normalized = normalizeForKey(input);
+  return (
+    normalized === "no" ||
+    normalized.includes("no ") ||
+    normalized.includes("no es por fallecimiento") ||
+    normalized.includes("no hay fallecimiento")
+  );
+}
+
 async function maybeGenerateStyledReply({
   conv,
   userText,
@@ -293,6 +315,37 @@ async function handleInbound(payload, options = {}) {
 
   appendConversationMessage(phone, { role: "user", text, rawType: isAudio ? "audio" : "text" });
 
+  if (conv.metadata?.victimClarificationPending) {
+    if (isNegative(text)) {
+      const redDiscardReply = await maybeGenerateStyledReply({
+        conv,
+        userText: text,
+        responseType: "closed_red",
+        instruction:
+          "El cliente confirma que NO es un caso por fallecimiento de familiar. Responde en 1-2 frases cortas, profesionales y amables, indicando que este caso no lo manejamos.",
+        fallback: "Gracias por la información. Este tipo de caso no lo manejamos actualmente.",
+      });
+      await sendOutbound(phone, redDiscardReply);
+      onBotMessage(redDiscardReply);
+      appendConversationMessage(phone, { role: "bot", text: redDiscardReply });
+      upsertConversation(phone, {
+        status: "closed",
+        color: "red",
+        awaitingData: false,
+        metadata: { ...conv.metadata, senderName, aiDriven: true, victimClarificationPending: false },
+      });
+      console.log(`[BOT] victim clarification resolved as red discard phone=${phone}`);
+      return { ok: true, responseType: "closed_red" };
+    }
+    if (isAffirmative(text)) {
+      upsertConversation(phone, {
+        metadata: { ...conv.metadata, senderName, aiDriven: true, victimClarificationPending: false },
+      });
+      conv = getConversation(phone) || conv;
+      console.log(`[BOT] victim clarification confirmed death-related phone=${phone}`);
+    }
+  }
+
   if (isSimpleGreeting(text)) {
     console.log(`[BOT] simple greeting detected phone=${phone}`);
     const presentation = await maybeGenerateStyledReply({
@@ -362,6 +415,48 @@ async function handleInbound(payload, options = {}) {
   const hasCoreData = Boolean(mergedData.idNumber && mergedData.deathDate);
   const hadCoreDataBefore = Boolean(conv.data?.idNumber && conv.data?.deathDate);
   const missingCoreFields = getMissingCoreDataFields(mergedData);
+
+  if (classification.isVictimCase) {
+    const victimClarificationReply = "¿El caso es por fallecimiento de un familiar?";
+    await sendOutbound(phone, victimClarificationReply);
+    onBotMessage(victimClarificationReply);
+    appendConversationMessage(phone, { role: "bot", text: victimClarificationReply });
+    upsertConversation(phone, {
+      status: "active",
+      color: "yellow",
+      awaitingData: true,
+      data: mergedData,
+      metadata: { ...conv.metadata, senderName, aiDriven: true, victimClarificationPending: true },
+    });
+    console.log(`[BOT] victim clarification requested phone=${phone}`);
+    return { ok: true, responseType: "victim_clarification" };
+  }
+
+  if (color === "red") {
+    const redDiscardReply = await maybeGenerateStyledReply({
+      conv,
+      userText: text,
+      responseType: "closed_red",
+      instruction:
+        "Caso ROJO. Responde en 1-2 frases cortas, profesionales y amables, indicando que ese tipo de caso no lo manejamos.",
+      fallback: "Gracias por la información. Este tipo de caso no lo manejamos actualmente.",
+    });
+    await sendOutbound(phone, redDiscardReply);
+    onBotMessage(redDiscardReply);
+    appendConversationMessage(phone, { role: "bot", text: redDiscardReply });
+    upsertConversation(phone, {
+      status: "closed",
+      color: "red",
+      awaitingData: false,
+      reminderCount: 0,
+      data: mergedData,
+      metadata: { ...conv.metadata, senderName, aiDriven: true, followUpAt: "", victimClarificationPending: false },
+    });
+    if (extracted.idNumber) incrementDailyStat(getTodayKey(), "idNumbersCollected");
+    if (extracted.deathDate) incrementDailyStat(getTodayKey(), "deathDatesCollected");
+    console.log(`[BOT] completed phone=${phone} responseType=closed_red`);
+    return { ok: true, responseType: "closed_red" };
+  }
 
   if (missingCoreFields.length) {
     const missingCoreDataPrompt = await maybeGenerateStyledReply({
