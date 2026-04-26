@@ -130,6 +130,30 @@ function isSimpleGreeting(input) {
   return words <= 6;
 }
 
+function isLocationQuestion(input) {
+  const normalized = normalizeForKey(input);
+  if (!normalized) return false;
+  const locationSignals = [
+    "donde se encuentra",
+    "donde estan",
+    "donde esta",
+    "en que ciudad",
+    "trabaja en mi ciudad",
+    "en mi ciudad",
+    "ubicados",
+    "ubicacion",
+    "sede",
+  ];
+  return locationSignals.some((token) => normalized.includes(token));
+}
+
+function getMissingCoreDataFields(data) {
+  const missing = [];
+  if (!data?.idNumber) missing.push("idNumber");
+  if (!data?.deathDate) missing.push("deathDate");
+  return missing;
+}
+
 async function maybeGenerateStyledReply({
   conv,
   userText,
@@ -282,6 +306,22 @@ async function handleInbound(payload, options = {}) {
     return { ok: true, responseType: "greeting_presentation" };
   }
 
+  if (isLocationQuestion(text)) {
+    const locationReply = [
+      "Estamos en Medellín.",
+      "Aunque trabajamos a nivel nacional y atendemos casos en todas las ciudades del país, no importa dónde nos encuentre.",
+    ].join("\n\n");
+    await sendOutbound(phone, locationReply);
+    onBotMessage(locationReply);
+    appendConversationMessage(phone, { role: "bot", text: locationReply });
+    upsertConversation(phone, {
+      status: "active",
+      metadata: { ...conv.metadata, senderName, aiDriven: true },
+    });
+    console.log(`[BOT] location response sent phone=${phone}`);
+    return { ok: true, responseType: "location_info" };
+  }
+
   const classification = classifyMessage(text);
   const color = classification.color || "purple";
   console.log(
@@ -309,6 +349,48 @@ async function handleInbound(payload, options = {}) {
 
   const hasCoreData = Boolean(mergedData.idNumber && mergedData.deathDate);
   const hadCoreDataBefore = Boolean(conv.data?.idNumber && conv.data?.deathDate);
+  const missingCoreFields = getMissingCoreDataFields(mergedData);
+
+  if (missingCoreFields.length) {
+    const missingCoreDataPrompt = await maybeGenerateStyledReply({
+      conv,
+      userText: text,
+      responseType: "missing_core_data_request",
+      instruction:
+        "Responde en maximo 2 frases cortas. No pidas nombre. Pide solo los datos faltantes para continuar: cédula del fallecido y fecha exacta de fallecimiento (día, mes y año). Si solo falta uno, pide solo ese uno.",
+      fallback:
+        missingCoreFields.length === 2
+          ? "Para continuar, por favor envíeme la cédula del fallecido y la fecha exacta de fallecimiento (día, mes y año)."
+          : missingCoreFields[0] === "idNumber"
+          ? "Para continuar, por favor envíeme la cédula del fallecido."
+          : "Para continuar, por favor envíeme la fecha exacta de fallecimiento (día, mes y año).",
+    });
+    await sendOutbound(phone, missingCoreDataPrompt);
+    onBotMessage(missingCoreDataPrompt);
+    appendConversationMessage(phone, { role: "bot", text: missingCoreDataPrompt });
+
+    upsertConversation(phone, {
+      status: color === "red" ? "closed" : "active",
+      color,
+      awaitingData: color !== "red",
+      reminderCount: color !== "red" ? conv.reminderCount || 0 : 0,
+      data: mergedData,
+      metadata: {
+        ...conv.metadata,
+        senderName,
+        aiDriven: true,
+        followUpAt: color !== "red" ? dayjs().add(7, "hour").toISOString() : "",
+      },
+    });
+
+    if (extracted.idNumber) incrementDailyStat(getTodayKey(), "idNumbersCollected");
+    if (extracted.deathDate) incrementDailyStat(getTodayKey(), "deathDatesCollected");
+
+    console.log(
+      `[BOT] completed phone=${phone} responseType=missing_core_data_request missing=${missingCoreFields.join(",")}`
+    );
+    return { ok: true, responseType: "missing_core_data_request" };
+  }
 
   if (hasCoreData) {
     const dataReceivedAck = await maybeGenerateStyledReply({
