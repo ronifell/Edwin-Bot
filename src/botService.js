@@ -280,10 +280,17 @@ async function handleInbound(payload, options = {}) {
   appendConversationMessage(phone, { role: "bot", text: aiReply });
 
   const hasCoreData = Boolean(mergedData.idNumber && mergedData.deathDate);
-  const awaitingData = !hasCoreData && color !== "red";
-  const status = hasCoreData ? "pending_legal_review" : color === "red" ? "closed" : "active";
+  const isGreenAutoClosed = color === "green";
+  const awaitingData = !hasCoreData && color !== "red" && !isGreenAutoClosed;
+  const status = isGreenAutoClosed
+    ? "closed"
+    : hasCoreData
+    ? "pending_legal_review"
+    : color === "red"
+    ? "closed"
+    : "active";
   console.log(
-    `[BOT] state update phone=${phone} status=${status} awaitingData=${!hasCoreData && color !== "red"} hasCoreData=${hasCoreData}`
+    `[BOT] state update phone=${phone} status=${status} awaitingData=${awaitingData} hasCoreData=${hasCoreData}`
   );
 
   // Metrics required by about.md
