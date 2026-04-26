@@ -139,6 +139,9 @@ function classifyMessage(text) {
     normalized.includes("tengo derecho") ||
     normalized.includes("quiero saber") ||
     normalized.includes("asesoria");
+  const hasGeneralPensionInfoIntent =
+    (normalized.includes("informacion general") || normalized.includes("informacion")) &&
+    (normalized.includes("pension") || normalized.includes("pensiones"));
   const continuationSignals = [
     "ok cuando llegue",
     "cuando llegue",
@@ -201,6 +204,10 @@ function classifyMessage(text) {
 
   if (hasEligibilityIntent) {
     return { color: "green", reason: "eligibility_intent_without_clear_context" };
+  }
+
+  if (hasGeneralPensionInfoIntent) {
+    return { color: "green", reason: "general_pension_info_intent" };
   }
 
   return { color: "purple", reason: "unknown_or_incomplete" };

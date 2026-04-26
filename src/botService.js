@@ -228,14 +228,8 @@ async function handleInbound(payload, options = {}) {
       userText: text,
       responseType: "greeting_presentation",
       instruction:
-        'Si el cliente envia solo un saludo, responde con un mensaje de presentacion en estilo humano similar a: "Hola, gracias por escribirnos. Soy Edwin Tello, abogado especialista en pensión de sobrevivientes a nivel nacional. ¿Cómo podemos ayudarle?". Mantener 2-4 lineas, tono profesional y cercano.',
-      fallback: [
-        "Hola, gracias por escribirnos.",
-        "",
-        "Soy Edwin Tello, abogado especialista en pensión de sobrevivientes a nivel nacional.",
-        "",
-        "¿Cómo podemos ayudarle?",
-      ].join("\n"),
+        'Si el cliente envia solo un saludo, responde exactamente con esta frase: "Hola, como podemos ayudarte?"',
+      fallback: "Hola, como podemos ayudarte?",
     });
     await sendOutbound(phone, presentation);
     onBotMessage(presentation);
