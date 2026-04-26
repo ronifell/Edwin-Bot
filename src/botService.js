@@ -353,8 +353,8 @@ async function handleInbound(payload, options = {}) {
       userText: text,
       responseType: "greeting_presentation",
       instruction:
-        'Si el cliente envia solo un saludo, responde exactamente con esta frase: "Hola, como podemos ayudarte?"',
-      fallback: "Hola, como podemos ayudarte?",
+        "Si el cliente envia solo un saludo, responde breve, humana y profesionalmente, preguntando como puedes ayudar.",
+      fallback: "Hola, ¿cómo puedo ayudarle?",
     });
     await sendOutbound(phone, presentation);
     onBotMessage(presentation);
