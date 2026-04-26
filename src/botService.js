@@ -17,13 +17,46 @@ const {
 } = require("./storage");
 const { config } = require("./config");
 
+const PROCESSED_EVENT_TTL_MS = 10 * 60 * 1000;
+const processedEventCache = new Map();
+
+function cleanupProcessedEventCache(now = Date.now()) {
+  for (const [key, ts] of processedEventCache.entries()) {
+    if (now - ts > PROCESSED_EVENT_TTL_MS) processedEventCache.delete(key);
+  }
+}
+
+function normalizeForKey(input) {
+  return String(input || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^\w\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function buildFallbackEventKey({ phone, type, message, isAudio }) {
+  const normalizedText = normalizeForKey(message).slice(0, 120);
+  return `fp:${phone}|${type || "n/a"}|audio:${isAudio ? 1 : 0}|${normalizedText}`;
+}
+
 function extractInbound(payload) {
   const message = payload?.text?.message || payload?.message || payload?.body || "";
   const phone = payload?.phone || payload?.from || payload?.chatLid || payload?.sender || "";
   const senderName = payload?.senderName || payload?.pushName || "";
   const isAudio = Boolean(payload?.audio?.audioUrl || payload?.audio?.url || payload?.isAudio);
   const audioUrl = payload?.audio?.audioUrl || payload?.audio?.url || payload?.fileUrl || "";
-  return { message, phone, senderName, isAudio, audioUrl };
+  const fromMe = Boolean(payload?.fromMe);
+  const isStatusReply = Boolean(payload?.isStatusReply);
+  const type = payload?.type || "";
+  const isGroup = Boolean(payload?.isGroup);
+  const messageId =
+    payload?.messageId ||
+    payload?.ids?.id ||
+    (Array.isArray(payload?.ids) ? payload.ids[0] : "") ||
+    "";
+  return { message, phone, senderName, isAudio, audioUrl, fromMe, isStatusReply, type, isGroup, messageId };
 }
 
 function normalizeForGreeting(input) {
@@ -103,31 +136,93 @@ async function maybeGenerateStyledReply({
 async function handleInbound(payload, options = {}) {
   const sendOutbound = options.sendMessage || sendMessage;
   const onBotMessage = options.onBotMessage || (() => {});
-  const { message, phone, senderName, isAudio, audioUrl } = extractInbound(payload);
-  if (!phone) return { ok: true, ignored: "missing_phone" };
+  const { message, phone, senderName, isAudio, audioUrl, fromMe, isStatusReply, type, isGroup, messageId } =
+    extractInbound(payload);
+  console.log(
+    `[BOT] inbound received phone=${phone || "missing"} sender=${senderName || "unknown"} isAudio=${isAudio} type=${
+      type || "n/a"
+    } fromMe=${fromMe} isStatusReply=${isStatusReply} isGroup=${isGroup} messageId=${messageId || "n/a"}`
+  );
+  if (!phone) {
+    console.warn("[BOT] ignored: missing_phone");
+    return { ok: true, ignored: "missing_phone" };
+  }
+
+  if (fromMe) {
+    console.log(`[BOT] ignored: fromMe echo event phone=${phone}`);
+    return { ok: true, ignored: "from_me" };
+  }
+
+  if (isStatusReply) {
+    console.log(`[BOT] ignored: status reply event phone=${phone}`);
+    return { ok: true, ignored: "status_reply_event" };
+  }
+
+  if (isGroup) {
+    console.log(`[BOT] ignored: group message phone=${phone}`);
+    return { ok: true, ignored: "group_message" };
+  }
+
+  cleanupProcessedEventCache();
+  const stableKey = messageId ? `mid:${phone}|${type || "n/a"}|${messageId}` : "";
+  const fallbackKey = buildFallbackEventKey({ phone, type, message, isAudio });
+  const now = Date.now();
+
+  if (stableKey && processedEventCache.has(stableKey)) {
+    console.log(`[BOT] ignored: duplicate_message by messageId phone=${phone} messageId=${messageId}`);
+    return { ok: true, ignored: "duplicate_message" };
+  }
+  // Fallback dedupe for providers that resend without stable messageId.
+  const previousByFingerprint = processedEventCache.get(fallbackKey);
+  if (previousByFingerprint && now - previousByFingerprint < 30 * 1000) {
+    console.log(`[BOT] ignored: duplicate_message by fingerprint phone=${phone}`);
+    return { ok: true, ignored: "duplicate_message" };
+  }
+
+  if (stableKey) processedEventCache.set(stableKey, now);
+  processedEventCache.set(fallbackKey, now);
 
   let text = message || "";
   if (isAudio && audioUrl) {
     try {
+      console.log(`[BOT] transcribing audio phone=${phone} urlPresent=${Boolean(audioUrl)}`);
       const transcription = await transcribeAudioFromUrl(audioUrl);
       if (transcription) {
         text = transcription;
+        console.log(`[BOT] audio transcription ok phone=${phone} chars=${transcription.length}`);
+      } else {
+        console.warn(`[BOT] audio transcription empty phone=${phone}`);
       }
     } catch (error) {
-      console.error("Audio transcription error:", error.message);
+      console.error(`[BOT] audio transcription error phone=${phone}:`, error.message);
     }
   }
 
-  if (!text.trim()) return { ok: true, ignored: "empty_message" };
+  const hasConversationalPayload = Boolean(text.trim()) || isAudio;
+  if (!hasConversationalPayload) {
+    console.log(`[BOT] ignored: non-conversational event phone=${phone} type=${type || "n/a"}`);
+    return { ok: true, ignored: "non_conversational_event" };
+  }
+
+  if (!text.trim()) {
+    console.warn(`[BOT] ignored: empty_message phone=${phone}`);
+    return { ok: true, ignored: "empty_message" };
+  }
 
   let conv = getConversation(phone);
   if (!conv) {
+    console.log(`[BOT] creating new conversation phone=${phone}`);
     conv = upsertConversation(phone, { metadata: { senderName } });
+  } else {
+    console.log(
+      `[BOT] existing conversation phone=${phone} status=${conv.status || "n/a"} color=${conv.color || "n/a"}`
+    );
   }
 
   appendConversationMessage(phone, { role: "user", text, rawType: isAudio ? "audio" : "text" });
 
   if (isSimpleGreeting(text)) {
+    console.log(`[BOT] simple greeting detected phone=${phone}`);
     const presentation = await maybeGenerateStyledReply({
       conv,
       userText: text,
@@ -149,11 +244,17 @@ async function handleInbound(payload, options = {}) {
       status: "active",
       metadata: { ...conv.metadata, senderName, aiDriven: true },
     });
+    console.log(`[BOT] greeting response sent phone=${phone}`);
     return { ok: true, responseType: "greeting_presentation" };
   }
 
   const classification = classifyMessage(text);
   const color = classification.color || "purple";
+  console.log(
+    `[BOT] classified phone=${phone} color=${color} reason=${classification.reason || "n/a"} intent=${
+      classification.intent || "n/a"
+    }`
+  );
   const extracted = extractStructuredData(text);
   const mergedData = {
     idNumber: extracted.idNumber || conv.data?.idNumber || "",
@@ -173,6 +274,7 @@ async function handleInbound(payload, options = {}) {
   }
 
   const aiReply = await maybeGenerateStyledReply({ conv, userText: text });
+  console.log(`[BOT] ai reply generated phone=${phone} chars=${aiReply.length}`);
   await sendOutbound(phone, aiReply);
   onBotMessage(aiReply);
   appendConversationMessage(phone, { role: "bot", text: aiReply });
@@ -180,6 +282,9 @@ async function handleInbound(payload, options = {}) {
   const hasCoreData = Boolean(mergedData.idNumber && mergedData.deathDate);
   const awaitingData = !hasCoreData && color !== "red";
   const status = hasCoreData ? "pending_legal_review" : color === "red" ? "closed" : "active";
+  console.log(
+    `[BOT] state update phone=${phone} status=${status} awaitingData=${!hasCoreData && color !== "red"} hasCoreData=${hasCoreData}`
+  );
 
   // Metrics required by about.md
   if (extracted.idNumber) incrementDailyStat(getTodayKey(), "idNumbersCollected");
@@ -201,6 +306,7 @@ async function handleInbound(payload, options = {}) {
 
   // Preferred CRM/Sheets persistence with claimant + phone context.
   if (hasCoreData && conv.status !== "pending_legal_review") {
+    console.log(`[BOT] appending lead row phone=${phone}`);
     await appendLeadRow({
       name: senderName,
       phone,
@@ -211,8 +317,10 @@ async function handleInbound(payload, options = {}) {
         ? `Quien reclama: ${mergedData.claimant}`
         : "Quien reclama: pendiente",
     });
+    console.log(`[BOT] lead row appended phone=${phone}`);
   }
 
+  console.log(`[BOT] completed phone=${phone} responseType=ai_response`);
   return { ok: true, responseType: "ai_response" };
 }
 

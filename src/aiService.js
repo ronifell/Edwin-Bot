@@ -50,7 +50,10 @@ async function generateNaturalReply({
   responseType = "",
   conversationHistory = [],
 }) {
-  if (!client) return "";
+  if (!client) {
+    console.warn("[AI] OpenAI client unavailable (missing OPENAI_API_KEY)");
+    return "";
+  }
 
   const historyText = (conversationHistory || [])
     .slice(-8)
@@ -74,6 +77,8 @@ Reglas obligatorias:
 - Si ya hay una pregunta activa de recoleccion de datos, no cambies de tema.
 - No inventes hechos no dados por el cliente.
 - Entrega solo el texto final del mensaje para WhatsApp.
+- NO respondas con mensajes de indisponibilidad como: "En este momento no estamos disponibles..." o "te responderemos cuando regresemos".
+- Asume que el despacho esta disponible y debe atender en tiempo real.
 
 Regla critica de relacion (obligatoria):
 - En el primer mensaje del cliente, intenta identificar:
@@ -97,15 +102,31 @@ Mensaje actual del cliente:
 "${userText}"
 `.trim();
 
-  const res = await client.chat.completions.create({
-    model: config.openai.model,
-    temperature: 0.7,
-    messages: [
-      { role: "system", content: systemPrompt },
-      { role: "user", content: userPrompt },
-    ],
-  });
-  return res.choices?.[0]?.message?.content?.trim() || "";
+  try {
+    console.log(
+      `[AI] request model=${config.openai.model} responseType=${responseType || "n/a"} historyItems=${
+        conversationHistory?.length || 0
+      } userTextChars=${String(userText || "").length}`
+    );
+    const res = await client.chat.completions.create({
+      model: config.openai.model,
+      temperature: 0.7,
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userPrompt },
+      ],
+    });
+    const output = res.choices?.[0]?.message?.content?.trim() || "";
+    console.log(`[AI] response ok chars=${output.length}`);
+    return output;
+  } catch (error) {
+    console.error(
+      `[AI] request failed status=${error?.status || "n/a"} code=${error?.code || "n/a"} message=${
+        error?.message || "unknown_error"
+      }`
+    );
+    throw error;
+  }
 }
 
 module.exports = { transcribeAudioFromUrl, generateNaturalReply };

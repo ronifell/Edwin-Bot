@@ -15,7 +15,20 @@ app.get("/health", (_req, res) => {
 });
 
 app.post("/webhook/zapi", async (req, res) => {
+  const body = req.body || {};
+  const from = body?.phone || body?.from || body?.chatLid || body?.sender || "unknown";
+  const fromMe = Boolean(body?.fromMe);
+  const type = body?.type || "n/a";
+  const isStatusReply = Boolean(body?.isStatusReply);
+  const isGroup = Boolean(body?.isGroup);
+  const bodyKeys = Object.keys(body || {});
+  console.log(
+    `[WEBHOOK] incoming /webhook/zapi from=${from} mode=${config.botChannelMode} type=${type} fromMe=${fromMe} isStatusReply=${isStatusReply} isGroup=${isGroup} keys=${bodyKeys.join(
+      ","
+    )}`
+  );
   if (config.botChannelMode !== "whatsapp") {
+    console.warn(`[WEBHOOK] rejected: mode=${config.botChannelMode} (expected whatsapp)`);
     return res.status(403).json({
       ok: false,
       error: "webhook_disabled_in_local_mode",
@@ -23,10 +36,13 @@ app.post("/webhook/zapi", async (req, res) => {
     });
   }
   try {
-    const result = await handleInbound(req.body || {});
+    const result = await handleInbound(body);
+    console.log(
+      `[WEBHOOK] processed ok from=${from} responseType=${result?.responseType || "n/a"} ignored=${result?.ignored || "no"}`
+    );
     return res.json({ ok: true, result });
   } catch (error) {
-    console.error("Webhook failed:", error);
+    console.error(`[WEBHOOK] failed from=${from}:`, error?.message || error);
     return res.status(500).json({ ok: false, error: "webhook_failed" });
   }
 });

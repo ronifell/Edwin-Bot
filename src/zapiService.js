@@ -14,8 +14,11 @@ const api = axios.create({
 function normalizePhone(phone) {
   const digits = String(phone || "").replace(/[^\d]/g, "");
   if (!digits) return "";
+  // Keep full international numbers as-is; only prefix local numbers.
+  if (digits.startsWith("00")) return digits.slice(2);
   if (digits.startsWith(config.defaultCountryPrefix)) return digits;
-  return `${config.defaultCountryPrefix}${digits}`;
+  if (digits.length === 10) return `${config.defaultCountryPrefix}${digits}`;
+  return digits;
 }
 
 function countPunctuationPauses(text) {
@@ -50,8 +53,14 @@ async function sendTypingPresence(normalizedPhone, stage) {
   for (const attempt of candidateCalls) {
     try {
       await api.post(attempt.url, attempt.body);
+      console.log(`[ZAPI] typing stage=${stage} phone=${normalizedPhone} endpoint=${attempt.url} ok`);
       return;
-    } catch {
+    } catch (error) {
+      console.warn(
+        `[ZAPI] typing stage=${stage} phone=${normalizedPhone} endpoint=${attempt.url} failed status=${
+          error?.response?.status || "n/a"
+        }`
+      );
       // Try next variant to support different Z-API presence payloads.
     }
   }
@@ -59,14 +68,30 @@ async function sendTypingPresence(normalizedPhone, stage) {
 
 async function sendMessage(phone, text) {
   const normalizedPhone = normalizePhone(phone);
-  if (!normalizedPhone) return;
+  if (!normalizedPhone) {
+    console.warn(`[ZAPI] send-text skipped: invalid phone input="${phone}"`);
+    return;
+  }
   const delay = computeHumanDelayMs(text);
+  console.log(
+    `[ZAPI] send-text preparing phone=${normalizedPhone} delayMs=${delay} chars=${String(text || "").length}`
+  );
   await sendTypingPresence(normalizedPhone, "composing");
   await sleep(delay);
-  await api.post("/send-text", {
-    phone: normalizedPhone,
-    message: text,
-  });
+  try {
+    await api.post("/send-text", {
+      phone: normalizedPhone,
+      message: text,
+    });
+    console.log(`[ZAPI] send-text ok phone=${normalizedPhone}`);
+  } catch (error) {
+    console.error(
+      `[ZAPI] send-text failed phone=${normalizedPhone} status=${error?.response?.status || "n/a"} message=${
+        error?.message || "unknown_error"
+      }`
+    );
+    throw error;
+  }
   await sendTypingPresence(normalizedPhone, "paused");
 }
 
