@@ -130,23 +130,6 @@ function isSimpleGreeting(input) {
   return words <= 6;
 }
 
-function isLocationQuestion(input) {
-  const normalized = normalizeForKey(input);
-  if (!normalized) return false;
-  const locationSignals = [
-    "donde se encuentra",
-    "donde estan",
-    "donde esta",
-    "en que ciudad",
-    "trabaja en mi ciudad",
-    "en mi ciudad",
-    "ubicados",
-    "ubicacion",
-    "sede",
-  ];
-  return locationSignals.some((token) => normalized.includes(token));
-}
-
 function isContactLaterIntent(input) {
   const normalized = normalizeForKey(input);
   if (!normalized) return false;
@@ -329,22 +312,6 @@ async function handleInbound(payload, options = {}) {
     });
     console.log(`[BOT] greeting response sent phone=${phone}`);
     return { ok: true, responseType: "greeting_presentation" };
-  }
-
-  if (isLocationQuestion(text)) {
-    const locationReply = [
-      "Estamos en Medellín.",
-      "Aunque trabajamos a nivel nacional y atendemos casos en todas las ciudades del país, no importa dónde nos encuentre.",
-    ].join("\n\n");
-    await sendOutbound(phone, locationReply);
-    onBotMessage(locationReply);
-    appendConversationMessage(phone, { role: "bot", text: locationReply });
-    upsertConversation(phone, {
-      status: "active",
-      metadata: { ...conv.metadata, senderName, aiDriven: true },
-    });
-    console.log(`[BOT] location response sent phone=${phone}`);
-    return { ok: true, responseType: "location_info" };
   }
 
   if (isContactLaterIntent(text)) {
