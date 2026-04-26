@@ -32,9 +32,11 @@ function computeHumanDelayMs(text) {
   // Deterministic human-like delay proportional to text length.
   const thinkingMs = Math.max(config.timing.humanMinThinkingMs, 0);
   const total = typingMs + punctuationMs + thinkingMs;
-  const minBound = Math.max(config.timing.minDelayMs, 0);
-  const maxBound = Math.max(config.timing.maxDelayMs, minBound);
-  return Math.min(Math.max(total, minBound), maxBound);
+  const multiplier = Math.max(config.timing.responseDelayMultiplier || 1, 0.1);
+  const scaledTotal = Math.round(total * multiplier);
+  const minBound = Math.max(Math.round(config.timing.minDelayMs * multiplier), 0);
+  const maxBound = Math.max(Math.round(config.timing.maxDelayMs * multiplier), minBound);
+  return Math.min(Math.max(scaledTotal, minBound), maxBound);
 }
 
 async function sendTypingPresence(normalizedPhone, stage) {

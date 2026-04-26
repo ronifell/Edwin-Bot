@@ -38,6 +38,7 @@ const config = {
     humanMinThinkingMs: Number(process.env.HUMAN_MIN_THINKING_MS || 900),
     humanMaxThinkingMs: Number(process.env.HUMAN_MAX_THINKING_MS || 2400),
     humanPausePerPunctuationMs: Number(process.env.HUMAN_PAUSE_PER_PUNCTUATION_MS || 120),
+    responseDelayMultiplier: Number(process.env.RESPONSE_DELAY_MULTIPLIER || 5),
     typingEffectEnabled: toBool(process.env.TYPING_EFFECT_ENABLED, true),
   },
   localTest: {
