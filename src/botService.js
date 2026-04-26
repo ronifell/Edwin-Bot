@@ -26,9 +26,59 @@ function extractInbound(payload) {
   return { message, phone, senderName, isAudio, audioUrl };
 }
 
+function normalizeForGreeting(input) {
+  return String(input || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^\w\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function isSimpleGreeting(input) {
+  const normalized = normalizeForGreeting(input);
+  const greetingTokens = [
+    "hola",
+    "buen dia",
+    "buenos dias",
+    "buena tarde",
+    "buenas tardes",
+    "buenas noches",
+    "saludos",
+    "que tal",
+  ];
+  const hasGreeting = greetingTokens.some((token) => normalized.includes(token));
+  if (!hasGreeting) return false;
+
+  const nonGreetingSignals = [
+    "fallecio",
+    "murio",
+    "muerte",
+    "pension",
+    "beneficiario",
+    "beneficiaria",
+    "cotizo",
+    "cotizaba",
+    "reclamar",
+    "derecho",
+    "caso",
+    "consulta",
+    "ayuda",
+    "pregunta",
+  ];
+  if (nonGreetingSignals.some((token) => normalized.includes(token))) return false;
+
+  const words = normalized.split(" ").filter(Boolean).length;
+  return words <= 6;
+}
+
 async function maybeGenerateStyledReply({
   conv,
-  userText
+  userText,
+  instruction,
+  responseType = "ai_response",
+  fallback = "Gracias por escribirnos. ¿Me puede contar su caso para ayudarle?",
 }) {
   if (!config.openai.apiKey) {
     return "Gracias por escribirnos. En este momento no tengo IA activa. Por favor configure OPENAI_API_KEY para responder con el estilo entrenado.";
@@ -38,14 +88,15 @@ async function maybeGenerateStyledReply({
       userText,
       color: "ai",
       instruction:
+        instruction ||
         "Responde 100% en base a los estilos y lineamientos de about.md y conversation.md. No uses respuestas roboticas.",
-      responseType: "ai_response",
+      responseType,
       conversationHistory: conv?.messages || [],
     });
-    return aiReply || "Gracias por escribirnos. ¿Me puede contar su caso para ayudarle?";
+    return aiReply || fallback;
   } catch (error) {
     console.error("AI reply generation failed:", error.message);
-    return "Gracias por escribirnos. En este momento tuve un problema temporal para responder. Puede reenviar su mensaje, por favor?";
+    return fallback;
   }
 }
 
@@ -75,6 +126,31 @@ async function handleInbound(payload, options = {}) {
   }
 
   appendConversationMessage(phone, { role: "user", text, rawType: isAudio ? "audio" : "text" });
+
+  if (isSimpleGreeting(text)) {
+    const presentation = await maybeGenerateStyledReply({
+      conv,
+      userText: text,
+      responseType: "greeting_presentation",
+      instruction:
+        'Si el cliente envia solo un saludo, responde con un mensaje de presentacion en estilo humano similar a: "Hola, gracias por escribirnos. Soy Edwin Tello, abogado especialista en pensión de sobrevivientes a nivel nacional. ¿Cómo podemos ayudarle?". Mantener 2-4 lineas, tono profesional y cercano.',
+      fallback: [
+        "Hola, gracias por escribirnos.",
+        "",
+        "Soy Edwin Tello, abogado especialista en pensión de sobrevivientes a nivel nacional.",
+        "",
+        "¿Cómo podemos ayudarle?",
+      ].join("\n"),
+    });
+    await sendOutbound(phone, presentation);
+    onBotMessage(presentation);
+    appendConversationMessage(phone, { role: "bot", text: presentation });
+    upsertConversation(phone, {
+      status: "active",
+      metadata: { ...conv.metadata, senderName, aiDriven: true },
+    });
+    return { ok: true, responseType: "greeting_presentation" };
+  }
 
   const classification = classifyMessage(text);
   const color = classification.color || "purple";

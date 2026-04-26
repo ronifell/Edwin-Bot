@@ -34,6 +34,11 @@ const config = {
   timing: {
     minDelayMs: Number(process.env.MIN_TYPING_DELAY_MS || 1300),
     maxDelayMs: Number(process.env.MAX_TYPING_DELAY_MS || 3800),
+    humanCharsPerSecond: Number(process.env.HUMAN_TYPING_CHARS_PER_SECOND || 7),
+    humanMinThinkingMs: Number(process.env.HUMAN_MIN_THINKING_MS || 900),
+    humanMaxThinkingMs: Number(process.env.HUMAN_MAX_THINKING_MS || 2400),
+    humanPausePerPunctuationMs: Number(process.env.HUMAN_PAUSE_PER_PUNCTUATION_MS || 120),
+    typingEffectEnabled: toBool(process.env.TYPING_EFFECT_ENABLED, true),
   },
   localTest: {
     enabled: toBool(process.env.LOCAL_TEST_UI_ENABLED, true),
