@@ -31,6 +31,13 @@ app.post("/webhook/zapi", async (req, res) => {
   const isStatusReply = Boolean(body?.isStatusReply);
   const isGroup = Boolean(body?.isGroup);
   const bodyKeys = Object.keys(body || {});
+  const isMessageStatusCallback = type === "MessageStatusCallback";
+
+  // Ignore provider status callbacks early to avoid noisy logs and duplicate-event churn.
+  if (isMessageStatusCallback) {
+    return res.json({ ok: true, result: { ok: true, ignored: "message_status_callback" } });
+  }
+
   console.log(
     `[WEBHOOK] incoming /webhook/zapi from=${from} mode=${config.botChannelMode} type=${type} fromMe=${fromMe} isStatusReply=${isStatusReply} isGroup=${isGroup} keys=${bodyKeys.join(
       ","
