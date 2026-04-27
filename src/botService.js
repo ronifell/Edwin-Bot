@@ -145,10 +145,23 @@ function isSimpleGreeting(input) {
 function isContactLaterIntent(input) {
   const normalized = normalizeForKey(input);
   if (!normalized) return false;
-  const laterSignals = [
+  const immediateReturnSignals = [
     "espere un momento",
     "espera un momento",
-    "espera",
+    "un momento",
+    "en un momento",
+    "dame un momento",
+    "deme un momento",
+    "ahorita",
+    "ya le escribo",
+    "ya te escribo",
+    "ahora le escribo",
+    "ahora te escribo",
+    "enseguida",
+  ];
+  if (immediateReturnSignals.some((token) => normalized.includes(token))) return false;
+
+  const laterSignals = [
     "luego te escribo",
     "luego le escribo",
     "despues te escribo",
@@ -165,6 +178,26 @@ function isContactLaterIntent(input) {
     "mas adelante",
   ];
   return laterSignals.some((token) => normalized.includes(token));
+}
+
+function isContactSoonIntent(input) {
+  const normalized = normalizeForKey(input);
+  if (!normalized) return false;
+  const immediateReturnSignals = [
+    "espere un momento",
+    "espera un momento",
+    "un momento",
+    "en un momento",
+    "dame un momento",
+    "deme un momento",
+    "ahorita",
+    "ya le escribo",
+    "ya te escribo",
+    "ahora le escribo",
+    "ahora te escribo",
+    "enseguida",
+  ];
+  return immediateReturnSignals.some((token) => normalized.includes(token));
 }
 
 function getMissingCoreDataFields(data) {
@@ -379,6 +412,26 @@ async function handleInbound(payload, options = {}) {
     });
     console.log(`[BOT] greeting response sent phone=${phone}`);
     return { ok: true, responseType: "greeting_presentation" };
+  }
+
+  if (isContactSoonIntent(text)) {
+    const soonReply = await maybeGenerateStyledReply({
+      conv,
+      userText: text,
+      responseType: "contact_soon_ack",
+      instruction:
+        'El cliente indica que vuelve en un momento. Responde en una sola frase corta, tipo "Sí, entendido." con tono amable y profesional, sin pedir datos adicionales.',
+      fallback: "Sí, entendido.",
+    });
+    await sendOutbound(phone, soonReply);
+    onBotMessage(soonReply);
+    appendConversationMessage(phone, { role: "bot", text: soonReply });
+    upsertConversation(phone, {
+      status: "active",
+      metadata: { ...conv.metadata, senderName, aiDriven: true },
+    });
+    console.log(`[BOT] contact-soon response sent phone=${phone}`);
+    return { ok: true, responseType: "contact_soon_ack" };
   }
 
   if (isContactLaterIntent(text)) {
