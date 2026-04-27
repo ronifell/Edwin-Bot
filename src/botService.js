@@ -473,12 +473,15 @@ async function handleInbound(payload, options = {}) {
   }
 
   if (missingCoreFields.length) {
+    const missingFieldsLabel = missingCoreFields
+      .map((field) => (field === "idNumber" ? "cedula del fallecido" : "fecha exacta de fallecimiento"))
+      .join(" y ");
     const missingCoreDataPrompt = await maybeGenerateStyledReply({
       conv,
       userText: text,
       responseType: "missing_core_data_request",
       instruction:
-        "Responde en maximo 2 frases cortas y 1 pregunta. No pidas nombre. Siga exactamente la lógica: objetivo final siempre cédula del fallecido + fecha exacta. Si quien escribe es esposa/companera/pareja, vaya directo a pedir esos datos. Si NO es pareja (hijo, hermano, padre u otro familiar), valide beneficiarios en este orden exacto, una pregunta por mensaje: 1) ¿El fallecido dejó esposa, compañera o pareja?, 2) ¿Dejó hijos menores de edad?, 3) ¿Dejó padres con vida?, 4) ¿Dejó algún dependiente con discapacidad?. Solo pida datos cuando en alguno de esos pasos la respuesta sea sí. Si todas son no, cierre con el mensaje jurídico de no beneficiarios directos.",
+        `Responde en maximo 2 frases cortas y 1 pregunta. No pidas nombre. Regla previa obligatoria: antes de aplicar cualquier escenario, confirme la relacion entre quien escribe y el fallecido; si no está clara, pregunte primero por esa relacion y espere respuesta. Solo cuando la relacion quede clara, aplique esta lógica: objetivo final siempre cédula del fallecido + fecha exacta. Si quien escribe es esposa/companera/pareja, vaya directo a pedir esos datos. Si NO es pareja (hijo, hermano, padre u otro familiar), valide beneficiarios en este orden exacto, una pregunta por mensaje: 1) ¿El fallecido dejó esposa, compañera o pareja?, 2) ¿Dejó hijos menores de edad?, 3) ¿Dejó padres con vida?, 4) ¿Dejó algún dependiente con discapacidad?. Solo pida datos cuando en alguno de esos pasos la respuesta sea sí. Si todas son no, cierre con el mensaje jurídico de no beneficiarios directos. IMPORTANTE: en este turno solo faltan estos datos: ${missingFieldsLabel}. Pida unicamente esos faltantes y no vuelva a pedir datos ya entregados.`,
       fallback:
         missingCoreFields.length === 2
           ? "Para continuar, por favor envíeme la cédula del fallecido y la fecha exacta de fallecimiento (día, mes y año). Si el fallecido no era su pareja, primero debo validar beneficiarios."

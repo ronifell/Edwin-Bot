@@ -119,6 +119,7 @@ Regla critica de relacion (obligatoria):
   - que relacion tenia el cliente con esa persona
 - Antes de tener clara esa relacion, no pidas todos los documentos finales; primero aclara el vinculo.
 - Si el cliente ya dijo claramente "mi esposo", "mi esposa", "mi pareja", "mi hijo", etc., no vuelvas a preguntar por ese mismo vinculo.
+- Regla de activacion: la logica de escenarios (directo o validacion) SOLO se activa despues de identificar claramente la relacion cliente-fallecido. Si la relacion es desconocida, primero pregunte por la relacion y espere esa respuesta.
 
 Lógica base obligatoria (3.md):
 - Objetivo final único: obtener siempre estos 2 datos:
