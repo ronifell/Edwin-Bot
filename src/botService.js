@@ -41,6 +41,17 @@ function buildFallbackEventKey({ phone, type, message, isAudio }) {
   return `fp:${phone}|${type || "n/a"}|audio:${isAudio ? 1 : 0}|${normalizedText}`;
 }
 
+function shouldSkipFingerprintDedupe(message, conv) {
+  const normalized = normalizeForKey(message);
+  if (!normalized) return false;
+
+  const shortInteractiveReplies = new Set(["si", "no", "ok", "gracias"]);
+  if (!shortInteractiveReplies.has(normalized)) return false;
+
+  const lastBotMessage = [...(conv?.messages || [])].reverse().find((item) => item.role === "bot");
+  return Boolean(lastBotMessage?.text);
+}
+
 function extractInbound(payload) {
   const message =
     payload?.text?.message ||
@@ -97,6 +108,7 @@ function isSimpleGreeting(input) {
   const normalized = normalizeForGreeting(input);
   const greetingTokens = [
     "hola",
+    "buenas",
     "buen dia",
     "buenos dias",
     "buena tarde",
@@ -245,6 +257,8 @@ async function handleInbound(payload, options = {}) {
   const stableKey = messageId ? `mid:${phone}|${type || "n/a"}|${messageId}` : "";
   const fallbackKey = buildFallbackEventKey({ phone, type, message, isAudio });
   const now = Date.now();
+  const existingConv = getConversation(phone);
+  const skipFingerprintDedupe = shouldSkipFingerprintDedupe(message, existingConv);
 
   if (stableKey && processedEventCache.has(stableKey)) {
     console.log(`[BOT] ignored: duplicate_message by messageId phone=${phone} messageId=${messageId}`);
@@ -252,7 +266,7 @@ async function handleInbound(payload, options = {}) {
   }
   // Fallback dedupe for providers that resend without stable messageId.
   const previousByFingerprint = processedEventCache.get(fallbackKey);
-  if (previousByFingerprint && now - previousByFingerprint < 30 * 1000) {
+  if (!skipFingerprintDedupe && previousByFingerprint && now - previousByFingerprint < 30 * 1000) {
     console.log(`[BOT] ignored: duplicate_message by fingerprint phone=${phone}`);
     return { ok: true, ignored: "duplicate_message" };
   }
@@ -464,10 +478,10 @@ async function handleInbound(payload, options = {}) {
       userText: text,
       responseType: "missing_core_data_request",
       instruction:
-        "Responde en maximo 2 frases cortas. No pidas nombre. Pide solo los datos faltantes para continuar: cédula del fallecido y fecha exacta de fallecimiento (día, mes y año). Si solo falta uno, pide solo ese uno.",
+        "Responde en maximo 2 frases cortas y 1 pregunta. No pidas nombre. Siga exactamente la lógica: objetivo final siempre cédula del fallecido + fecha exacta. Si quien escribe es esposa/companera/pareja, vaya directo a pedir esos datos. Si NO es pareja (hijo, hermano, padre u otro familiar), valide beneficiarios en este orden exacto, una pregunta por mensaje: 1) ¿El fallecido dejó esposa, compañera o pareja?, 2) ¿Dejó hijos menores de edad?, 3) ¿Dejó padres con vida?, 4) ¿Dejó algún dependiente con discapacidad?. Solo pida datos cuando en alguno de esos pasos la respuesta sea sí. Si todas son no, cierre con el mensaje jurídico de no beneficiarios directos.",
       fallback:
         missingCoreFields.length === 2
-          ? "Para continuar, por favor envíeme la cédula del fallecido y la fecha exacta de fallecimiento (día, mes y año)."
+          ? "Para continuar, por favor envíeme la cédula del fallecido y la fecha exacta de fallecimiento (día, mes y año). Si el fallecido no era su pareja, primero debo validar beneficiarios."
           : missingCoreFields[0] === "idNumber"
           ? "Para continuar, por favor envíeme la cédula del fallecido."
           : "Para continuar, por favor envíeme la fecha exacta de fallecimiento (día, mes y año).",
