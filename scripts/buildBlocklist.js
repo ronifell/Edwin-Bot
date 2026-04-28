@@ -3,9 +3,13 @@ const path = require("path");
 
 function parseArgs(argv) {
   const args = {};
+  const positional = [];
   for (let i = 0; i < argv.length; i += 1) {
     const token = argv[i];
-    if (!token.startsWith("--")) continue;
+    if (!token.startsWith("--")) {
+      positional.push(token);
+      continue;
+    }
     const key = token.slice(2);
     const next = argv[i + 1];
     if (!next || next.startsWith("--")) {
@@ -15,6 +19,10 @@ function parseArgs(argv) {
     args[key] = next;
     i += 1;
   }
+  if (!args.input && positional[0]) args.input = positional[0];
+  if (!args.output && positional[1] && String(positional[1]).endsWith(".json")) args.output = positional[1];
+  if (!args.country && positional[1] && /^\d+$/.test(String(positional[1]))) args.country = positional[1];
+  if (!args.country && positional[2] && /^\d+$/.test(String(positional[2]))) args.country = positional[2];
   return args;
 }
 

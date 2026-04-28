@@ -5,6 +5,7 @@ const { classifyMessage } = require("./classifier");
 const { extractStructuredData } = require("./extractor");
 const { appendLeadRow } = require("./sheetService");
 const { sendMessage } = require("./zapiService");
+const { isPhoneBlocked } = require("./blocklist");
 const {
   appendConversationMessage,
   getConversation,
@@ -271,7 +272,37 @@ async function handleInbound(payload, options = {}) {
     return { ok: true, ignored: "missing_phone" };
   }
 
-  const existingConv = getConversation(phone);
+  let existingConv = getConversation(phone);
+  const phoneIsBlocked = isPhoneBlocked(phone, config.defaultCountryPrefix);
+
+  if (phoneIsBlocked) {
+    upsertConversation(phone, {
+      status: "blocked",
+      awaitingData: false,
+      metadata: {
+        ...(existingConv?.metadata || {}),
+        senderName,
+        manualTakeover: true,
+        manualTakeoverAt: existingConv?.metadata?.manualTakeoverAt || new Date().toISOString(),
+        blockedByExternalBlocklist: true,
+      },
+    });
+    console.log(`[BOT] ignored: phone_blocklisted phone=${phone}`);
+    return { ok: true, ignored: "phone_blocklisted" };
+  }
+
+  // If a number was previously blocked by external blocklist but was later removed,
+  // release the automatic manual-takeover lock so bot can process new inbound again.
+  if (existingConv?.metadata?.blockedByExternalBlocklist) {
+    upsertConversation(phone, {
+      metadata: {
+        ...existingConv.metadata,
+        blockedByExternalBlocklist: false,
+        manualTakeover: false,
+      },
+    });
+    existingConv = getConversation(phone);
+  }
 
   if (fromMe) {
     if (existingConv) {

@@ -13,8 +13,9 @@ const {
   permanentlyDeleteLeadRecord,
   getLeadStats,
 } = require("./leadRepository");
-const { getConversation } = require("./storage");
+const { getConversation, getBlockedConversations } = require("./storage");
 const { verifyAdminPassword } = require("./adminAuth");
+const { listBlockedNumbers, addBlockedNumber, removeBlockedNumber } = require("./blocklist");
 
 validateConfig();
 
@@ -247,6 +248,78 @@ app.get("/api/admin/conversations/:phone", validateAdminAccess, async (req, res)
   } catch (error) {
     console.error("Failed to load conversation:", error.message);
     return res.status(500).json({ ok: false, error: "admin_conversation_failed" });
+  }
+});
+
+app.get("/api/admin/blocked-conversations", validateAdminAccess, async (_req, res) => {
+  try {
+    const rows = getBlockedConversations().map((conv) => ({
+      phone: conv.phone || "",
+      senderName: conv?.metadata?.senderName || "",
+      status: conv.status || "",
+      color: conv.color || "",
+      blockedAt: conv?.metadata?.manualTakeoverAt || conv.updatedAt || conv.createdAt || "",
+      updatedAt: conv.updatedAt || conv.createdAt || "",
+      messageCount: Array.isArray(conv.messages) ? conv.messages.length : 0,
+      blockedByExternalBlocklist: true,
+    }));
+    return res.json({ ok: true, rows, total: rows.length });
+  } catch (error) {
+    console.error("Failed to list blocked conversations:", error.message);
+    return res.status(500).json({ ok: false, error: "admin_blocked_list_failed" });
+  }
+});
+
+app.get("/api/admin/blocklist", validateAdminAccess, async (_req, res) => {
+  try {
+    const numbers = listBlockedNumbers(config.defaultCountryPrefix);
+    const blockedMap = new Map(getBlockedConversations().map((conv) => [String(conv.phone || ""), conv]));
+    const rows = numbers.map((phone) => {
+      const byWithPlus = blockedMap.get(phone);
+      const byNoPlus = blockedMap.get(phone.replace(/^\+/, ""));
+      const conv = byWithPlus || byNoPlus || null;
+      return {
+        phone,
+        seenByBot: Boolean(conv),
+        status: conv?.status || "",
+        senderName: conv?.metadata?.senderName || "",
+        updatedAt: conv?.updatedAt || conv?.createdAt || "",
+      };
+    });
+    return res.json({ ok: true, rows, total: rows.length });
+  } catch (error) {
+    console.error("Failed to list blocklist numbers:", error.message);
+    return res.status(500).json({ ok: false, error: "admin_blocklist_list_failed" });
+  }
+});
+
+app.post("/api/admin/blocklist", validateAdminAccess, async (req, res) => {
+  const phone = String(req.body?.phone || "").trim();
+  if (!phone) return res.status(400).json({ ok: false, error: "missing_phone" });
+  try {
+    const result = addBlockedNumber(phone, config.defaultCountryPrefix);
+    if (!result.added && result.reason === "invalid_phone") {
+      return res.status(400).json({ ok: false, error: "invalid_phone" });
+    }
+    return res.json({ ok: true, result });
+  } catch (error) {
+    console.error("Failed to add blocklist number:", error.message);
+    return res.status(500).json({ ok: false, error: "admin_blocklist_add_failed" });
+  }
+});
+
+app.delete("/api/admin/blocklist/:phone", validateAdminAccess, async (req, res) => {
+  const phone = decodeURIComponent(String(req.params.phone || "").trim());
+  if (!phone) return res.status(400).json({ ok: false, error: "missing_phone" });
+  try {
+    const result = removeBlockedNumber(phone, config.defaultCountryPrefix);
+    if (!result.removed && result.reason === "invalid_phone") {
+      return res.status(400).json({ ok: false, error: "invalid_phone" });
+    }
+    return res.json({ ok: true, result });
+  } catch (error) {
+    console.error("Failed to remove blocklist number:", error.message);
+    return res.status(500).json({ ok: false, error: "admin_blocklist_remove_failed" });
   }
 });
 

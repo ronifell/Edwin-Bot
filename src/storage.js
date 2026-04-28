@@ -150,6 +150,13 @@ function getConversationsAwaitingData(cutoffIso) {
   );
 }
 
+function getBlockedConversations() {
+  const store = readStore();
+  return Object.values(store.conversations)
+    .filter((conv) => conv?.metadata?.blockedByExternalBlocklist)
+    .sort((a, b) => new Date(b.updatedAt || b.createdAt) - new Date(a.updatedAt || a.createdAt));
+}
+
 function resetStore() {
   writeStore({ ...initialStore });
 }
@@ -163,5 +170,6 @@ module.exports = {
   getTodayKey,
   getStatsForDate,
   getConversationsAwaitingData,
+  getBlockedConversations,
   resetStore,
 };
