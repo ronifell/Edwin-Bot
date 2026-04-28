@@ -35,9 +35,9 @@ const config = {
     connectionString: process.env.POSTGRES_URL || "",
     ssl: toBool(process.env.POSTGRES_SSL, true),
   },
-  adminApiToken: process.env.ADMIN_API_TOKEN || "",
+  adminApiToken: String(process.env.ADMIN_API_TOKEN || "").trim(),
   /** Optional gate for POST /api/admin/login; returns ADMIN_API_TOKEN when password matches. */
-  adminPassword: process.env.ADMIN_PASSWORD || "",
+  adminPassword: String(process.env.ADMIN_PASSWORD || "").trim(),
   timing: {
     minDelayMs: Number(process.env.MIN_TYPING_DELAY_MS || 1300),
     maxDelayMs: Number(process.env.MAX_TYPING_DELAY_MS || 3800),

@@ -66,7 +66,7 @@ app.post("/api/admin/login", async (req, res) => {
   if (!config.adminApiToken) {
     return res.status(503).json({ ok: false, error: "login_requires_ADMIN_API_TOKEN" });
   }
-  const password = String(req.body?.password || "");
+  const password = String(req.body?.password || "").trim();
   if (!verifyAdminPassword(password, config.adminPassword)) {
     return res.status(401).json({ ok: false, error: "invalid_password" });
   }
