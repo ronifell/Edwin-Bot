@@ -31,6 +31,13 @@ const config = {
     clientEmail: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL || "",
     privateKey: (process.env.GOOGLE_PRIVATE_KEY || "").replace(/\\n/g, "\n"),
   },
+  postgres: {
+    connectionString: process.env.POSTGRES_URL || "",
+    ssl: toBool(process.env.POSTGRES_SSL, true),
+  },
+  adminApiToken: process.env.ADMIN_API_TOKEN || "",
+  /** Optional gate for POST /api/admin/login; returns ADMIN_API_TOKEN when password matches. */
+  adminPassword: process.env.ADMIN_PASSWORD || "",
   timing: {
     minDelayMs: Number(process.env.MIN_TYPING_DELAY_MS || 1300),
     maxDelayMs: Number(process.env.MAX_TYPING_DELAY_MS || 3800),
@@ -61,6 +68,10 @@ function validateConfig() {
   if (missing.length) {
     // Do not throw hard so the app can boot in dry mode.
     console.warn(`Missing env vars: ${missing.join(", ")}`);
+  }
+
+  if (!config.postgres.connectionString) {
+    console.warn("POSTGRES_URL is not configured. Lead persistence APIs will be disabled.");
   }
 }
 

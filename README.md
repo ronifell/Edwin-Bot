@@ -29,6 +29,22 @@ Proyecto con dos modos de operacion:
    - `NEXT_PUBLIC_BACKEND_URL=http://localhost:3000`
    - Numero de prueba (`NEXT_PUBLIC_TEST_PHONE`) y nombre (`NEXT_PUBLIC_TEST_NAME`)
 
+## 2.1) Configurar Admin web app (Next.js + Tailwind)
+
+1. En `Admin`, copie `.env.local.example` a `.env.local`.
+2. Defina:
+   - `NEXT_PUBLIC_BACKEND_URL=http://localhost:3000`
+   - `NEXT_PUBLIC_ADMIN_TOKEN` (opcional; debe coincidir con `ADMIN_API_TOKEN` del backend si usa token embebido)
+3. En el backend (`.env` raiz), opcionalmente:
+   - `ADMIN_PASSWORD`: si esta definido, el Admin puede iniciar sesion con contrasena; el endpoint `POST /api/admin/login` devuelve el bearer `ADMIN_API_TOKEN`.
+4. Instale dependencias (si fallan scripts postinstall en Windows, use `npm install --ignore-scripts --prefix Admin`).
+
+```bash
+npm install --prefix Admin
+```
+
+**Funciones del panel:** lista de leads (PostgreSQL), papelera de reciclaje (borrado suave), restaurar / borrar definitivo, export CSV, detalle con linea de tiempo de conversacion (desde `data-store.json` del servidor cuando exista).
+
 ## 3) Instalar dependencias
 
 Backend:
@@ -59,7 +75,14 @@ Terminal 2 (frontend):
 npm run dev:frontend
 ```
 
+Terminal 3 (admin):
+
+```bash
+npm run dev:admin
+```
+
 Abra [http://localhost:3001](http://localhost:3001) y pruebe mensajes.
+Admin: [http://localhost:3002](http://localhost:3002)
 
 ## 5) Ejecutar en modo WhatsApp real
 
@@ -79,6 +102,14 @@ Configure Z-API para apuntar al webhook:
 - `POST /webhook/zapi` (solo habilitado en modo `whatsapp`)
 - `POST /api/test/chat` (solo habilitado en modo `local`)
 - `POST /jobs/daily-summary`
+- `POST /api/admin/login` (opcional; requiere `ADMIN_PASSWORD` + `ADMIN_API_TOKEN`)
+- `GET /api/admin/leads` (PostgreSQL; query `view=active|recycle`, `search`, `color`, paginacion)
+- `GET /api/admin/leads/export` (CSV; mismos filtros que listado)
+- `GET /api/admin/leads/:id` (detalle + conversacion desde almacen local del bot)
+- `GET /api/admin/conversations/:phone`
+- `GET /api/admin/stats` (PostgreSQL)
+- `POST /api/admin/leads/:id/restore`
+- `DELETE /api/admin/leads/:id` (borrado suave; `?permanent=true` solo en papelera)
 
 ## Simular escenarios de about.md
 
@@ -89,6 +120,25 @@ npm run test:scenarios
 ```
 
 Incluye pruebas para verde, amarillo, rojo, victima, preguntas informativas, saludo y control de repeticion despues de enviar datos.
+
+## Generar blocklist de clientes antiguos
+
+Para evitar responder clientes previos al go-live, puede generar un archivo de bloqueo desde export de contactos:
+
+```bash
+npm run build:blocklist -- --input "./contacts.vcf" --country 57
+```
+
+Tambien soporta CSV:
+
+```bash
+npm run build:blocklist -- --input "./contacts.csv" --output "./old_customers_blocklist.json" --country 57
+```
+
+Salida:
+
+- Crea `old_customers_blocklist.json` con numeros normalizados (`+57...`), deduplicados y ordenados.
+- Parametro `--country` define prefijo por defecto para numeros locales de 10 digitos.
 
 ## Incluye funcionalidad
 

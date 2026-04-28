@@ -3,12 +3,75 @@ const cors = require("cors");
 const { validateConfig } = require("./config");
 const { handleInbound, sendDailySummary, startSchedulers } = require("./botService");
 const { config } = require("./config");
+const { ensurePostgresReady, isPostgresEnabled } = require("./db");
+const {
+  listLeadRecords,
+  listLeadRecordsForExport,
+  getLeadRecordById,
+  softDeleteLeadRecord,
+  restoreLeadRecord,
+  permanentlyDeleteLeadRecord,
+  getLeadStats,
+} = require("./leadRepository");
+const { getConversation } = require("./storage");
+const { verifyAdminPassword } = require("./adminAuth");
 
 validateConfig();
 
 const app = express();
 app.use(cors());
 app.use(express.json({ limit: "10mb" }));
+
+function validateAdminAccess(req, res, next) {
+  if (!config.adminApiToken) return next();
+  const authHeader = req.headers.authorization || "";
+  const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : "";
+  if (token !== config.adminApiToken) {
+    return res.status(401).json({ ok: false, error: "unauthorized_admin_access" });
+  }
+  return next();
+}
+
+function csvEscape(value) {
+  const s = String(value ?? "");
+  if (/[",\n\r]/.test(s)) return `"${s.replace(/"/g, '""')}"`;
+  return s;
+}
+
+function buildLeadsCsv(rows) {
+  const headers = ["id", "name", "phone", "id_number", "death_date", "color", "observations", "created_at", "deleted_at"];
+  const lines = [headers.join(",")];
+  for (const row of rows) {
+    lines.push(
+      [
+        csvEscape(row.id),
+        csvEscape(row.name),
+        csvEscape(row.phone),
+        csvEscape(row.id_number),
+        csvEscape(row.death_date),
+        csvEscape(row.color),
+        csvEscape(row.observations),
+        csvEscape(row.created_at),
+        csvEscape(row.deleted_at),
+      ].join(",")
+    );
+  }
+  return lines.join("\r\n");
+}
+
+app.post("/api/admin/login", async (req, res) => {
+  if (!config.adminPassword) {
+    return res.status(400).json({ ok: false, error: "login_disabled_set_ADMIN_PASSWORD" });
+  }
+  if (!config.adminApiToken) {
+    return res.status(503).json({ ok: false, error: "login_requires_ADMIN_API_TOKEN" });
+  }
+  const password = String(req.body?.password || "");
+  if (!verifyAdminPassword(password, config.adminPassword)) {
+    return res.status(401).json({ ok: false, error: "invalid_password" });
+  }
+  return res.json({ ok: true, token: config.adminApiToken });
+});
 
 app.get("/health", (_req, res) => {
   res.json({ ok: true, service: "edwin-whatsapp-bot-backend" });
@@ -106,8 +169,149 @@ app.post("/jobs/daily-summary", async (_req, res) => {
   }
 });
 
+app.get("/api/admin/leads/export", validateAdminAccess, async (req, res) => {
+  if (!isPostgresEnabled()) {
+    return res.status(503).json({ ok: false, error: "postgres_not_configured" });
+  }
+  const search = String(req.query.search || "").trim();
+  const color = String(req.query.color || "").trim();
+  const view = req.query.view === "recycle" ? "recycle" : "active";
+
+  try {
+    const { rows } = await listLeadRecordsForExport({ search, color, view, limit: 50000 });
+    const csv = buildLeadsCsv(rows);
+    res.setHeader("Content-Type", "text/csv; charset=utf-8");
+    res.setHeader("Content-Disposition", `attachment; filename="leads_${view}_${Date.now()}.csv"`);
+    return res.send(csv);
+  } catch (error) {
+    console.error("Failed to export leads:", error.message);
+    return res.status(500).json({ ok: false, error: "admin_export_failed" });
+  }
+});
+
+app.get("/api/admin/leads", validateAdminAccess, async (req, res) => {
+  if (!isPostgresEnabled()) {
+    return res.status(503).json({ ok: false, error: "postgres_not_configured" });
+  }
+  const limit = Math.min(Math.max(Number(req.query.limit || 25), 1), 100);
+  const page = Math.max(Number(req.query.page || 1), 1);
+  const offset = (page - 1) * limit;
+  const search = String(req.query.search || "").trim();
+  const color = String(req.query.color || "").trim();
+  const view = req.query.view === "recycle" ? "recycle" : "active";
+
+  try {
+    const { rows, total } = await listLeadRecords({ search, color, limit, offset, view });
+    return res.json({
+      ok: true,
+      rows,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.max(Math.ceil(total / limit), 1),
+      },
+    });
+  } catch (error) {
+    console.error("Failed to list lead records:", error.message);
+    return res.status(500).json({ ok: false, error: "admin_list_failed" });
+  }
+});
+
+app.get("/api/admin/leads/:id", validateAdminAccess, async (req, res) => {
+  if (!isPostgresEnabled()) {
+    return res.status(503).json({ ok: false, error: "postgres_not_configured" });
+  }
+  const id = Number(req.params.id);
+  if (!Number.isInteger(id) || id <= 0) {
+    return res.status(400).json({ ok: false, error: "invalid_lead_id" });
+  }
+  try {
+    const lead = await getLeadRecordById(id);
+    if (!lead) return res.status(404).json({ ok: false, error: "lead_not_found" });
+    const phone = lead.phone || "";
+    const conversation = phone ? getConversation(phone) : null;
+    return res.json({ ok: true, lead, conversation });
+  } catch (error) {
+    console.error("Failed to load lead detail:", error.message);
+    return res.status(500).json({ ok: false, error: "admin_lead_detail_failed" });
+  }
+});
+
+app.get("/api/admin/conversations/:phone", validateAdminAccess, async (req, res) => {
+  const phone = decodeURIComponent(String(req.params.phone || "").trim());
+  if (!phone) return res.status(400).json({ ok: false, error: "missing_phone" });
+  try {
+    const conversation = getConversation(phone);
+    return res.json({ ok: true, phone, conversation });
+  } catch (error) {
+    console.error("Failed to load conversation:", error.message);
+    return res.status(500).json({ ok: false, error: "admin_conversation_failed" });
+  }
+});
+
+app.post("/api/admin/leads/:id/restore", validateAdminAccess, async (req, res) => {
+  if (!isPostgresEnabled()) {
+    return res.status(503).json({ ok: false, error: "postgres_not_configured" });
+  }
+  const id = Number(req.params.id);
+  if (!Number.isInteger(id) || id <= 0) {
+    return res.status(400).json({ ok: false, error: "invalid_lead_id" });
+  }
+  try {
+    const restored = await restoreLeadRecord(id);
+    if (!restored) return res.status(404).json({ ok: false, error: "lead_not_found_or_not_in_recycle" });
+    return res.json({ ok: true, restoredId: id });
+  } catch (error) {
+    console.error("Failed to restore lead:", error.message);
+    return res.status(500).json({ ok: false, error: "admin_restore_failed" });
+  }
+});
+
+app.get("/api/admin/stats", validateAdminAccess, async (_req, res) => {
+  if (!isPostgresEnabled()) {
+    return res.status(503).json({ ok: false, error: "postgres_not_configured" });
+  }
+  try {
+    const stats = await getLeadStats();
+    return res.json({ ok: true, stats });
+  } catch (error) {
+    console.error("Failed to read lead stats:", error.message);
+    return res.status(500).json({ ok: false, error: "admin_stats_failed" });
+  }
+});
+
+app.delete("/api/admin/leads/:id", validateAdminAccess, async (req, res) => {
+  if (!isPostgresEnabled()) {
+    return res.status(503).json({ ok: false, error: "postgres_not_configured" });
+  }
+  const id = Number(req.params.id);
+  if (!Number.isInteger(id) || id <= 0) {
+    return res.status(400).json({ ok: false, error: "invalid_lead_id" });
+  }
+
+  const permanent = String(req.query.permanent || "").toLowerCase() === "true" || req.query.permanent === "1";
+
+  try {
+    if (permanent) {
+      const removed = await permanentlyDeleteLeadRecord(id);
+      if (!removed) return res.status(404).json({ ok: false, error: "lead_not_found_or_not_in_recycle" });
+      return res.json({ ok: true, deletedId: id, permanent: true });
+    }
+    const soft = await softDeleteLeadRecord(id);
+    if (!soft) return res.status(404).json({ ok: false, error: "lead_not_found" });
+    return res.json({ ok: true, deletedId: id, permanent: false });
+  } catch (error) {
+    console.error("Failed to delete lead:", error.message);
+    return res.status(500).json({ ok: false, error: "admin_delete_failed" });
+  }
+});
+
 app.listen(config.port, () => {
   console.log(`Server listening on port ${config.port} in ${config.botChannelMode} mode`);
+  ensurePostgresReady().catch((error) => {
+    console.error("PostgreSQL init failed:", error.message);
+  });
   if (config.botChannelMode === "whatsapp") {
     startSchedulers();
   }
