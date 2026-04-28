@@ -271,8 +271,21 @@ async function handleInbound(payload, options = {}) {
     return { ok: true, ignored: "missing_phone" };
   }
 
+  const existingConv = getConversation(phone);
+
   if (fromMe) {
-    console.log(`[BOT] ignored: fromMe echo event phone=${phone}`);
+    if (existingConv) {
+      upsertConversation(phone, {
+        awaitingData: false,
+        metadata: {
+          ...existingConv.metadata,
+          senderName,
+          manualTakeover: true,
+          manualTakeoverAt: new Date().toISOString(),
+        },
+      });
+    }
+    console.log(`[BOT] ignored: manual_takeover_by_human phone=${phone}`);
     return { ok: true, ignored: "from_me" };
   }
 
@@ -290,7 +303,10 @@ async function handleInbound(payload, options = {}) {
   const stableKey = messageId ? `mid:${phone}|${type || "n/a"}|${messageId}` : "";
   const fallbackKey = buildFallbackEventKey({ phone, type, message, isAudio });
   const now = Date.now();
-  const existingConv = getConversation(phone);
+  if (existingConv?.metadata?.manualTakeover) {
+    console.log(`[BOT] ignored: manual_takeover_active phone=${phone}`);
+    return { ok: true, ignored: "manual_takeover_active" };
+  }
   const skipFingerprintDedupe = shouldSkipFingerprintDedupe(message, existingConv);
 
   if (stableKey && processedEventCache.has(stableKey)) {
@@ -570,26 +586,15 @@ async function handleInbound(payload, options = {}) {
   }
 
   if (hasCoreData) {
-    const dataReceivedAck = await maybeGenerateStyledReply({
-      conv,
-      userText: text,
-      responseType: "core_data_received_ack",
-      instruction:
-        'Cuando ya tengas cédula y fecha exacta de fallecimiento, confirma brevemente que revisarás el caso y que solo contactarás al cliente si tiene derecho a pensión. No hagas más preguntas.',
-      fallback:
-        "Consultaré su caso y lo contactaré únicamente en caso de encontrar si tiene derecho a pensión.",
-    });
     console.log(`[BOT] core data received phone=${phone} hadCoreDataBefore=${hadCoreDataBefore}`);
-    await sendOutbound(phone, dataReceivedAck);
-    onBotMessage(dataReceivedAck);
-    appendConversationMessage(phone, { role: "bot", text: dataReceivedAck });
 
     // Metrics required by about.md
     if (extracted.idNumber) incrementDailyStat(getTodayKey(), "idNumbersCollected");
     if (extracted.deathDate) incrementDailyStat(getTodayKey(), "deathDatesCollected");
 
     upsertConversation(phone, {
-      status: "active",
+      // Leave chat ready for human takeover once core legal data is complete.
+      status: "pending_human_takeover",
       color,
       awaitingData: false,
       reminderCount: 0,
@@ -599,6 +604,8 @@ async function handleInbound(payload, options = {}) {
         senderName,
         aiDriven: true,
         manualClosePending: true,
+        manualTakeover: true,
+        manualTakeoverAt: new Date().toISOString(),
         followUpAt: "",
       },
     });
@@ -619,8 +626,8 @@ async function handleInbound(payload, options = {}) {
       console.log(`[BOT] lead row appended phone=${phone}`);
     }
 
-    console.log(`[BOT] completed phone=${phone} responseType=core_data_received_ack`);
-    return { ok: true, responseType: "core_data_received_ack" };
+    console.log(`[BOT] completed phone=${phone} responseType=core_data_received_handover_no_reply`);
+    return { ok: true, responseType: "core_data_received_handover_no_reply" };
   }
 
   const aiReply = await maybeGenerateStyledReply({ conv, userText: text });
