@@ -271,6 +271,33 @@ function isNegative(input) {
   );
 }
 
+function enforcePoliteTone(text) {
+  let output = String(text || "").trim();
+  if (!output) return output;
+
+  const discouragedStarts = [
+    /^ok[\s,!.:;-]*/i,
+    /^okay[\s,!.:;-]*/i,
+    /^perfecto[\s,!.:;-]*/i,
+    /^excelente[\s,!.:;-]*/i,
+    /^genial[\s,!.:;-]*/i,
+    /^super[\s,!.:;-]*/i,
+    /^listo[\s,!.:;-]*/i,
+  ];
+  for (const pattern of discouragedStarts) {
+    if (pattern.test(output)) {
+      output = output.replace(pattern, "Entendido, ");
+      break;
+    }
+  }
+
+  output = output
+    .replace(/\bperfecto\b/gi, "entendido")
+    .replace(/\bok(?:ay)?\b/gi, "entendido");
+
+  return output.trim();
+}
+
 async function maybeGenerateStyledReply({
   conv,
   userText,
@@ -291,10 +318,10 @@ async function maybeGenerateStyledReply({
       responseType,
       conversationHistory: conv?.messages || [],
     });
-    return aiReply || fallback;
+    return enforcePoliteTone(aiReply || fallback);
   } catch (error) {
     console.error("AI reply generation failed:", error.message);
-    return fallback;
+    return enforcePoliteTone(fallback);
   }
 }
 
@@ -686,6 +713,14 @@ async function handleInbound(payload, options = {}) {
         followUpAt: "",
       },
     });
+
+    if (!hadCoreDataBefore) {
+      const finalCoreDataAck =
+        "Gracias por proporcionar la información. Revisaremos su caso y nos pondremos en contacto con usted si cumple los requisitos para la pensión.";
+      await sendOutbound(phone, finalCoreDataAck);
+      onBotMessage(finalCoreDataAck);
+      appendConversationMessage(phone, { role: "bot", text: finalCoreDataAck });
+    }
 
     // Persist lead once when core data is first completed.
     if (!hadCoreDataBefore) {

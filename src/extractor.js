@@ -13,10 +13,10 @@ function extractIdNumber(text) {
   const labeledMatch = text.match(labeledIdRegex);
   if (labeledMatch) {
     const normalized = normalizeId(labeledMatch[1]);
-    if (normalized.length >= 6 && normalized.length <= 15) return normalized;
+    if (normalized.length >= 5 && normalized.length <= 15) return normalized;
   }
 
-  const plainCandidates = text.match(/\b\d{6,15}\b/g) || [];
+  const plainCandidates = text.match(/\b\d{5,15}\b/g) || [];
   for (const candidate of plainCandidates) {
     return candidate;
   }
@@ -24,7 +24,7 @@ function extractIdNumber(text) {
   const groupedCandidates = text.match(/\b\d{1,3}(?:[.,\s]\d{3})+\b/g) || [];
   for (const candidate of groupedCandidates) {
     const normalized = normalizeId(candidate);
-    if (normalized.length >= 6 && normalized.length <= 15) return normalized;
+    if (normalized.length >= 5 && normalized.length <= 15) return normalized;
   }
   return "";
 }
