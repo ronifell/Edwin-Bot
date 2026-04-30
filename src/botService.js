@@ -691,6 +691,9 @@ async function handleInbound(payload, options = {}) {
 
   if (hasCoreData) {
     console.log(`[BOT] core data received phone=${phone} hadCoreDataBefore=${hadCoreDataBefore}`);
+    const finalCoreDataAck =
+      "Gracias por proporcionar la información. Revisaremos su caso y nos pondremos en contacto con usted si cumple los requisitos para la pensión.";
+    const finalAckAlreadySent = Boolean(conv.metadata?.coreDataFinalAckSent);
 
     // Metrics required by about.md
     if (extracted.idNumber) incrementDailyStat(getTodayKey(), "idNumbersCollected");
@@ -710,16 +713,21 @@ async function handleInbound(payload, options = {}) {
         manualClosePending: true,
         manualTakeover: true,
         manualTakeoverAt: new Date().toISOString(),
+        coreDataFinalAckSent: finalAckAlreadySent,
         followUpAt: "",
       },
     });
 
-    if (!hadCoreDataBefore) {
-      const finalCoreDataAck =
-        "Gracias por proporcionar la información. Revisaremos su caso y nos pondremos en contacto con usted si cumple los requisitos para la pensión.";
+    if (!finalAckAlreadySent) {
       await sendOutbound(phone, finalCoreDataAck);
       onBotMessage(finalCoreDataAck);
       appendConversationMessage(phone, { role: "bot", text: finalCoreDataAck });
+      upsertConversation(phone, {
+        metadata: {
+          ...(getConversation(phone)?.metadata || {}),
+          coreDataFinalAckSent: true,
+        },
+      });
     }
 
     // Persist lead once when core data is first completed.
