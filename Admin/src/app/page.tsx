@@ -85,6 +85,8 @@ export default function HomePage() {
   const [blocklistLoading, setBlocklistLoading] = useState(false);
   const [newBlockedPhone, setNewBlockedPhone] = useState("");
   const [blocklistActionPhone, setBlocklistActionPhone] = useState("");
+  const [clearConversationPhone, setClearConversationPhone] = useState("");
+  const [clearingConversations, setClearingConversations] = useState(false);
 
   const [search, setSearch] = useState("");
   const [searchDraft, setSearchDraft] = useState("");
@@ -368,6 +370,47 @@ export default function HomePage() {
       setError(err instanceof Error ? err.message : "Failed to remove number");
     } finally {
       setBlocklistActionPhone("");
+    }
+  }
+
+  async function handleClearConversationByPhone() {
+    const phone = clearConversationPhone.trim();
+    if (!phone) return;
+    const ok = window.confirm(`Clear stored conversation for ${phone}?`);
+    if (!ok) return;
+    setClearingConversations(true);
+    setError("");
+    try {
+      const response = await authFetch(`${API_BASE_URL}/api/admin/conversations/${encodeURIComponent(phone)}`, {
+        method: "DELETE",
+      });
+      const data = await response.json();
+      if (!response.ok || !data?.ok) throw new Error(data?.error || "Failed to clear conversation");
+      setClearConversationPhone("");
+      await fetchBlockedRows();
+    } catch (err) {
+      console.error(err);
+      setError(err instanceof Error ? err.message : "Failed to clear conversation");
+    } finally {
+      setClearingConversations(false);
+    }
+  }
+
+  async function handleClearAllConversations() {
+    const ok = window.confirm("Clear ALL stored bot/customer conversations?\n\nThis cannot be undone.");
+    if (!ok) return;
+    setClearingConversations(true);
+    setError("");
+    try {
+      const response = await authFetch(`${API_BASE_URL}/api/admin/conversations`, { method: "DELETE" });
+      const data = await response.json();
+      if (!response.ok || !data?.ok) throw new Error(data?.error || "Failed to clear all conversations");
+      await fetchBlockedRows();
+    } catch (err) {
+      console.error(err);
+      setError(err instanceof Error ? err.message : "Failed to clear all conversations");
+    } finally {
+      setClearingConversations(false);
     }
   }
 
@@ -655,6 +698,34 @@ export default function HomePage() {
           </div>
 
           <div className="mt-6 rounded-xl border border-white/10 bg-slate-900/30 p-4">
+            <div className="mb-4 rounded-lg border border-rose-400/30 bg-rose-500/10 p-3">
+              <p className="text-xs uppercase tracking-[0.15em] text-rose-200">Conversation archive cleanup</p>
+              <div className="mt-2 flex flex-col gap-3 md:flex-row">
+                <input
+                  value={clearConversationPhone}
+                  onChange={(event) => setClearConversationPhone(event.target.value)}
+                  placeholder="Clear one conversation by phone"
+                  className="h-11 flex-1 rounded-lg border border-white/10 bg-slate-950/80 px-3 text-sm text-slate-100 outline-none focus:border-rose-300"
+                />
+                <button
+                  type="button"
+                  onClick={handleClearConversationByPhone}
+                  disabled={!clearConversationPhone.trim() || clearingConversations}
+                  className="h-11 rounded-lg border border-rose-300/50 bg-rose-500/20 px-4 text-sm font-semibold text-rose-100 transition hover:bg-rose-500/30 disabled:opacity-60"
+                >
+                  Clear by phone
+                </button>
+                <button
+                  type="button"
+                  onClick={handleClearAllConversations}
+                  disabled={clearingConversations}
+                  className="h-11 rounded-lg border border-rose-500/60 bg-rose-600/30 px-4 text-sm font-semibold text-rose-100 transition hover:bg-rose-600/40 disabled:opacity-60"
+                >
+                  Clear all conversations
+                </button>
+              </div>
+            </div>
+
             <div className="flex flex-col gap-3 md:flex-row">
               <input
                 value={newBlockedPhone}

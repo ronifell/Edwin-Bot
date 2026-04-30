@@ -162,6 +162,24 @@ function getBlockedConversations() {
     .sort((a, b) => new Date(b.updatedAt || b.createdAt) - new Date(a.updatedAt || a.createdAt));
 }
 
+function clearConversationByPhone(phone) {
+  return withStore((store) => {
+    const key = String(phone || "").trim();
+    if (!key) return { removed: false, reason: "missing_phone" };
+    if (!store.conversations[key]) return { removed: false, reason: "not_found", phone: key };
+    delete store.conversations[key];
+    return { removed: true, phone: key };
+  });
+}
+
+function clearAllConversations() {
+  return withStore((store) => {
+    const total = Object.keys(store.conversations || {}).length;
+    store.conversations = {};
+    return { removed: true, totalCleared: total };
+  });
+}
+
 function resetStore() {
   writeStore({ ...initialStore });
 }
@@ -176,5 +194,7 @@ module.exports = {
   getStatsForDate,
   getConversationsAwaitingData,
   getBlockedConversations,
+  clearConversationByPhone,
+  clearAllConversations,
   resetStore,
 };

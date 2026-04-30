@@ -13,7 +13,12 @@ const {
   permanentlyDeleteLeadRecord,
   getLeadStats,
 } = require("./leadRepository");
-const { getConversation, getBlockedConversations } = require("./storage");
+const {
+  getConversation,
+  getBlockedConversations,
+  clearConversationByPhone,
+  clearAllConversations,
+} = require("./storage");
 const { verifyAdminPassword } = require("./adminAuth");
 const { listBlockedNumbers, addBlockedNumber, removeBlockedNumber } = require("./blocklist");
 
@@ -248,6 +253,31 @@ app.get("/api/admin/conversations/:phone", validateAdminAccess, async (req, res)
   } catch (error) {
     console.error("Failed to load conversation:", error.message);
     return res.status(500).json({ ok: false, error: "admin_conversation_failed" });
+  }
+});
+
+app.delete("/api/admin/conversations/:phone", validateAdminAccess, async (req, res) => {
+  const phone = decodeURIComponent(String(req.params.phone || "").trim());
+  if (!phone) return res.status(400).json({ ok: false, error: "missing_phone" });
+  try {
+    const result = clearConversationByPhone(phone);
+    if (!result.removed && result.reason === "not_found") {
+      return res.status(404).json({ ok: false, error: "conversation_not_found", phone });
+    }
+    return res.json({ ok: true, result });
+  } catch (error) {
+    console.error("Failed to clear conversation:", error.message);
+    return res.status(500).json({ ok: false, error: "admin_conversation_clear_failed" });
+  }
+});
+
+app.delete("/api/admin/conversations", validateAdminAccess, async (_req, res) => {
+  try {
+    const result = clearAllConversations();
+    return res.json({ ok: true, result });
+  } catch (error) {
+    console.error("Failed to clear all conversations:", error.message);
+    return res.status(500).json({ ok: false, error: "admin_conversation_clear_all_failed" });
   }
 });
 
