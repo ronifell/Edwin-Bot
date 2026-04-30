@@ -332,6 +332,37 @@ function enforcePoliteTone(text) {
   return output.trim();
 }
 
+function hasCondolenceText(input) {
+  const normalized = normalizeForKey(input);
+  if (!normalized) return false;
+  const condolenceSignals = [
+    "lamento",
+    "lo siento",
+    "mi sentido pesame",
+    "sentido pesame",
+    "lamentamos",
+    "siento mucho",
+  ];
+  return condolenceSignals.some((token) => normalized.includes(token));
+}
+
+function keepOnlyFirstCondolencePerConversation(text, conv) {
+  const output = String(text || "").trim();
+  if (!output) return output;
+  if (!hasCondolenceText(output)) return output;
+
+  const alreadySentCondolence = (conv?.messages || []).some(
+    (item) => item.role === "bot" && hasCondolenceText(item.text)
+  );
+  if (!alreadySentCondolence) return output;
+
+  // Remove introductory condolence sentence when it has already been sent before.
+  const parts = output.split(/(?<=[.!?])\s+/).filter(Boolean);
+  const filtered = parts.filter((sentence) => !hasCondolenceText(sentence));
+  if (!filtered.length) return "Entendido. ¿Me confirma ese dato, por favor?";
+  return filtered.join(" ").trim();
+}
+
 async function maybeGenerateStyledReply({
   conv,
   userText,
@@ -352,10 +383,10 @@ async function maybeGenerateStyledReply({
       responseType,
       conversationHistory: conv?.messages || [],
     });
-    return enforcePoliteTone(aiReply || fallback);
+    return keepOnlyFirstCondolencePerConversation(enforcePoliteTone(aiReply || fallback), conv);
   } catch (error) {
     console.error("AI reply generation failed:", error.message);
-    return enforcePoliteTone(fallback);
+    return keepOnlyFirstCondolencePerConversation(enforcePoliteTone(fallback), conv);
   }
 }
 
