@@ -19,7 +19,12 @@ function readStore() {
   ensureStoreFile();
   const content = fs.readFileSync(STORE_FILE, "utf8");
   try {
-    return JSON.parse(content);
+    const parsed = JSON.parse(content);
+    return {
+      conversations:
+        parsed && typeof parsed.conversations === "object" && parsed.conversations !== null ? parsed.conversations : {},
+      dailyStats: parsed && typeof parsed.dailyStats === "object" && parsed.dailyStats !== null ? parsed.dailyStats : {},
+    };
   } catch {
     return { ...initialStore };
   }
