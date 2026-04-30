@@ -78,6 +78,7 @@ export default function HomePage() {
   const [stats, setStats] = useState<StatsResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [actionId, setActionId] = useState<number | null>(null);
   const [blockedRows, setBlockedRows] = useState<BlockedConversation[]>([]);
   const [blockedLoading, setBlockedLoading] = useState(false);
@@ -244,6 +245,7 @@ export default function HomePage() {
     if (!ok) return;
     setActionId(row.id);
     setError("");
+    setSuccess("");
     try {
       const response = await authFetch(`${API_BASE_URL}/api/admin/leads/${row.id}`, { method: "DELETE" });
       const data = await response.json();
@@ -261,6 +263,7 @@ export default function HomePage() {
   async function handleRestore(row: LeadRecord) {
     setActionId(row.id);
     setError("");
+    setSuccess("");
     try {
       const response = await authFetch(`${API_BASE_URL}/api/admin/leads/${row.id}/restore`, { method: "POST" });
       const data = await response.json();
@@ -282,6 +285,7 @@ export default function HomePage() {
     if (!ok) return;
     setActionId(row.id);
     setError("");
+    setSuccess("");
     try {
       const response = await authFetch(`${API_BASE_URL}/api/admin/leads/${row.id}?permanent=true`, {
         method: "DELETE",
@@ -300,6 +304,7 @@ export default function HomePage() {
 
   async function handleExportCsv() {
     setError("");
+    setSuccess("");
     try {
       const query = new URLSearchParams({ view });
       if (search) query.set("search", search);
@@ -332,6 +337,7 @@ export default function HomePage() {
     if (!phone) return;
     setBlocklistActionPhone(phone);
     setError("");
+    setSuccess("");
     try {
       const response = await authFetch(`${API_BASE_URL}/api/admin/blocklist`, {
         method: "POST",
@@ -356,6 +362,7 @@ export default function HomePage() {
     if (!ok) return;
     setBlocklistActionPhone(phone);
     setError("");
+    setSuccess("");
     try {
       const response = await authFetch(`${API_BASE_URL}/api/admin/blocklist/${encodeURIComponent(phone)}`, {
         method: "DELETE",
@@ -380,6 +387,7 @@ export default function HomePage() {
     if (!ok) return;
     setClearingConversations(true);
     setError("");
+    setSuccess("");
     try {
       const response = await authFetch(`${API_BASE_URL}/api/admin/conversations/${encodeURIComponent(phone)}`, {
         method: "DELETE",
@@ -388,6 +396,7 @@ export default function HomePage() {
       if (!response.ok || !data?.ok) throw new Error(data?.error || "Failed to clear conversation");
       setClearConversationPhone("");
       await fetchBlockedRows();
+      setSuccess("Conversation cleared.");
     } catch (err) {
       console.error(err);
       setError(err instanceof Error ? err.message : "Failed to clear conversation");
@@ -401,11 +410,14 @@ export default function HomePage() {
     if (!ok) return;
     setClearingConversations(true);
     setError("");
+    setSuccess("");
     try {
       const response = await authFetch(`${API_BASE_URL}/api/admin/conversations`, { method: "DELETE" });
       const data = await response.json();
       if (!response.ok || !data?.ok) throw new Error(data?.error || "Failed to clear all conversations");
       await fetchBlockedRows();
+      const total = Number(data?.result?.totalCleared || 0);
+      setSuccess(`All conversations cleared (${total}).`);
     } catch (err) {
       console.error(err);
       setError(err instanceof Error ? err.message : "Failed to clear all conversations");
@@ -568,6 +580,11 @@ export default function HomePage() {
           {error ? (
             <p className="mt-4 rounded-lg border border-rose-500/40 bg-rose-500/10 px-3 py-2 text-sm text-rose-200">
               {error}
+            </p>
+          ) : null}
+          {success ? (
+            <p className="mt-4 rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-200">
+              {success}
             </p>
           ) : null}
 
