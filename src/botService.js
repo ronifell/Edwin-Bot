@@ -21,6 +21,47 @@ const { config } = require("./config");
 const PROCESSED_EVENT_TTL_MS = 10 * 60 * 1000;
 const processedEventCache = new Map();
 
+function normalizeDigits(input) {
+  const digits = String(input || "").replace(/\D/g, "");
+  if (!digits) return "";
+  if (digits.startsWith("00")) return digits.slice(2);
+  return digits;
+}
+
+function variantsForPhone(digits, defaultCountryPrefix = "57") {
+  const variants = new Set();
+  if (!digits) return variants;
+  variants.add(digits);
+
+  const prefix = String(defaultCountryPrefix || "").replace(/\D/g, "");
+  if (prefix) {
+    if (digits.startsWith(prefix) && digits.length > 10) {
+      variants.add(digits.slice(prefix.length));
+    }
+    if (digits.length === 10) {
+      variants.add(`${prefix}${digits}`);
+    }
+  }
+  return variants;
+}
+
+function isAllowedInboundPhone(phone) {
+  if (!Array.isArray(config.allowedInboundNumbers) || config.allowedInboundNumbers.length === 0) return true;
+  const incomingDigits = normalizeDigits(phone);
+  if (!incomingDigits) return false;
+
+  const incomingVariants = variantsForPhone(incomingDigits, config.defaultCountryPrefix);
+  for (const allowedNumber of config.allowedInboundNumbers) {
+    const allowedDigits = normalizeDigits(allowedNumber);
+    if (!allowedDigits) continue;
+    const allowedVariants = variantsForPhone(allowedDigits, config.defaultCountryPrefix);
+    for (const variant of incomingVariants) {
+      if (allowedVariants.has(variant)) return true;
+    }
+  }
+  return false;
+}
+
 function cleanupProcessedEventCache(now = Date.now()) {
   for (const [key, ts] of processedEventCache.entries()) {
     if (now - ts > PROCESSED_EVENT_TTL_MS) processedEventCache.delete(key);
@@ -270,6 +311,11 @@ async function handleInbound(payload, options = {}) {
   if (!phone) {
     console.warn("[BOT] ignored: missing_phone");
     return { ok: true, ignored: "missing_phone" };
+  }
+
+  if (!isAllowedInboundPhone(phone)) {
+    console.log(`[BOT] ignored: phone_not_allowed phone=${phone}`);
+    return { ok: true, ignored: "phone_not_allowed" };
   }
 
   let existingConv = getConversation(phone);

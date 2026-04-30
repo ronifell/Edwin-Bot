@@ -25,6 +25,10 @@ const config = {
   },
   adminReportNumber: process.env.ADMIN_REPORT_NUMBER || "",
   defaultCountryPrefix: process.env.DEFAULT_COUNTRY_PREFIX || "57",
+  allowedInboundNumbers: String(process.env.ALLOWED_INBOUND_NUMBERS || "")
+    .split(",")
+    .map((item) => item.trim())
+    .filter(Boolean),
   googleSheets: {
     enabled: toBool(process.env.GOOGLE_SHEETS_ENABLED, false),
     sheetId: process.env.GOOGLE_SHEETS_ID || "",
