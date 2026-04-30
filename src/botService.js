@@ -271,6 +271,40 @@ function isNegative(input) {
   );
 }
 
+function hasDeathContext(input) {
+  const normalized = normalizeForKey(input);
+  if (!normalized) return false;
+  const deathSignals = [
+    "fallecio",
+    "fallecida",
+    "fallecido",
+    "murio",
+    "muerte",
+    "difunto",
+    "difunta",
+    "es por fallecimiento",
+    "pension de sobrevivientes",
+  ];
+  return deathSignals.some((token) => normalized.includes(token));
+}
+
+function hasSurvivorPensionIntent(input) {
+  const normalized = normalizeForKey(input);
+  if (!normalized) return false;
+  const intentSignals = [
+    "pension",
+    "sobrevivientes",
+    "sobreviviente",
+    "cumplo los requisitos",
+    "cumplo requisitos",
+    "tengo derecho",
+    "quiero saber si",
+    "recibir el dinero",
+    "recibir la pension",
+  ];
+  return intentSignals.some((token) => normalized.includes(token));
+}
+
 function enforcePoliteTone(text) {
   let output = String(text || "").trim();
   if (!output) return output;
@@ -602,6 +636,44 @@ async function handleInbound(payload, options = {}) {
   const hasCoreData = Boolean(mergedData.idNumber && mergedData.deathDate);
   const hadCoreDataBefore = Boolean(conv.data?.idNumber && conv.data?.deathDate);
   const missingCoreFields = getMissingCoreDataFields(mergedData);
+  const relationshipIsClear = Boolean(mergedData.claimant);
+  const shouldAskRelationshipFirst =
+    !relationshipIsClear &&
+    !hasCoreData &&
+    (hasDeathContext(text) ||
+      hasDeathContext(conv.messages?.map((m) => m.text).join(" ")) ||
+      hasSurvivorPensionIntent(text));
+
+  if (shouldAskRelationshipFirst) {
+    const relationPrompt = await maybeGenerateStyledReply({
+      conv,
+      userText: text,
+      responseType: "relationship_clarification",
+      instruction:
+        "Aun no esta clara la relacion entre quien escribe y la persona fallecida. Responda en maximo 2 frases cortas y una sola pregunta para aclarar primero: quien fallecio y cual es la relacion del cliente con esa persona. No pida cedula ni fecha en este turno.",
+      fallback:
+        "Antes de continuar, por favor indíqueme quién fue la persona fallecida y cuál era su relación con usted.",
+    });
+    await sendOutbound(phone, relationPrompt);
+    onBotMessage(relationPrompt);
+    appendConversationMessage(phone, { role: "bot", text: relationPrompt });
+    upsertConversation(phone, {
+      status: "active",
+      color,
+      awaitingData: true,
+      reminderCount: conv.reminderCount || 0,
+      data: mergedData,
+      metadata: {
+        ...conv.metadata,
+        senderName,
+        aiDriven: true,
+        relationClarificationPending: true,
+        followUpAt: dayjs().add(7, "hour").toISOString(),
+      },
+    });
+    console.log(`[BOT] relationship clarification requested phone=${phone}`);
+    return { ok: true, responseType: "relationship_clarification" };
+  }
 
   if (classification.isVictimCase) {
     const victimClarificationReply = "¿El caso es por fallecimiento de un familiar?";
