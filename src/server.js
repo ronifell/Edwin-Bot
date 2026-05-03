@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const { validateConfig } = require("./config");
 const { handleInbound, sendDailySummary, startSchedulers } = require("./botService");
+const { disableInstanceAutoRead } = require("./zapiService");
 const { config } = require("./config");
 const { ensurePostgresReady, isPostgresEnabled } = require("./db");
 const {
@@ -182,9 +183,10 @@ app.get("/api/admin/leads/export", validateAdminAccess, async (req, res) => {
   const search = String(req.query.search || "").trim();
   const color = String(req.query.color || "").trim();
   const view = req.query.view === "recycle" ? "recycle" : "active";
+  const sort = String(req.query.sort || "").trim().toLowerCase() === "color_rank" ? "color_rank" : "created";
 
   try {
-    const { rows } = await listLeadRecordsForExport({ search, color, view, limit: 50000 });
+    const { rows } = await listLeadRecordsForExport({ search, color, view, limit: 50000, sort });
     const csv = buildLeadsCsv(rows);
     res.setHeader("Content-Type", "text/csv; charset=utf-8");
     res.setHeader("Content-Disposition", `attachment; filename="leads_${view}_${Date.now()}.csv"`);
@@ -205,9 +207,10 @@ app.get("/api/admin/leads", validateAdminAccess, async (req, res) => {
   const search = String(req.query.search || "").trim();
   const color = String(req.query.color || "").trim();
   const view = req.query.view === "recycle" ? "recycle" : "active";
+  const sort = String(req.query.sort || "").trim().toLowerCase() === "color_rank" ? "color_rank" : "created";
 
   try {
-    const { rows, total } = await listLeadRecords({ search, color, limit, offset, view });
+    const { rows, total } = await listLeadRecords({ search, color, limit, offset, view, sort });
     return res.json({
       ok: true,
       rows,
@@ -416,6 +419,9 @@ app.listen(config.port, () => {
     console.error("PostgreSQL init failed:", error.message);
   });
   if (config.botChannelMode === "whatsapp") {
+    disableInstanceAutoRead().catch((error) =>
+      console.warn("[ZAPI] disableInstanceAutoRead failed:", error?.message || error)
+    );
     startSchedulers();
   }
 });

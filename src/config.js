@@ -16,6 +16,8 @@ const config = {
     token: process.env.ZAPI_TOKEN || "",
     baseUrl: process.env.ZAPI_BASE_URL || "https://api.z-api.io",
     clientToken: process.env.CLIENT_TOKEN || "",
+    /** Call Z-API on boot to turn off "auto read all incoming messages" (instance setting, not this repo). */
+    disableAutoReadOnStartup: toBool(process.env.ZAPI_DISABLE_AUTO_READ_ON_START, true),
   },
   openai: {
     apiKey: process.env.OPENAI_API_KEY || "",

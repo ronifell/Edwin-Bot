@@ -19,6 +19,14 @@ Proyecto con dos modos de operacion:
    - `CLIENT_TOKEN`
    - `ADMIN_REPORT_NUMBER`
    - `PRESERVE_UNREAD_ENABLED=true` para intentar mantener chats entrantes en no leido
+   - `ZAPI_DISABLE_AUTO_READ_ON_START=true` (por defecto) para pedir a Z-API que desactive **Auto-read** en la instancia; si sigue activo en el panel, los mensajes se marcan como leidos aun con el backend apagado
+
+### Mensajes que aparecen como leidos sin abrirlos
+
+Z-API puede tener **lectura automatica de mensajes entrantes** activada a nivel de **instancia** (sesion WhatsApp Web enlazada). Eso ocurre en los servidores de Z-API / en la sesion vinculada: **no depende** de que el backend Node este en ejecucion (`pm2 stop` no desconecta la instancia Z-API).
+
+- Desactivalo en el panel de Z-API (opcion tipo *Auto-read messages* / lectura automatica), o deja `ZAPI_DISABLE_AUTO_READ_ON_START=true` para que al arrancar el servidor se llame a la API [`update-auto-read-message`](https://developer.z-api.io/en/instance/update-auto-read-message) con `value: false`.
+- Este proyecto **no** llama al endpoint de marcar mensaje como leido (`read-message`) al recibir webhooks; el comportamiento anterior venia del ajuste de la instancia en Z-API.
 5. Respuesta IA opcional:
    - `OPENAI_ENABLE_REPLY_GENERATION=false` (recomendado para flujo estable por reglas)
    - `true` si quiere que el mensaje verde se reescriba con OpenAI.

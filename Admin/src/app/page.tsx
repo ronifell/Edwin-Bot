@@ -48,6 +48,9 @@ const API_BASE_URL = "";
 const ENV_TOKEN = process.env.NEXT_PUBLIC_ADMIN_TOKEN || "";
 const STORAGE_KEY = "edwin_admin_token";
 
+/** Table / export ordering: Verde → Amarillo → Morado → Rojo, then newest date. */
+type LeadSortMode = "created" | "color_rank";
+
 function buildHeaders(token: string) {
   const headers: Record<string, string> = { "Content-Type": "application/json" };
   if (token) headers.Authorization = `Bearer ${token}`;
@@ -92,6 +95,7 @@ export default function HomePage() {
   const [search, setSearch] = useState("");
   const [searchDraft, setSearchDraft] = useState("");
   const [color, setColor] = useState("");
+  const [leadSort, setLeadSort] = useState<LeadSortMode>("created");
   const [view, setView] = useState<"active" | "recycle">("active");
   const [page, setPage] = useState(1);
   const pageSize = 20;
@@ -130,9 +134,10 @@ export default function HomePage() {
     const parts = [];
     if (search) parts.push(`search: "${search}"`);
     if (color) parts.push(`color: ${color}`);
+    if (leadSort === "color_rank") parts.push("sort: color rank");
     parts.push(view === "recycle" ? "recycle bin" : "active leads");
     return parts.join(" | ");
-  }, [search, color, view]);
+  }, [search, color, leadSort, view]);
 
   async function fetchStats() {
     const response = await authFetch(`${API_BASE_URL}/api/admin/stats`);
@@ -154,6 +159,7 @@ export default function HomePage() {
       });
       if (search) query.set("search", search);
       if (color) query.set("color", color);
+      if (leadSort === "color_rank") query.set("sort", "color_rank");
 
       const response = await authFetch(`${API_BASE_URL}/api/admin/leads?${query.toString()}`);
       const data = await response.json();
@@ -210,7 +216,7 @@ export default function HomePage() {
     fetchRows();
     fetchBlockedRows();
     fetchBlocklistRows();
-  }, [hydrated, page, search, color, view, token]);
+  }, [hydrated, page, search, color, leadSort, view, token]);
 
   useEffect(() => {
     if (!hydrated) return;
@@ -309,6 +315,7 @@ export default function HomePage() {
       const query = new URLSearchParams({ view });
       if (search) query.set("search", search);
       if (color) query.set("color", color);
+      if (leadSort === "color_rank") query.set("sort", "color_rank");
       const response = await authFetch(`${API_BASE_URL}/api/admin/leads/export?${query.toString()}`);
       if (!response.ok) {
         const errBody = await response.json().catch(() => ({}));
@@ -504,8 +511,8 @@ export default function HomePage() {
           <article className="rounded-xl border border-white/10 bg-slate-900/70 p-5">
             <p className="text-sm text-slate-400">Color mix</p>
             <p className="mt-2 text-sm text-slate-200">
-              G {stats?.byColor?.green ?? 0} / Y {stats?.byColor?.yellow ?? 0} / R {stats?.byColor?.red ?? 0} / P{" "}
-              {stats?.byColor?.purple ?? 0}
+              Verde {stats?.byColor?.green ?? 0} · Amarillo {stats?.byColor?.yellow ?? 0} · Morado{" "}
+              {stats?.byColor?.purple ?? 0} · Rojo {stats?.byColor?.red ?? 0}
             </p>
           </article>
         </section>
@@ -565,8 +572,20 @@ export default function HomePage() {
               <option value="">All colors</option>
               <option value="green">Green</option>
               <option value="yellow">Yellow</option>
-              <option value="red">Red</option>
               <option value="purple">Purple</option>
+              <option value="red">Red</option>
+            </select>
+            <select
+              value={leadSort}
+              onChange={(event) => {
+                setPage(1);
+                setLeadSort(event.target.value as LeadSortMode);
+              }}
+              className="h-11 min-w-[220px] rounded-lg border border-white/10 bg-slate-950/80 px-3 text-sm text-slate-100 outline-none focus:border-sky-400"
+              title="Row order for the table below (and CSV when exported)"
+            >
+              <option value="created">Sort: newest first</option>
+              <option value="color_rank">Sort: Verde → Amarillo → Morado → Rojo</option>
             </select>
             <button
               type="button"

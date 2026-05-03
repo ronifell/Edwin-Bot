@@ -25,7 +25,24 @@ async function insertLeadRecord({ name = "", phone = "", idNumber = "", deathDat
   return rows[0] || null;
 }
 
-async function listLeadRecords({ search = "", color = "", limit = 50, offset = 0, view = "active" }) {
+/** Admin sort: Verde → Amarillo → Morado → Rojo (green, yellow, purple, red), then by date. */
+const COLOR_RANK_ORDER_SQL = `
+  CASE LOWER(TRIM(COALESCE(color, '')))
+    WHEN 'green' THEN 1
+    WHEN 'yellow' THEN 2
+    WHEN 'purple' THEN 3
+    WHEN 'red' THEN 4
+    ELSE 5
+  END ASC
+`;
+
+function resolveLeadListSort(sort) {
+  const normalized = String(sort || "").trim().toLowerCase();
+  if (normalized === "color_rank") return "color_rank";
+  return "created";
+}
+
+async function listLeadRecords({ search = "", color = "", limit = 50, offset = 0, view = "active", sort = "created" }) {
   if (!isPostgresEnabled()) return { rows: [], total: 0 };
   await ensurePostgresReady();
   const pool = getPool();
@@ -55,12 +72,16 @@ async function listLeadRecords({ search = "", color = "", limit = 50, offset = 0
   const limitParam = `$${values.length - 1}`;
   const offsetParam = `$${values.length}`;
 
+  const sortMode = resolveLeadListSort(sort);
+  const dateOrder = view === "recycle" ? "deleted_at DESC" : "created_at DESC";
+  const orderClause = sortMode === "color_rank" ? `${COLOR_RANK_ORDER_SQL}, ${dateOrder}` : dateOrder;
+
   const dataResult = await pool.query(
     `
       SELECT ${BASE_SELECT}
       FROM lead_records
       ${whereClause}
-      ORDER BY ${view === "recycle" ? "deleted_at DESC" : "created_at DESC"}
+      ORDER BY ${orderClause}
       LIMIT ${limitParam}
       OFFSET ${offsetParam}
     `,
@@ -79,9 +100,9 @@ async function getLeadRecordById(id) {
 }
 
 /** Rows matching filters for CSV export (no pagination cap internally — caller passes sane limit). */
-async function listLeadRecordsForExport({ search = "", color = "", view = "active", limit = 10000 }) {
+async function listLeadRecordsForExport({ search = "", color = "", view = "active", limit = 10000, sort = "created" }) {
   const capped = Math.min(Math.max(Number(limit) || 10000, 1), 50000);
-  return listLeadRecords({ search, color, limit: capped, offset: 0, view });
+  return listLeadRecords({ search, color, limit: capped, offset: 0, view, sort });
 }
 
 async function softDeleteLeadRecord(id) {

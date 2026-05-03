@@ -125,4 +125,47 @@ async function preserveUnread(phone) {
   console.warn(`[ZAPI] preserve-unread unsupported for current instance phone=${normalizedPhone}`);
 }
 
-module.exports = { sendMessage, normalizePhone, computeHumanDelayMs, preserveUnread };
+/**
+ * Z-API can mark every inbound message as read on the linked session when "auto read" is enabled
+ * on the instance. That happens on Z-API/WhatsApp Web side even if this Node server is stopped.
+ * @see https://developer.z-api.io/en/instance/update-auto-read-message
+ */
+async function disableInstanceAutoRead() {
+  if (config.botChannelMode !== "whatsapp") return;
+  if (!config.zapi.disableAutoReadOnStartup) return;
+  if (!config.zapi.instanceId || !config.zapi.token || !config.zapi.clientToken) {
+    console.warn("[ZAPI] skip disable-auto-read: missing Z-API credentials");
+    return;
+  }
+
+  const body = { value: false };
+  const attempts = [
+    { method: "post", url: "/update-auto-read-message" },
+    { method: "put", url: "/update-auto-read-message" },
+  ];
+
+  for (const { method, url } of attempts) {
+    try {
+      await api.request({ method, url, data: body });
+      console.log(`[ZAPI] instance auto-read disabled ok method=${method.toUpperCase()} ${url}`);
+      return;
+    } catch (error) {
+      console.warn(
+        `[ZAPI] disable auto-read failed method=${method.toUpperCase()} ${url} status=${
+          error?.response?.status || "n/a"
+        }`
+      );
+    }
+  }
+  console.warn(
+    "[ZAPI] could not disable instance auto-read; turn it off in the Z-API panel (Auto-read messages) or check API version"
+  );
+}
+
+module.exports = {
+  sendMessage,
+  normalizePhone,
+  computeHumanDelayMs,
+  preserveUnread,
+  disableInstanceAutoRead,
+};
