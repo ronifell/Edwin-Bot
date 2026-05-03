@@ -52,6 +52,9 @@ const config = {
     responseDelayMultiplier: Number(process.env.RESPONSE_DELAY_MULTIPLIER || 5),
     typingEffectEnabled: toBool(process.env.TYPING_EFFECT_ENABLED, true),
   },
+  unreadProtection: {
+    enabled: toBool(process.env.PRESERVE_UNREAD_ENABLED, true),
+  },
   localTest: {
     enabled: toBool(process.env.LOCAL_TEST_UI_ENABLED, true),
   },

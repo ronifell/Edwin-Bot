@@ -4,7 +4,7 @@ const { generateNaturalReply, transcribeAudioFromUrl } = require("./aiService");
 const { classifyMessage } = require("./classifier");
 const { extractStructuredData } = require("./extractor");
 const { appendLeadRow } = require("./sheetService");
-const { sendMessage } = require("./zapiService");
+const { sendMessage, preserveUnread } = require("./zapiService");
 const { isPhoneBlocked } = require("./blocklist");
 const {
   appendConversationMessage,
@@ -403,6 +403,13 @@ async function handleInbound(payload, options = {}) {
   if (!phone) {
     console.warn("[BOT] ignored: missing_phone");
     return { ok: true, ignored: "missing_phone" };
+  }
+
+  if (!fromMe) {
+    // Best-effort protection so inbound chats remain unread for the account owner.
+    preserveUnread(phone).catch((error) => {
+      console.warn(`[BOT] preserve-unread failed phone=${phone}: ${error?.message || error}`);
+    });
   }
 
   if (!isAllowedInboundPhone(phone)) {

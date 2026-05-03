@@ -95,4 +95,34 @@ async function sendMessage(phone, text) {
   await sendTypingPresence(normalizedPhone, "paused");
 }
 
-module.exports = { sendMessage, normalizePhone, computeHumanDelayMs };
+async function preserveUnread(phone) {
+  if (!config.unreadProtection?.enabled) return;
+  if (config.botChannelMode !== "whatsapp") return;
+  const normalizedPhone = normalizePhone(phone);
+  if (!normalizedPhone) return;
+
+  const candidateCalls = [
+    { url: "/mark-as-unread", body: { phone: normalizedPhone } },
+    { url: "/mark-unread", body: { phone: normalizedPhone } },
+    { url: "/mark-chat-unread", body: { phone: normalizedPhone } },
+    { url: "/modify-chat", body: { phone: normalizedPhone, read: false } },
+  ];
+
+  for (const attempt of candidateCalls) {
+    try {
+      await api.post(attempt.url, attempt.body);
+      console.log(`[ZAPI] preserve-unread ok phone=${normalizedPhone} endpoint=${attempt.url}`);
+      return;
+    } catch (error) {
+      console.warn(
+        `[ZAPI] preserve-unread failed phone=${normalizedPhone} endpoint=${attempt.url} status=${
+          error?.response?.status || "n/a"
+        }`
+      );
+    }
+  }
+
+  console.warn(`[ZAPI] preserve-unread unsupported for current instance phone=${normalizedPhone}`);
+}
+
+module.exports = { sendMessage, normalizePhone, computeHumanDelayMs, preserveUnread };

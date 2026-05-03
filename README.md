@@ -18,6 +18,7 @@ Proyecto con dos modos de operacion:
    - `ZAPI_BASE_URL`
    - `CLIENT_TOKEN`
    - `ADMIN_REPORT_NUMBER`
+   - `PRESERVE_UNREAD_ENABLED=true` para intentar mantener chats entrantes en no leido
 5. Respuesta IA opcional:
    - `OPENAI_ENABLE_REPLY_GENERATION=false` (recomendado para flujo estable por reglas)
    - `true` si quiere que el mensaje verde se reescriba con OpenAI.
