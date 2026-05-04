@@ -725,7 +725,8 @@ export default function HomePage() {
               <p className="text-xs uppercase tracking-[0.15em] text-amber-300">Blocklist monitor</p>
               <h2 className="mt-1 text-lg font-semibold text-white">Blocked by external blocklist</h2>
               <p className="text-sm text-slate-300">
-                These chats are ignored by the bot because their numbers exist in `old_customers_blocklist.json`.
+                Numbers in <code className="text-sky-300">old_customers_blocklist.json</code> are listed here for
+                reference. Inbound handling no longer skips these numbers.
               </p>
             </div>
             <span className="rounded-full border border-amber-300/40 bg-amber-500/10 px-3 py-1 text-sm text-amber-200">

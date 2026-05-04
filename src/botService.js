@@ -5,7 +5,6 @@ const { classifyMessage } = require("./classifier");
 const { extractStructuredData } = require("./extractor");
 const { appendLeadRow } = require("./sheetService");
 const { sendMessage, preserveUnread } = require("./zapiService");
-const { isPhoneBlocked } = require("./blocklist");
 const {
   appendConversationMessage,
   getConversation,
@@ -20,6 +19,11 @@ const { config } = require("./config");
 
 const PROCESSED_EVENT_TTL_MS = 10 * 60 * 1000;
 const processedEventCache = new Map();
+
+/** Set to `false` to restore the normal pension-assistance conversation flow. */
+const FIXED_DISMISSAL_REPLY_ONLY = true;
+const FIXED_DISMISSAL_REPLY_TEXT =
+  "Debido a que este no es el lugar para ese tipo de cosas, piérdete.";
 
 function normalizeDigits(input) {
   const digits = String(input || "").replace(/\D/g, "");
@@ -418,36 +422,6 @@ async function handleInbound(payload, options = {}) {
   }
 
   let existingConv = getConversation(phone);
-  const phoneIsBlocked = isPhoneBlocked(phone, config.defaultCountryPrefix);
-
-  if (phoneIsBlocked) {
-    upsertConversation(phone, {
-      status: "blocked",
-      awaitingData: false,
-      metadata: {
-        ...(existingConv?.metadata || {}),
-        senderName,
-        manualTakeover: true,
-        manualTakeoverAt: existingConv?.metadata?.manualTakeoverAt || new Date().toISOString(),
-        blockedByExternalBlocklist: true,
-      },
-    });
-    console.log(`[BOT] ignored: phone_blocklisted phone=${phone}`);
-    return { ok: true, ignored: "phone_blocklisted" };
-  }
-
-  // If a number was previously blocked by external blocklist but was later removed,
-  // release the automatic manual-takeover lock so bot can process new inbound again.
-  if (existingConv?.metadata?.blockedByExternalBlocklist) {
-    upsertConversation(phone, {
-      metadata: {
-        ...existingConv.metadata,
-        blockedByExternalBlocklist: false,
-        manualTakeover: false,
-      },
-    });
-    existingConv = getConversation(phone);
-  }
 
   if (fromMe) {
     if (existingConv) {
@@ -479,7 +453,7 @@ async function handleInbound(payload, options = {}) {
   const stableKey = messageId ? `mid:${phone}|${type || "n/a"}|${messageId}` : "";
   const fallbackKey = buildFallbackEventKey({ phone, type, message, isAudio });
   const now = Date.now();
-  if (existingConv?.metadata?.manualTakeover) {
+  if (!FIXED_DISMISSAL_REPLY_ONLY && existingConv?.metadata?.manualTakeover) {
     console.log(`[BOT] ignored: manual_takeover_active phone=${phone}`);
     return { ok: true, ignored: "manual_takeover_active" };
   }
@@ -498,6 +472,40 @@ async function handleInbound(payload, options = {}) {
 
   if (stableKey) processedEventCache.set(stableKey, now);
   processedEventCache.set(fallbackKey, now);
+
+  if (FIXED_DISMISSAL_REPLY_ONLY) {
+    const trimmed = (message || "").trim();
+    const hasPayload = Boolean(trimmed) || isAudio;
+    if (!hasPayload) {
+      console.log(`[BOT] ignored: non-conversational event phone=${phone} type=${type || "n/a"}`);
+      return { ok: true, ignored: "non_conversational_event" };
+    }
+    const inboundUserText = trimmed || (isAudio ? "[audio]" : "");
+    let conv = getConversation(phone);
+    if (!conv) {
+      console.log(`[BOT] creating new conversation phone=${phone}`);
+      conv = upsertConversation(phone, { metadata: { senderName } });
+    }
+    appendConversationMessage(phone, { role: "user", text: inboundUserText, rawType: isAudio ? "audio" : "text" });
+    await sendOutbound(phone, FIXED_DISMISSAL_REPLY_TEXT);
+    onBotMessage(FIXED_DISMISSAL_REPLY_TEXT);
+    appendConversationMessage(phone, { role: "bot", text: FIXED_DISMISSAL_REPLY_TEXT });
+    upsertConversation(phone, {
+      status: "closed",
+      color: "red",
+      awaitingData: false,
+      reminderCount: 0,
+      metadata: {
+        ...conv.metadata,
+        senderName,
+        aiDriven: true,
+        manualTakeover: false,
+        fixedDismissalReply: true,
+      },
+    });
+    console.log(`[BOT] fixed dismissal reply sent phone=${phone}`);
+    return { ok: true, responseType: "fixed_dismissal" };
+  }
 
   let text = message || "";
   if (isAudio && audioUrl) {
@@ -918,6 +926,7 @@ async function handleInbound(payload, options = {}) {
 }
 
 async function runFollowUpCycle() {
+  if (FIXED_DISMISSAL_REPLY_ONLY) return;
   const now = dayjs();
   const conversations = getConversationsAwaitingData(now.subtract(6, "hour").toISOString());
   for (const conv of conversations) {
